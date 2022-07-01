@@ -1,0 +1,13 @@
+<ngb-carousel >
+    
+    <ng-template ngbSlide *ngFor="let i of outlets" >
+      <div class="picsum-img-wrapper vendor-profile" (click)="getShopItemsByShopId(i)">
+        <img [src]="'data:image/jpeg;base64,'+i.pic" alt="profile-image" 
+class="align-self-start mr-3 vendor-profile">
+      </div>
+      <div class="carousel-caption">
+        <h3><p class="card-title">{{i.name}}</p></h3>
+      
+      </div>
+    </ng-template>
+  </ngb-carousel>

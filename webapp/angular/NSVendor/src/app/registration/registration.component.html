@@ -1,0 +1,184 @@
+<div id="wrapper" style="padding: 3.25rem;height: 100vh;background-repeat:no-repeat;background-size: cover; background-image: url(assets/images/login_bg.jpg);">
+	<div class="row">
+		<div class="col-md-4">
+		   
+		</div>
+		<div class="col-md-4">
+			<div class="card card-authentication1">
+				<div class="card-body">
+				  <div class="card-content p-2">
+					<div class="text-center">
+					  <img src="assets/images/lg.png" alt="logo icon" width="200" />
+					</div>
+					<div class="card-title text-uppercase text-center py-3">Sign Up
+					  <div class="text-center text-lowercase" style="color: #ff3300;font-size: 12px;">{{mandatoryFields}}</div>
+					</div>
+					<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+					  <div class="form-group">
+						<label for="exampleInputContact">Name<span style="color: red;">*</span></label>
+			
+						<div class="position-relative has-icon-right">
+						  <input
+							type="text"
+							id="exampleInputContact"
+							formControlName="name"
+							class="form-control input-shadow"
+							placeholder="Enter Your Name"
+							[ngClass]="{ 'is-invalid': submitted && f.name.errors }"
+						  />
+			
+						  <div class="form-control-position">
+							<i class="icon-user"></i>
+						  </div>
+			
+						  <!-- <div *ngIf="submitted && error" style="color:red">
+												<div>{{error.error.errorMessage}}</div>
+										</div> -->
+			
+						  <div *ngIf="submitted && f.name.errors" class="invalid-feedback">
+							<div *ngIf="f.name.errors.required">
+							  <strong>
+								Name is Required!
+							  </strong>
+							</div>
+						  </div>
+						</div>
+					  </div>
+			
+					  <div class="form-group">
+						<label for="exampleInputContact">Contact<span style="color: red;">*</span></label>
+			
+						<div class="position-relative has-icon-right">
+						  <input
+							type="text"
+							numbersOnly
+							id="exampleInputContact"
+							formControlName="contact"
+							class="form-control input-shadow"
+							placeholder="Enter Your Contact Number"
+							[ngClass]="{ 'is-invalid': submitted && f.contact.errors }"
+						  />
+						  <div *ngIf="f.contact.pending" style="color: red;">Checking for Uniqueness........</div>
+			
+						  <div class="form-control-position">
+							<i class="icon-phone"></i>
+						  </div>
+			
+						  <!-- <div *ngIf="submitted && error" style="color:red">
+												<div>{{error.error.errorMessage}}</div>
+										</div> -->
+			
+						  <div *ngIf="f.contact.errors" class="invalid-feedback">
+							<ng-container *ngIf="f.contact.errors.required">
+							  <strong>Contact is required</strong>
+							</ng-container>
+							<div *ngIf="f.contact.errors.minlength">
+							  <strong
+								>Contact must be at least
+								{{ f.contact.errors.minlength.requiredLength }}
+								digit</strong
+							  >
+							</div>
+							<ng-container *ngIf="f.contact.errors.maxlength">
+							  <strong
+								>Contact not more than
+								{{ f.contact.errors.maxlength.requiredLength }}
+								digit</strong
+							  >
+							</ng-container>
+							<div *ngIf="f.contact.errors.contactTaken">
+							  <strong>This Contact is alredy taken</strong>
+							</div>
+						  </div>
+						</div>
+					  </div>
+			
+					  <div class="form-group">
+						<label for="exampleInputContact" class="">Email
+						  <span>(Optional)</span>              
+						</label>
+						<div class="position-relative has-icon-right">
+						  <input
+							type="text"
+							id="exampleInputContact"
+							formControlName="email"
+							class="form-control input-shadow"
+							placeholder="Enter Your Email"
+							[ngClass]="{ 'is-invalid': submitted && f.email.errors }"
+						  />
+						  <!-- <div *ngIf="f.email.pending">Checking for Uniqueness........</div> -->
+			
+						  <div class="form-control-position">
+							<i class="icon-envelope"></i>
+						  </div>
+			
+						  <!-- <div *ngIf="submitted && error" style="color:red">
+												<div>{{error.error.errorMessage}}</div>
+										</div>
+			
+										<div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+												<div *ngIf="f.email.errors.required">Email Required!</div>
+										</div> -->
+						  <!-- <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+							<ng-container *ngIf="f.email.errors.required">
+							  <strong>Email is required</strong>
+							</ng-container>
+							<ng-container *ngIf="f.email.errors.email">
+							  <strong>Email must be a valid email address</strong>
+							</ng-container>
+							<div *ngIf="f.email.errors?.userEmailExists">
+							  <strong>This email is alredy taken</strong>
+							</div>
+						  </div> -->
+						</div>
+					  </div>
+			
+					  <!-- <div class="form-group">
+			
+									<label for="exampleInputContact" class="">Contact</label>
+			
+									<div class="position-relative has-icon-right">
+			
+										<input type="text" id="exampleInputContact" formControlName="contact" class="form-control input-shadow"
+											placeholder="Enter Your Contact Number" [ngClass]="{ 'is-invalid': submitted && f.contact.errors }">
+			
+										<div class="form-control-position">
+											<i class="icon-phone"></i>
+										</div>
+			
+										<div *ngIf="submitted && error" style="color:red">
+												<div>{{error.error.errorMessage}}</div>
+										</div>
+			
+										<div *ngIf="submitted && f.contact.errors" class="invalid-feedback">
+												<div *ngIf="f.contact.errors.required">Contact Required!</div>
+										</div>
+			
+									</div>
+			
+								</div> -->
+					  
+					  <button
+						type="submit"
+						class="btn btn-primary shadow-primary btn-block waves-effect waves-light"
+					  >
+						Sign Up
+					  </button>
+					</form>
+				  </div>
+				</div>
+				<div class="card-footer text-center py-3">
+				  <p class="text-muted mb-0">
+					Already have an account? <a routerLink="/login"> Sign In here</a>
+				  </p>
+				</div>
+			  </div>
+		</div>
+		<div class="col-md-4">
+		   
+		</div>
+	</div>
+	
+	
+  </div>
+  

@@ -1,0 +1,58 @@
+<menu></menu>
+
+<div class="col-lg-12" style="margin-top: 80px;margin-left: 40px;">
+
+  <button class="btn btn-sm btn-info ml-2 mr-1" [routerLink]="['/address/add-address']">Add address</button>
+
+
+
+
+ 
+</div>
+<div class="row" style="margin-left: 30px!important;">
+  <div class="card col-md-3" *ngFor="let a of address; let i = index;" style="width: 65rem; margin:10px;">
+    <div class="card-body">
+      <!-- <div class="card-header" *ngIf="makedefault[i]==='true'">
+        <div>
+        
+        </div>
+        Default Address
+      </div> -->
+
+
+      <div class="row">
+        <div class="col-md-4">
+          <h6>{{a.type || 'N/A'}}</h6>
+        </div>
+
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4" *ngIf="a.isDefault === 'Y'" style="top:-10px;right:-26px;">
+          <button type="button" class="btn btn-primary">Primary</button>
+        </div>
+      </div>
+
+      <p class="card-subtitle mb-2 text-muted">{{a.line1 || 'N/A'}}, {{a.line2 || 'N/A'}},</p>
+      <p class="card-subtitle mb-2 text-muted">{{a.line3 || 'N/A'}}, {{a.line4 || 'N/A'}},</p>
+      <p class="card-subtitle mb-2 text-muted">{{a.pin || 'N/A'}}, {{a.city || 'N/A'}}, </p>
+      <p class="card-subtitle mb-2 text-muted">{{a.state || 'N/A'}}, {{a.country || 'N/A'}} </p>
+
+
+      <div class="row">
+        <div class="col-md-3">
+          <button class="btn btn-sm btn-info ml-2 mr-1" (click)="updateAddress(a)"
+            style="margin-right: 15px;">Edit</button>
+        </div>
+
+        <div class="col-md-3"><button class="btn btn-sm btn-info ml-2 mr-1" (click)="deleteAddress(a)"
+            style="margin-right: 15px;">Delete</button>
+        </div>
+        <div class="col-md-6">
+          <button class="btn btn-sm btn-info ml-2 mr-1" (click)="makeDefaultAddress(a)" style="margin-right: 15px;"
+            *ngIf="a.isDefault != 'Y'">Make Default</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

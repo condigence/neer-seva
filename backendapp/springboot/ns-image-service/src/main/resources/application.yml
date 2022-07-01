@@ -1,0 +1,22 @@
+server:
+  port: 9095
+  host: localhost
+
+
+
+  
+spring:
+  application:
+    name: NS-IMAGE-SERVICE
+  
+  zipkin:
+    baseUrl: http://127.0.0.1:9411/
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/

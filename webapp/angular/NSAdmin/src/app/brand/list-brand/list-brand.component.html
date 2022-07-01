@@ -1,0 +1,95 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="form-header">
+              <i class="zmdi zmdi-view-list"></i>
+              Brand List
+            </h5>
+            <button
+              [routerLink]="['/brand/add-brand']"
+              type="submit"
+              class="btn btn-primary"
+            >
+              <i class="zmdi zmdi-plus"></i> Add Brand
+            </button>
+            <form class="search-bar pull-right">
+              <input
+                type="text"
+                class="form-control"
+                name="search"
+                (input)="Search()"
+                [(ngModel)]="name"
+                autocomplete="off"
+                placeholder="Search By Brand Name"
+              />
+            </form>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div
+                class="col-lg-4 pt50 pb50 col-md-3 my-2"
+                *ngFor="let brand of brands; trackBy: trackBrand; let i = index"
+              >
+                <div class="row wow fadeIn" data-wow-delay=".3s">
+                  <div class="col-md-12">
+                    <figure class="card card-product">
+                      <div class="img-wrap">
+                        <img
+                          [src]="'data:image/jpeg;base64,' + brand.pic"
+                          style="
+                            margin: auto;
+                            display: block;
+                            margin-top: 20px;
+                          "
+                          class="brandImg"
+                        />
+                      </div>
+                      <figcaption class="info-wrap text-center">
+                        <h6 class="title">{{ brand.name || "N/A" }}</h6>
+                        <div class="row" style="padding-left: 50px;">
+                          <div class="col-md-2"></div>
+                          <div class="col-md-6">
+                            <a
+                              (click)="updateBrand(brand)"
+                              style="margin-right: 10px; color: white;"
+                              class="btn btn-sm btn-primary"
+                              ><i
+                                class="zmdi zmdi-edit"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="Edit"
+                              ></i
+                            ></a>
+
+                            <a
+                              class="btn btn-sm btn-danger"
+                              style="color: white;"
+                              (click)="deleteTheBrand(brand)"
+                            >
+                              <i
+                                class="zmdi zmdi-delete"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="Delete"
+                              ></i>
+                            </a>
+                          </div>
+                        </div>
+                      </figcaption>
+                      <div class="bottom-wrap">
+                        <div class="price-wrap h5"></div>
+                      </div>
+                    </figure>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

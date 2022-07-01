@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "sdkVersion": "44.0.0",
+    "name": "NeerSeva",
+    "slug": "NeerSeva",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "icon": "./app/assets/logo.png",
+    "ios": {
+      "bundleIdentifier": "net.service.neerseva"
+    },
+    "android": {
+      "package": "net.service.neerseva"
+    }
+  }
+}

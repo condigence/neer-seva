@@ -1,0 +1,62 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="form-header text-uppercase">
+              <i class="zmdi zmdi-view-list"></i>
+              Shop List
+            </h5>
+            <button [routerLink]="['/add-shop']" type="submit" class="btn btn-primary">
+              <i class="zmdi zmdi-plus"></i> Add Shop
+            </button>
+            <form class="search-bar pull-right">
+              <input class="form-control" type="text" name="search" (input)="Search()" [(ngModel)]="name"
+                autocomplete="off" placeholder="Search By Shop Name" />
+              <a></a>
+            </form>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table id="example" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th class="hidden">S.N</th>
+                    <th>SHOP Image</th>
+                    <th>SHOP NAME</th>
+                    <th>SHOP TYPE</th>
+                    <th>SHOP BRANCH</th>
+                    <th>ACTION</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let shop of shops; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>
+                      <img [src]="'data:image/jpeg;base64,'+shop.pic" class="rounded-circle customer-img"
+                        onerror="this.onerror=null; this.src='assets/images/shop.png'" alt="" />
+                    </td>
+                    <td>{{ shop.name || "N/A" }}</td>
+                    <td>{{ shop.type || "N/A" }}</td>
+                    <td>{{ shop.branch || "N/A" }}</td>
+                    <td>
+                      <!-- <a (click)="updateShop(shop)"  class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Edit" style="margin: 5px;"><i class="zmdi zmdi-edit"></i></a>
+                              <a (click)="updateShop(shop)" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="Delete"><i class="zmdi zmdi-delete"></i></a> -->
+                      <a (click)="updateShop(shop)" style="margin-right: 10px;" class="btn btn-sm btn-primary"><i
+                          class="zmdi zmdi-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>
+                      <a class="btn btn-sm btn-danger" (click)="deleteTheShop(shop)" style="color: white;">
+                        <i class="zmdi zmdi-delete" data-toggle="tooltip" data-placement="top" title="Delete"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Row-->
+  </div>
+</div>

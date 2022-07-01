@@ -1,0 +1,21 @@
+server:
+  port: 9091
+  host: localhost
+  
+spring:
+  application:
+    name: NS-PRODUCT-SERVICE
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+  
+  zipkin:
+    baseUrl: http://127.0.0.1:9411/
+
+#corsDomains: http://localhost:4500,http://localhost:4200,http://localhost:9090/

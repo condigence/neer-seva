@@ -1,0 +1,139 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <form [formGroup]="addForm" (ngSubmit)="onSubmit()">
+              <h4 class="form-header text-uppercase">
+                <i class="zmdi zmdi-view-list"></i>
+                Add Stock
+                <!-- <p style="float:right;color: #ff3300;font-size: 11px;" class="text-lowercase">{{mandatoryFields}}</p> -->
+              </h4>
+              <div class="form-group row">
+                <label for="name" class="col-sm-2 col-form-label"
+                  >Brand
+                  <span style="color: red;">*</span>
+                </label>
+                <div class="col-sm-10">
+                  <select
+                    class="form-control"
+                    (change)="onChangeBrand($event.target.value)"
+                  >
+                    <option value="">Select Brand</option>
+                    <option *ngFor="let brand of brands" [value]="brand.id">
+                      {{ brand.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="type" class="col-sm-2 col-form-label"
+                  >Item
+                  <span style="color: red;">*</span>
+                </label>
+                <div class="col-sm-10">
+                  <select
+                    (change)="changeItem($event)"
+                    class="form-control"
+                    formControlName="itemId"
+                    id="id"
+                    [ngClass]="{ 'is-invalid': submitted && f.itemId.errors }"
+                  >
+                    <option value="">Select Item</option>
+                    <option *ngFor="let item of items" [value]="item.id">{{
+                      item.name
+                    }}</option>
+                  </select>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="submitted && handleError('itemId', 'required')"
+                  >
+                    <strong>
+                      You must select a user type!
+                    </strong>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="type" class="col-sm-2 col-form-label"
+                  >Shop
+                  <span style="color: red;">*</span>
+                </label>
+                <div class="col-sm-10">
+                  <select
+                    (change)="changeShop($event)"
+                    class="form-control"
+                    formControlName="shopId"
+                    id="shopId"
+                    [ngClass]="{ 'is-invalid': submitted && f.shopId.errors }"
+                  >
+                    <option value="">Select Shop</option>
+                    <option *ngFor="let shop of shops" [value]="shop.id">{{
+                      shop.name
+                    }}</option>
+                  </select>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="submitted && handleError('shopId', 'required')"
+                  >
+                    <strong>
+                      You must select your shop!
+                    </strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="name" class="col-sm-2 col-form-label"
+                  >Quantity
+                  <span style="color: red;">*</span>
+                </label>
+                <div class="col-sm-10">
+                  <input
+                    formControlName="quantity"
+                    type="text"
+                    placeholder="Enter Quantity"
+                    class="form-control"
+                    id="name"
+                    name="quantity"
+                    [ngClass]="{
+                      'is-invalid': submitted && f.quantity.errors
+                    }"
+                  />
+                  <div
+                    *ngIf="submitted && f.quantity.errors"
+                    class="invalid-feedback"
+                  >
+                    <ng-container *ngIf="f.quantity.errors.required">
+                      <strong> Quantity is required</strong>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <p
+                  style="
+                    float: right;
+                    color: #ff0000;
+                    font-size: 13px;
+                    font-weight: 600;
+                    margin: 1%;
+                  "
+                >
+                  Note: {{ mandatoryFields }}
+                </p>
+              </div>
+
+              <div class="form-footer">
+                <button type="submit" class="btn btn-success">
+                  <i class="zmdi zmdi-plus"></i> Add
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

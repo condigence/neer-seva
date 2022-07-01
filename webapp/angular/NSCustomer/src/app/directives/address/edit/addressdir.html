@@ -1,0 +1,35 @@
+<menu></menu>
+<div class="content-wrapper" style="margin-left: 250px;margin-right: 250px;">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="form-header text-uppercase">
+              <i class="zmdi zmdi-view-list"></i>
+              Edit address
+            </h5>
+          </div>
+          <div class="col-lg-12">
+            <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+
+                <div class="form-group row">
+                    <label for="name" class="col-sm-2 col-form-label">Address Type</label>
+                    <div class="col-sm-10">
+                      <select class="form-control" formControlName="type" id="type">
+                        <option value="" disabled>Select shop type</option>
+                        <option *ngFor="let type of addressType" [value]=type.addressName>
+                          {{ type.addressName }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+               
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

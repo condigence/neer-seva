@@ -1,0 +1,22 @@
+<div class="row">
+
+  <div class="col-sm-3">
+    <div>
+      <input type="file" (change)="onFileChanged($event)" class="btn btn-warning btn-xs">
+     
+    </div>
+  </div>
+  <div class="col-sm-3"> 
+      <img [src]="imgURL" height="100" *ngIf="imgURL">
+  </div>
+
+  <div class="col-sm-3" style="left:80px;"> <input type="button" (click)="onUpload()" value="upload" class="btn btn-success btn-xs">
+  </div>
+  <div class="col-sm-3">
+    <div *ngIf='dispalyPreview'>
+      <span>Preview:</span>
+      {{childMessage}}
+      <img height="100" [src]="convertedImage">
+    </div>
+  </div>
+</div>

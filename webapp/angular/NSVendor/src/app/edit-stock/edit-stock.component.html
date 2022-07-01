@@ -1,0 +1,75 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+              <h4 class="form-header text-uppercase">
+                <i class="zmdi zmdi-view-list"></i>
+                Edit Stock  
+      
+              </h4>
+
+              <div class="form-group row">
+                  <label class="col-lg-3 col-form-label form-control-label">Shop Name</label>
+                  <div class="col-lg-9">
+                      <input class="form-control" type="text" readonly
+                          value="{{stock.shop.name}}">
+                  </div>
+              </div>
+
+              <div class="form-group row">
+                  <label class="col-lg-3 col-form-label form-control-label">Item Name</label>
+                  <div class="col-lg-9">
+                      <input class="form-control" type="text" readonly
+                          value="{{stock.item.name}}">
+                  </div>
+              </div>
+
+              <!-- <div class="form-group row">
+                <label for="name" class="col-sm-2 col-form-label">Shop</label>
+                <div class="col-sm-10">
+                  <select class="form-control" formControlName="shopId" id="shopId">
+                    <option value="" disabled>Select Shop</option>
+                    <option *ngFor="let st of stock" [value]=st.shop.id>
+                      {{ st.shop.id }}
+                    </option>
+                  </select>
+                </div>
+              </div> -->
+              <!-- <div class="form-group row">
+                <label for="name" class="col-sm-2 col-form-label">Item</label>
+                <div class="col-sm-10">
+                  <select class="form-control" formControlName="itemId" id="itemId">
+                    <option value="" disabled>Select Item</option>
+                    <option *ngFor="let st of stock" [value]=st.item.id>
+                      {{ st.item.id }}
+                    </option>
+                  </select>
+                </div>
+              </div> -->
+
+
+
+              <div class="form-group row">
+                <label for="quantity" class="col-lg-3 col-form-label form-control-label">Quantity</label>
+                <div class="col-lg-9">
+                 
+                    <input formControlName="quantity" value="{{stock.quantity}}" placeholder="Quantity" type="text" class="form-control" id="quantity" name="quantity"  required [ngClass]="{ 'is-invalid': submitted && f.quantity.errors }">
+                  <div *ngIf="submitted && f.quantity.errors">
+                    <div *ngIf="f.quantity.errors.required">quntity is required</div>
+                  </div>
+                </div>
+              </div> 
+              <button type="submit" class="btn btn-success"><i class="fa fa-check-square-o"></i> Update</button>
+              <a href="javascript:history.go(-1)" style="margin-left: 20px;">Back</a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--End Row-->
+  </div>
+</div>
+<!-- <script src="assets/plugins/jquery-validation/js/jquery.validate.min.js"></script> -->

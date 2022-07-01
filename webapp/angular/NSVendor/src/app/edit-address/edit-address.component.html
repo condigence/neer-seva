@@ -1,0 +1,250 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+              <h4 class="form-header">
+                <i class="zmdi zmdi-view-list"></i>
+                Update Address
+              </h4>
+              <div class="form-group row">
+                <label for="address_type" class="col-sm-2 col-form-label">Address type</label>
+                <div class="col-sm-10">
+                  <select class="form-control" formControlName="address_type" id="address_type">
+                    <option value="" disabled>Select Address type</option>
+                    <option *ngFor="let a of addressType" [value]="a.addressName">
+                      {{ a.addressName }}
+                    </option>
+                  </select>
+                  <div *ngIf="submitted && f.address_type.errors">
+                    <div *ngIf="f.address_type.errors.required">
+                      Address type is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="addr_line1" class="col-sm-2 col-form-label"
+                  >Address line 1</label
+                >
+                <div class="col-sm-10">
+                  <input
+                    placeholder="flat/house no./floor no."
+                    formControlName="addr_line1"
+                    type="text"
+                    class="form-control"
+                    id="addr_line1"
+                    name="addr_line1"
+                    required
+                    [ngClass]="{
+                      'is-invalid': submitted && f.addr_line1.errors
+                    }"
+                  />
+                  <div *ngIf="submitted && f.addr_line1.errors">
+                    <div
+                      *ngIf="
+                        f.addr_line1.errors.required &&
+                        f.addr_line1.errors.minlength
+                      "
+                    >
+                      Address line 1 is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="addr_line2" class="col-sm-2 col-form-label"
+                  >Address line 2</label
+                >
+                <div class="col-sm-10">
+                  <input
+                    formControlName="addr_line2"
+                    placeholder="colony/street"
+                    type="text"
+                    class="form-control"
+                    id="addr_line2"
+                    name="addr_line2"
+                    required
+                    [ngClass]="{
+                      'is-invalid': submitted && f.addr_line2.errors
+                    }"
+                  />
+                  <div *ngIf="submitted && f.addr_line2.errors">
+                    <div *ngIf="f.addr_line2.errors.required">
+                      Address line 2 is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="addr_line3" class="col-sm-2 col-form-label"
+                  >Address line 3</label
+                >
+                <div class="col-sm-10">
+                  <input
+                    formControlName="addr_line3"
+                    type="text"
+                    placeholder="locality"
+                    class="form-control"
+                    id="addr_line3"
+                    name="addr_line3"
+                    required
+                    [ngClass]="{
+                      'is-invalid': submitted && f.addr_line3.errors
+                    }"
+                  />
+                  <div *ngIf="submitted && f.addr_line3.errors">
+                    <div *ngIf="f.addr_line3.errors.required">
+                      Address line 3 is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="addr_line4" class="col-sm-2 col-form-label"
+                  >Addredd line 4</label
+                >
+                <div class="col-sm-10">
+                  <input
+                    placeholder="Landmark E.g. near public school"
+                    formControlName="addr_line4"
+                    type="text"
+                    class="form-control"
+                    id="addr_line4"
+                    name="addr_line4"
+                    required
+                    [ngClass]="{
+                      'is-invalid': submitted && f.addr_line4.errors
+                    }"
+                  />
+                  <div *ngIf="submitted && f.addr_line4.errors">
+                    <div
+                      *ngIf="
+                        f.addr_line4.errors.required &&
+                        f.addr_line4.errors.minlength
+                      "
+                    >
+                    Address line 4 is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="pin" class="col-sm-2 col-form-label"
+                  >Pin</label
+                >
+                <div class="col-sm-10">
+                  <input
+                    formControlName="pin"
+                    placeholder="Enter your pincode"
+                    type="text"
+                    class="form-control"
+                    id="pin"
+                    minlength="6"
+                    maxlength="6"
+                    name="pin"
+                    required
+                    [ngClass]="{
+                      'is-invalid': submitted && f.pin.errors
+                    }"
+                  />
+                  <div *ngIf="submitted && f.pin.errors">
+                    <div *ngIf="f.pin.errors.required">
+                      Pin is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="city" class="col-sm-2 col-form-label"
+                  >City</label
+                >
+                <div class="col-sm-10">
+                  <input
+                    formControlName="city"
+                    type="text"
+                    placeholder="Enter your city name"
+                    class="form-control"
+                    id="city"
+                    name="city"
+                    required
+                    [ngClass]="{
+                      'is-invalid': submitted && f.city.errors
+                    }"
+                  />
+                  <div *ngIf="submitted && f.city.errors">
+                    <div *ngIf="f.city.errors.required">
+                      City is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="state" class="col-sm-2 col-form-label"
+                  >State</label
+                >
+                <div class="col-sm-10">
+                  <input
+                    placeholder="Enter your state name"
+                    formControlName="state"
+                    type="text"
+                    class="form-control"
+                    id="state"
+                    name="state"
+                    required
+                    [ngClass]="{
+                      'is-invalid': submitted && f.state.errors
+                    }"
+                  />
+                  <div *ngIf="submitted && f.state.errors">
+                    <div
+                      *ngIf="
+                        f.state.errors.required &&
+                        f.state.errors.minlength
+                      "
+                    >
+                      State is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="country" class="col-sm-2 col-form-label"
+                  >Country</label
+                >
+                <div class="col-sm-10">
+                  <input
+                    formControlName="country"
+                    placeholder="Enter your country name"
+                    type="text"
+                    class="form-control"
+                    id="country"
+                    name="country"
+                    required
+                    [ngClass]="{
+                      'is-invalid': submitted && f.country.errors
+                    }"
+                  />
+                  <div *ngIf="submitted && f.country.errors">
+                    <div *ngIf="f.country.errors.required">
+                      Countrty is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-footer">
+                <button type="submit" class="btn btn-success">
+                  <i class="fa fa-check-square-o"></i> Update
+                </button>
+                <a href="javascript:history.go(-1)" style="margin-left: 20px;">Back</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

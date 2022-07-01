@@ -1,0 +1,71 @@
+<div id="wrapper" style="padding: 3.25rem;height: 100vh;background-repeat:no-repeat;background-size: cover; background-image: url(assets/images/login_bg.jpg);">
+  <div class="row">
+    <div class="col-md-4">
+     
+    </div>
+    <div class="col-md-4">
+      
+  <div class="card card-authentication1">
+    <div class="card-body">
+      <div class="card-content p-2">
+        <div class="text-center">
+          <img src="assets/images/lg.png" alt="logo icon" width="200" />
+        </div>
+        <div class="card-title text-uppercase text-center py-3">OTP</div>
+
+        <form [formGroup]="otpForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="otp">Check you message for OTP</label>
+            <input
+              type="password"
+              formControlName="otp"
+              numbersOnly
+              class="form-control"
+              maxlength="4"              
+              placeholder="One Time password (4 digits)"
+              [ngClass]="{ 'is-invalid': submitted && f.otp.errors }"
+            />
+            <div *ngIf="submitted && f.otp.errors" class="invalid-feedback">
+              <div *ngIf="f.otp.errors.required">OTP is required</div>              
+            </div>
+
+            <input hidden formControlName="contact" />
+
+            <!-- <div
+              *ngIf="submitted && error"
+              class="alert alert-danger"
+              style="margin-top: 10px;"
+            >
+              <div>{{ error.error.errorMessage }}</div>
+            </div> -->
+
+            
+          </div>
+          <div class="form-group">
+            <button
+              [disabled]="!otpForm.valid"
+              class="btn btn-primary shadow-primary btn-block waves-effect waves-light"
+            >
+              Submit
+            </button>
+
+            <!-- <button [disabled]="loading" class="btn btn-primary">Submit</button> -->
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="card-footer text-center py-3">
+      <p class="text-muted mb-0">
+        Not yet Registered? <a routerLink="/registration"> Sign Up here</a>
+      </p>
+    </div>
+  </div>
+    </div>
+    <div class="col-md-4">
+     
+    </div>
+  </div>  
+  
+ 
+  </div>
+  

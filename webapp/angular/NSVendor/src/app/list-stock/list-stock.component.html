@@ -1,0 +1,79 @@
+
+ <div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="card-header">
+      <h5 class="form-header">
+        <i class="zmdi zmdi-format-list-numbered"></i>
+       List stock
+      </h5>
+      <div class="row" style="background: antiquewhite;padding-top: 1.5%;">
+        <div class="col-md-4">
+          <button [routerLink]="['/add-stock']" type="submit" class="btn btn-primary">
+            <i class="zmdi zmdi-plus"></i> Add new item in stock
+          </button>
+        </div>
+        <div class="col-md-8">
+          <div class="form-group row" >            
+            <div class="col-sm-12">
+              <select class="form-control" (change)="onChangeShop($event.target.value)">
+                <option value="" disabled>Select Shop</option>
+                <option *ngFor="let shop of shops" [value]="shop.id">
+                  {{ shop.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>        
+          <ng-template [ngIf]="stocks" [ngIfElse]="none">
+          <ng-template [ngIf]="stocks.length > 0" [ngIfElse]='NotAvailable'>            
+            <div class="row">              
+              <div class="col-lg-4 pt50 pb50  col-md-4 my-2" *ngFor="let stock of stocks; let i = index">
+                <div class="row wow fadeIn" data-wow-delay=".3s">
+                  <div class="col-md-12">                     
+                    <figure class="card card-product">
+                      <div class="img-wrap"><img [src]="'data:image/jpeg;base64,'+stock.item.pic" style="margin:auto;display:block;height: 150px;"
+                          class="brandImg"> </div>
+                      <figcaption class="info-wrap text-center">
+                        <h6 class="title">In stock: {{stock.quantity || 'N/A'}}</h6>
+                        <p>{{stock.item.name || 'N/A'}}</p>
+                        <div class="row">                  
+                          <div class="col-md-3">                   
+                          </div>
+                          <div class="col-md-5" style="margin-bottom: 10px;">
+                            <a id="first" (click)="updateStock(stock)" style="margin-right: 10px;" class="btn btn-sm btn-primary"><i
+                                class="zmdi zmdi-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>
+                            <a id="first" class="btn btn-sm btn-danger" mwlConfirmationPopover [popoverTitle]="popoverTitle"
+                              [popoverMessage]="popoverMessage" placement="right" (confirm)="deleteStock(stock)"
+                              (cancel)="cancelClicked = true">
+                              <i class="zmdi zmdi-delete" data-toggle="tooltip" data-placement="top" title="Delete"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </figcaption>                     
+                    </figure>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #NotAvailable>
+                <h3 style="text-align: center;margin: 5% 0% 5% 0%;">You don't have any Item in this shop</h3>
+            </ng-template>
+            </ng-template>            
+            <ng-template #none>
+              <h3 style="text-align: center;margin: 5% 0% 5% 0%;"> Please Choose your shop to see items</h3>
+            </ng-template>     
+          
+     
+      
+    </div>
+   
+  </div>
+</div>
+
+
+
+
+
+

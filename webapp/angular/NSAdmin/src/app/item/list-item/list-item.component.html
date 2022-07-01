@@ -1,0 +1,76 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="card-header">
+      <h5 class="form-header">
+        <i class="zmdi zmdi-format-list-numbered"></i>
+        Item List
+      </h5>
+      <button [routerLink]="['/item/add-item']" type="submit" class="btn btn-primary">
+        <i class="zmdi zmdi-plus"></i> Add Item
+      </button>
+      <form class="search-bar pull-right">
+        <input type="text" class="form-control" name="search" (input)="Search()" [(ngModel)]="name" autocomplete="off"
+          placeholder="Search By Item Name" />
+        <a href=""></a>
+      </form>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 pt50 pb50 col-md-4 my-2" *ngFor="let item of items; trackBy: trackItem; let i = index">
+        <div class="row wow fadeIn" data-wow-delay=".3s">
+          <div class="col-md-12">
+            <figure class="card card-product">
+              <div class="img-wrap">
+                <img [src]="'data:image/jpeg;base64,' + item.pic" style="margin: auto; display: block; width:80%;height:80%"
+                  class="brandImg" />
+                  <h6 class="title text-center">{{ item.name || "N/A" }}</h6>
+              </div>
+              <figcaption class="info-wrap text-center">
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <del class="price-old" style="margin-right: 10px;">&#x20B9;{{ item.price || "N/A" }}</del><span
+                      class="price-new">&#x20B9;{{ item.dispPrice || "N/A" }}</span>
+                  </div>
+
+                  <!-- <div class="col-md-2"></div> -->
+                  <div class="col-md-6">
+                    <a (click)="updateItem(item)" style="margin-right: 10px; color: white;"
+                      class="btn btn-sm btn-primary"><i class="zmdi zmdi-edit" data-toggle="tooltip"
+                        data-placement="top" title="Edit"></i></a>
+                    <!-- <a
+                      class="btn btn-sm btn-danger"
+                      style="color: white;"
+                      mwlConfirmationPopover
+                      [popoverTitle]="popoverTitle"
+                      [popoverMessage]="popoverMessage"
+                      placement="left"
+                      (confirm)="deleteItem(item)"
+                      (cancel)="cancelClicked = true"
+                    >
+                      <i
+                        class="zmdi zmdi-delete"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Delete"
+                      ></i>
+                    </a> -->
+
+                    <a class="btn btn-sm btn-danger" style="color:white;" (click)="deleteTheItem(item)">
+                      <i class="zmdi zmdi-delete" data-toggle="tooltip" data-placement="top" title="Delete"></i>
+                    </a>
+
+
+
+                  </div>
+                </div>
+              </figcaption>
+              <div class="bottom-wrap">
+                <div class="price-wrap h5"></div>
+              </div>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

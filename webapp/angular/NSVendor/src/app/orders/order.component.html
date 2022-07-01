@@ -1,0 +1,295 @@
+<menu></menu>
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="form-header text-uppercase">
+              <i class="zmdi zmdi-view-list"></i>
+              Customers Orders
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+                <ng-template [ngIf]="orders.length > 0" [ngIfElse]='None'>
+              <table id="example" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Order Id</th>
+                    <th>Date Time</th>
+                    <th>Items</th>
+                    <th>Customer Number</th>
+                    <th>Status</th>
+                    <th>View</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                        
+                                
+                                        <tr *ngFor="let o of orders">
+                                          <td>{{ o.orderId }}</td>
+                                          <td>On {{ o.orderDate }} @ {{ o.orderTime }}</td>
+                                          <td>
+                                            <ul>
+                                              <li *ngFor="let items of o.orderDetail.items">
+                                                {{ items.name }} x
+                                                {{ items.quantity }}
+                                              </li>
+                                            </ul>
+                                          </td>
+                                          <td>{{ o.orderDetail.customer.contact }}</td>
+                                          <td>
+                                            <span
+                                              class="btn btn-sm btn-outline-success btn-round btn-block"
+                                              >{{ o.orderStatus }}
+                                            </span>
+                                          </td>
+                                          <td>
+                                            <a class="btn btn-sm btn-primary"
+                                              ><i
+                                                class="fa fa-eye"
+                                                data-toggle="tooltip"
+                                                title="View"
+                                                (click)="openModal('custom-modal-1', o)"
+                                              ></i
+                                            ></a>
+                                          </td>
+                                          <td>
+                                            <a class="btn btn-sm btn-primary"
+                                              ><i
+                                                class="fa fa-eye"
+                                                data-toggle="tooltip"
+                                                title="View"
+                                                (click)="openModal('custom-modal-2')"
+                                              ></i
+                                            ></a>
+                                          </td>
+                                        </tr>                              
+
+                        
+                </tbody>
+                               
+                <tfoot>
+                  <tr>
+                    My Fev Orders!
+                  </tr>
+                </tfoot>
+              </table>
+        </ng-template>
+        <ng-template #None>
+                <h3 style="text-align: center;">No Order Yet</h3>
+        </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Row-->
+  </div>
+</div>
+
+<jw-modal id="custom-modal-1">
+  <div
+    class="content-wrapper"
+    style="margin-left: 0px !important; margin-top: 2px;"
+  >
+    <div class="container-fluid">
+      <!-- Breadcrumb-->
+      <div class="row pt-2 pb-2">
+        <div class="col-sm-9">
+          <h4 class="page-title">Customer Details</h4>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="card profile-card-2">
+            <div class="card-img-block" style="height: 230px;">
+              <!-- <img class="img-fluid" src="assets/images/mypic.jpg" alt="Card image cap"> -->
+            </div>
+            <div class="card-body pt-5">
+              <img
+                alt="profile-image"
+                [src]="
+                  'data:image/jpeg;base64,' + order.orderDetail.customer.pic
+                "
+                class="profile"
+              />
+
+              <h5 class="card-title">{{ order.orderDetail.customer.name }}</h5>
+              <!-- <p class="card-text">{{user.description}}</p> -->
+              <div class="icon-block"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-body">
+              <ul class="nav nav-tabs nav-tabs-primary top-icon nav-justified">
+                <li class="nav-item">
+                  <a
+                    data-target="#profile"
+                    data-toggle="pill"
+                    class="nav-link active"
+                    ><i class="icon-user"></i>
+                    <span class="hidden-xs">Profile</span></a
+                  >
+                </li>
+
+                <li class="nav-item">
+                  <a data-target="#address" data-toggle="pill" class="nav-link"
+                    ><i class="icon-note"></i>
+                    <span class="hidden-xs">Customer Address</span></a
+                  >
+                </li>
+              </ul>
+              <div class="tab-content p-3">
+                <div class="tab-pane active" id="profile">
+                  <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label"
+                      >Name</label
+                    >
+                    <div class="col-lg-9" style="margin-bottom: 15px;">
+                      <span>{{ order.orderDetail.customer.name }}</span>
+                    </div>
+                    <label class="col-lg-3 col-form-label form-control-label"
+                      >Email</label
+                    >
+                    <div class="col-lg-9" style="margin-bottom: 15px;">
+                      <span>{{ order.orderDetail.customer.email }}</span>
+                    </div>
+                    <label class="col-lg-3 col-form-label form-control-label"
+                      >Phone</label
+                    >
+                    <div class="col-lg-9" style="margin-bottom: 15px;">
+                      <span>{{ order.orderDetail.customer.contact }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane" id="address">
+                  <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label"
+                      >Address Line 1</label
+                    >
+                    <div class="col-lg-9" style="margin-bottom: 15px;">
+                      <span>501, Lakshmi Esmeralda, H.No. 1-57/718/B</span>
+                    </div>
+                    <label class="col-lg-3 col-form-label form-control-label"
+                      >Address Line 2</label
+                    >
+                    <div class="col-lg-9" style="margin-bottom: 15px;">
+                      <span>Sri Ramnagar Colony</span>
+                    </div>
+                    <label class="col-lg-3 col-form-label form-control-label"
+                      >Address Line 3</label
+                    >
+                    <div class="col-lg-9" style="margin-bottom: 15px;">
+                      <span>B-Block, Street-26, Kondapur,</span>
+                    </div>
+
+                    <label class="col-lg-3 col-form-label form-control-label"
+                      >Address Line 4</label
+                    >
+                    <div class="col-lg-9" style="margin-bottom: 15px;">
+                      <span>Hyderabad-500084</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End container-fluid-->
+  </div>
+  <!--End content-wrapper-->
+
+  <button (click)="closeModal('custom-modal-1')" class="btn btn-primary">
+    Close
+  </button>
+</jw-modal>
+
+<jw-modal id="custom-modal-2">
+  <div class="content">
+    <div class="content1">
+      <h2>Order Tracking: 56</h2>
+    </div>
+    <div class="content2">
+      <div class="content2-header1">
+        <p>Shipped Via : <span>Delivery Boy</span></p>
+      </div>
+      <div class="content2-header1">
+        <p>Status : <span>Checking Quality</span></p>
+      </div>
+      <div class="content2-header1">
+        <p>Expected Date : <span>7-Apr-2020</span></p>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="content3">
+      <div class="shipment">
+        <div class="confirm">
+          <div class="imgcircle">
+            <img
+              src="assets/images/confirm.png"
+              alt="confirm order"
+              style="background: #000;"
+            />
+          </div>
+          <span class="line"></span>
+          <p>Received</p>
+        </div>
+        <div class="process">
+          <div class="imgcircle">
+            <img
+              src="assets/images/process.png"
+              alt="process order"
+              style="background: #000;"
+            />
+          </div>
+          <span class="line"></span>
+          <p>Put in Queue</p>
+        </div>
+        <div class="quality">
+          <div class="imgcircle">
+            <img
+              src="assets/images/quality.png"
+              alt="quality check"
+              style="background: #000;"
+            />
+          </div>
+          <span class="line"></span>
+          <p>Order Assigned</p>
+        </div>
+        <div class="dispatch">
+          <div class="imgcircle">
+            <img
+              src="assets/images/dispatch.png"
+              alt="dispatch product"
+              style="background: #000;"
+            />
+          </div>
+          <span class="line"></span>
+          <p>Dispatched</p>
+        </div>
+        <div class="delivery">
+          <div class="imgcircle">
+            <img
+              src="assets/images/delivery.png"
+              alt="delivery"
+              style="background: #000;"
+            />
+          </div>
+          <p>Delivered</p>
+        </div>
+        <div class="clear"></div>
+      </div>
+    </div>
+  </div>
+  <button (click)="closeModal('custom-modal-2')" class="btn btn-primary">
+    Close
+  </button>
+</jw-modal>

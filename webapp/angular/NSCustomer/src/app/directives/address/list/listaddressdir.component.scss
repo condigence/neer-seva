@@ -1,0 +1,35 @@
+h6 .zmdi{
+  color: #fff !important;
+}
+
+th, td {
+  text-align: center
+}
+// a:link {
+//   text-decoration: underline;
+// }
+
+
+a {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #c45500;
+}
+
+.content-wrapper {
+  margin-left: 50px!important;
+  padding-top: 50px!important;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 70px;
+  overflow-x: hidden;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+
+
+
+

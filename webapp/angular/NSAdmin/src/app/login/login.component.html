@@ -1,0 +1,78 @@
+<div
+  id="wrapper"
+  style="
+    padding: 3.25rem;
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url(assets/images/login_bg.jpg);
+  "
+>
+  <div class="row">
+    <div class="col-md-4">
+      <!-- <img src="assets/images/glass1.png" alt="logo icon" width="" /> -->
+    </div>
+    <div class="col-md-4">
+      <div class="card card-authentication1">
+        <div class="card-body">
+          <div class="card-content p-2">
+            <div class="text-center">
+              <img src="assets/images/lg.png" alt="logo icon" width="200" />
+            </div>
+            <div class="card-title text-uppercase text-center py-3">
+              Sign In
+            </div>
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+              <div class="form-group">
+                <input
+                  type="text"
+                  maxlength="10"
+                  minlength="10"
+                  formControlName="contact"
+                  numbersOnly
+                  class="form-control"
+                  placeholder="Enter your contact number only 10 digits"
+                  [ngClass]="{ 'is-invalid': submitted && f.contact.errors }"
+                />
+                <!-- <div class="form-control-position">
+                <i class="icon-phone"></i>
+              </div> -->
+                <div
+                  *ngIf="submitted && f.contact.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="f.contact.errors.required">
+                    contact is required
+                  </div>
+                </div>
+
+                <input hidden formControlName="contact" />
+
+                <!-- <div
+                *ngIf="submitted && error"
+                class="alert alert-danger"
+                style="margin-top: 10px;"
+              >
+                <div>{{ error.error.errorMessage }}</div>
+              </div> -->
+              </div>
+              <div class="form-group">
+                <button
+                  [disabled]="!loginForm.valid"
+                  class="btn btn-primary shadow-primary btn-block waves-effect waves-light"
+                >
+                  Submit
+                </button>
+                </div>
+            </form>
+          </div>
+        </div>
+        <div class="card-footer text-center py-3">
+          <p class="text-muted mb-0">
+            Not yet Registered? <a routerLink="/register"> Sign Up here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

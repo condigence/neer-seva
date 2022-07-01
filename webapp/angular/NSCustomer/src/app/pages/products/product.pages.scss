@@ -1,0 +1,53 @@
+.vendor-profile{
+
+    border-radius: 50%;
+        //  left: 75%;
+         max-width: 100px;
+         border: 3px solid rgba(255, 255, 255, 1);
+         -webkit-transform: translate(-50%, 0%);
+         transform: translate(-50%, 0%);
+        
+}
+
+.carousel-vendor-caption {
+    position: absolute;
+    right: 15%;
+    bottom: 40px;
+    left: 15%;
+    z-index: 10;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.navbar {
+   
+    display: -webkit-box;
+    display: flex;
+    flex-wrap: wrap;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+}
+.navbar-expand-lg .navbar-nav .nav-link {
+   
+    padding-left: 3.5rem;
+}
+
+ngb-carousel .picsum-img-wrapper {
+    position: relative;
+    height: 0;
+    padding-top: 15%; /* Keep ratio for 900x500 images */
+  }
+  
+  ngb-carousel .picsum-img-wrapper>img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+  

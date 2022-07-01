@@ -1,0 +1,54 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="form-header">
+                <i class="zmdi zmdi-format-list-numbered"></i>
+              Manage Addresses
+            </h5>
+            <button [routerLink]="['/add-address']" type="submit" class="btn btn-success">
+              <i class="zmdi zmdi-plus
+              "></i> Add new address
+            </button>
+            <form class="search-bar pull-right">
+              <a ></a>
+            </form>
+          </div>
+          <div class="row" style="margin:auto;">
+            <div class="card col-md-4 my-2" *ngFor="let a of address let i = index;"  style="width: 25rem;">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <h6>{{a.address_type || 'N/A'}}</h6>
+                  </div>
+                  <!-- <div class="col-md-4"></div> -->
+                  <!-- <div class="col-md-4">
+                    <h6><a (click)="updateAddress(a)" class="btn btn-sm btn-primary" data-toggle="tooltip"
+                        data-placement="top" title="Edit" style="margin: 5px;"><i class="zmdi zmdi-edit"></i></a>
+                      <a class="btn btn-sm btn-danger" mwlConfirmationPopover [popoverTitle]="popoverTitle"
+                        [popoverMessage]="popoverMessage" placement="left" (confirm)="deleteAddress(a)"
+                        (cancel)="cancelClicked = true">
+                        <i class="zmdi zmdi-delete" data-toggle="tooltip" data-placement="right" title="Delete"></i>
+                      </a></h6>
+                  </div> -->
+                </div>
+                <p class="card-subtitle mb-2 text-muted">{{a.addr_line1 || 'N/A'}}, {{a.addr_line2 || 'N/A'}},</p>
+                <p class="card-subtitle mb-2 text-muted">{{a.addr_line3 || 'N/A'}}, {{a.addr_line4 || 'N/A'}},</p>
+                <p class="card-subtitle mb-2 text-muted">{{a.pin || 'N/A'}}, {{a.city || 'N/A'}}, </p>
+                <p class="card-subtitle mb-2 text-muted">{{a.state || 'N/A'}}, {{a.country || 'N/A'}} </p>
+                <a (click)="updateAddress(a)"  [routerLink]="" style="margin-right: 15px;">Edit</a>
+                <a mwlConfirmationPopover
+                [popoverTitle]="popoverTitle"
+                [popoverMessage]="popoverMessage"
+                [routerLink]=""
+                placement="right" (confirm)="deleteAddress(a)"
+                (cancel)="cancelClicked = true">
+                <i data-toggle="tooltip" data-placement="right" title="Delete"></i>
+                Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>

@@ -1,0 +1,103 @@
+<div class="content-wrapper">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <form [formGroup]="addForm" (ngSubmit)="onSubmit()">
+                <h4 class="form-header text-uppercase">
+                  <i class="zmdi zmdi-view-list"></i>
+                  Add Shop
+                  <!-- <p style="float:right;color: #ff3300;font-size: 11px;" class="text-lowercase">{{mandatoryFields}}</p> -->
+                </h4>
+                
+                <div class="form-group row">
+                  <label for="name" class="col-sm-2 col-form-label">Type
+                    <span style="color: red;">*</span>
+                  </label>                 
+                  <div class="col-sm-10">
+                    <select (change)="changeUserType($event)" class="form-control" formControlName="type" id="type"
+                      [ngClass]="{ 'is-invalid': submitted && f.type.errors }">
+                      <option value="">Select Shop Type</option>
+                      <option *ngFor="let shop of shopTypes"  [value]="shop.type">{{
+                        shop.type
+                      }}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="submitted && handleError('type', 'required')">
+                      <strong>
+                        You must select a shop type!
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+               
+
+
+                
+                <div class="form-group row">
+                  <label for="name" class="col-sm-2 col-form-label">Name
+                    <span style="color: red;">*</span>
+                  </label>
+                  <div class="col-sm-10">
+                    <input formControlName="name" type="text" placeholder="Enter your Shop Name" class="form-control" id="name"
+                      name="name" [ngClass]="{
+                        'is-invalid': submitted && f.name.errors
+                      }" />
+                    <div *ngIf="submitted && f.name.errors" class="invalid-feedback">
+                      <ng-container *ngIf="f.name.errors.required">
+                        <strong> Name is required</strong>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label form-control-label">Image <span style="color: red;">*</span>
+                    </label>
+                  <div class="col-sm-10">
+                      <app-upload-image (messageEvent)="receiveMessage($event)"
+                          [receivedParentMessage]="messageToSendP">
+                      </app-upload-image>
+                  </div>
+              </div>
+               
+              <!-- <div class="form-group row">
+                <label for="branch" class="col-sm-2 col-form-label">Branch <span style="color: red;">*</span>
+                </label>
+                <div class="col-sm-10">
+                  <input formControlName="branch" type="text" placeholder="Enter your Shop Branch" class="form-control" id="branch"
+                    name="branch" [ngClass]="{
+                      'is-invalid': submitted && f.branch.errors
+                    }" />
+                  <div *ngIf="submitted && f.branch.errors" class="invalid-feedback">
+                    <ng-container *ngIf="f.branch.errors.required">
+                      <strong> Branch is required</strong>
+                    </ng-container>
+                  </div>
+                </div>
+              </div> -->
+              <add-address
+                (messageEvent)="receiveMessageByAddressComponent($event)"
+                [receivedParentMessage]="messageToSendA"
+              >
+              </add-address>
+              <div class="form-group row">
+                <p style="float: right;color: #ff0000; font-size: 13px;font-weight: 600;margin: 1%;">
+                  Note: {{ mandatoryFields }}
+                </p>
+              </div>
+              
+                <div class="form-footer">
+                  <button type="submit" class="btn btn-success">
+                    <i class="zmdi zmdi-plus"></i> Add
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <script src="assets/plugins/jquery-validation/js/jquery.validate.min.js"></script> -->

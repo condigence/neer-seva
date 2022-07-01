@@ -1,0 +1,252 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+
+    <!--Start Dashboard Content-->
+
+    <div class="row mt-3">
+      <div class="col-12 col-lg-6 col-xl-3">
+        <div class="card gradient-bloody">
+          <div class="card-body">
+            <div class="media align-items-center">
+            <div class="media-body">
+              <p class="text-white">Total Orders</p>
+              <h6 class="text-white line-height-5" *ngFor="let order of totalOrders">{{order.NumberOfOrders || 'No Order Yet'}}</h6>
+            </div>
+            <div class="w-circle-icon rounded-circle border border-white">
+              <i class="fa fa-cart-plus text-white"></i></div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6 col-xl-3">
+        <div class="card gradient-scooter">
+          <div class="card-body">
+            <div class="media align-items-center">
+            <div class="media-body">
+              <p class="text-white">Total Revenue</p>
+              <h4 class="text-white line-height-5">&#x20B9;750</h4>
+            </div>
+            <div class="w-circle-icon rounded-circle border border-white">
+              <i class="fa fa-money text-white"></i></div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6 col-xl-3">
+        <div class="card gradient-blooker">
+          <div class="card-body">
+            <div class="media align-items-center">
+            <div class="media-body">
+              <p class="text-white">Total Users</p>
+              <h4 class="text-white line-height-5" *ngFor="let u of usercount">{{u.NumberOfUsers}}</h4>
+            </div>
+            <div class="w-circle-icon rounded-circle border border-white">
+              <i class="fa fa-user text-white"></i></div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6 col-xl-3">
+        <div class="card gradient-ohhappiness">
+          <div class="card-body">
+            <div class="media align-items-center">
+            <div class="media-body">
+              <p class="text-white">Total Customer</p>
+              <h4 class="text-white line-height-5" *ngFor="let c of userAsCustomer">{{c.numberOfCustomer}}</h4>
+            </div>
+            <div class="w-circle-icon rounded-circle border border-white">
+              <i class="fa fa-users text-white"></i></div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div><!--End Row-->
+
+    <div class="row">
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-header">
+              Last 7 Days Report
+              <div class="card-action">
+               <div class="dropdown">
+               <a href="javascript:void();" class="dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown">
+                <i class="icon-options"></i>
+               </a>
+                  <div class="dropdown-menu dropdown-menu-right">
+                  <a class="dropdown-item" href="javascript:void();">Action</a>
+                  <a class="dropdown-item" href="javascript:void();">Another action</a>
+                  <a class="dropdown-item" href="javascript:void();">Something else here</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="javascript:void();">Separated link</a>
+                 </div>
+                </div>
+               </div>
+              </div>
+              <div class="card-body">
+                <canvas id="dashboard-chart-1"></canvas>
+              </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-header">
+              Most Selling Items
+              <div class="card-action">
+               <div class="dropdown">
+               <a href="javascript:void();" class="dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown">
+                <i class="icon-options"></i>
+               </a>
+                  <div class="dropdown-menu dropdown-menu-right">
+                  <a class="dropdown-item" href="javascript:void();">Action</a>
+                  <a class="dropdown-item" href="javascript:void();">Another action</a>
+                  <a class="dropdown-item" href="javascript:void();">Something else here</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="javascript:void();">Separated link</a>
+                 </div>
+                </div>
+               </div>
+              </div>
+              <div class="card-body">
+                <canvas id="dashboard-chart-2"></canvas>
+              </div>
+        </div>
+      </div>
+    </div><!--End Row-->
+
+
+    <div class="row">
+       <div class="col-12 col-lg-12 col-xl-12">
+         <div class="card">
+           <div class="card-header border-0">
+            New Customer List
+          <div class="card-action">
+           <div class="dropdown">
+           <a href="javascript:void();" class="dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown">
+            <i class="icon-options"></i>
+           </a>
+
+            </div>
+           </div>
+          </div>
+          <div class="table-responsive">
+           <table class="table align-items-center table-flush">
+             <thead>
+              <tr>
+               <th>Photo</th>
+               <th>Name</th>
+               <th>Mobile</th>
+               <th>Email</th>
+              </tr>
+             </thead>
+             <tbody>
+               <tr>
+                 <td><img src="assets/images/avatars/avatar-1.png" class="rounded-circle customer-img" alt="user avatar"></td>
+                 <td>Selina Jccoy</td>
+                 <td>9999999999</td>
+                 <td>xyz@example.com</td>
+               </tr>
+               <tr>
+                 <td><img src="assets/images/avatars/avatar-2.png" class="rounded-circle customer-img" alt="user avatar"></td>
+                 <td>Michle jhon</td>
+                 <td>8888888888</td>
+                 <td>xyz@example.com</td>
+               </tr>
+               <tr>
+                 <td><img src="assets/images/avatars/avatar-3.png" class="rounded-circle customer-img" alt="user avatar"></td>
+                 <td>Jhon Deo</td>
+                 <td>7777777777</td>
+                 <td>xyz@example.com</td>
+               </tr>
+               <tr>
+                 <td><img src="assets/images/avatars/avatar-4.png" class="rounded-circle customer-img" alt="user avatar"></td>
+                 <td>Selina Jccoy</td>
+                 <td>8989898989</td>
+                 <td>xyz@example.com</td>
+               </tr>
+
+             </tbody>
+           </table>
+         </div>
+         </div>
+       </div>
+
+    </div><!--End Row-->
+
+
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+    <div class="card-header border-0">
+              Recent Orders Table
+      <div class="card-action">
+       <div class="dropdown">
+       <a href="javascript:void();" class="dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown">
+        <i class="icon-options"></i>
+       </a>
+
+        </div>
+               </div>
+              </div>
+             <div class="table-responsive">
+
+               <table class="table align-items-center table-flush">
+                <thead>
+                 <tr>
+                    <th>Product</th>
+                   <th>Photo</th>
+                   <th>Product ID</th>
+                   <th>Status</th>
+                   <th>Amount</th>
+
+                 </tr>
+                 </thead>
+                 <tr>
+
+                  <td>Bisleri</td>
+                  <td><img src="assets/images/bisleri.png" class="product-img" alt="product img"></td>
+                  <td>#9405822</td>
+                  <td><span class="btn btn-sm btn-outline-success btn-round btn-block">Paid</span></td>
+                  <td>&#x20B9; 1250.00</td>
+
+                 </tr>
+
+                 <tr>
+
+                  <td>Bisleri</td>
+                  <td><img src="assets/images/bisleri.png" class="product-img" alt="product img"></td>
+                  <td>#9405822</td>
+                  <td><span class="btn btn-sm btn-outline-info btn-round btn-block">Pending</span></td>
+                  <td>&#x20B9; 1250.00</td>
+
+                 </tr>
+                 <tr>
+
+                  <td>Bisleri</td>
+                  <td><img src="assets/images/bisleri.png" class="product-img" alt="product img"></td>
+                  <td>#9405822</td>
+                  <td><span class="btn btn-sm btn-outline-danger btn-round btn-block">Canceled</span></td>
+                  <td>&#x20B9; 1250.00</td>
+
+                 </tr>
+                 <tr>
+
+                  <td>Bisleri</td>
+                  <td><img src="assets/images/bisleri.png" class="product-img" alt="product img"></td>
+                  <td>#9405822</td>
+                  <td><span class="btn btn-sm btn-outline-success btn-round btn-block">Paid</span></td>
+                  <td>&#x20B9; 1250.00</td>
+
+                 </tr>
+
+               </table>
+             </div>
+        </div>
+      </div>
+    </div><!--End Row-->
+
+    <!--End Dashboard Content-->
+
+  </div>
+  <!-- End container-fluid-->
+
+  </div><!--End content-wrapper-->

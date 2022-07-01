@@ -1,0 +1,44 @@
+server:
+  port: 9090
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+  
+spring:
+  application:
+    name: NS-GATEWAY-SERVICE
+  cloud:
+    gateway:
+      routes:
+        - id: NS-USER-SERVICE
+          uri:  lb://NS-USER-SERVICE
+          predicates:
+           - Path=/neerseva/api/v1/users/**
+
+        - id: NS-ORDER-SERVICE
+          uri:  lb://NS-ORDER-SERVICE
+          predicates:
+           - Path=/neerseva/api/v1/orders/**
+           
+        - id: NS-PRODUCT-SERVICE
+          uri:  lb://NS-PRODUCT-SERVICE
+          predicates:
+           - Path=/neerseva/api/v1/products/**
+
+        - id: NS-IMAGE-SERVICE
+          uri: lb://NS-IMAGE-SERVICE
+          predicates:
+            - Path=/neerseva/api/v1/images/**
+
+        - id: NS-STOCK-SERVICE
+          uri: lb://NS-STOCK-SERVICE
+          predicates:
+            - Path=/neerseva/api/v1/stocks/**
+          
+    
