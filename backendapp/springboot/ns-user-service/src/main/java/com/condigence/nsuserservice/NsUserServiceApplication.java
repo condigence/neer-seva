@@ -14,7 +14,8 @@ public class NsUserServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(NsUserServiceApplication.class, args);
 	}
-	
+
+
 	@Bean
 	@LoadBalanced
 	public RestTemplate restTemplate() {
