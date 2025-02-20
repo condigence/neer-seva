@@ -1,6 +1,7 @@
 package com.condigence.nsproductservice.model;
 
-import javax.persistence.*;
+
+import jakarta.persistence.*;
 
 @Table(name = "brand")
 @Entity

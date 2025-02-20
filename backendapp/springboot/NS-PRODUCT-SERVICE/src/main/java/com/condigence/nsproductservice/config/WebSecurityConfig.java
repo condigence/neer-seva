@@ -3,9 +3,14 @@ package com.condigence.nsproductservice.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+//import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -21,18 +26,48 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableWebMvc
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+public class WebSecurityConfig implements WebMvcConfigurer {
 
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-//        http.authorizeRequests().anyRequest().permitAll();
-//        http.cors().and().csrf().disable();
-        http.cors()
-                .and().csrf().disable()
-                .authorizeRequests()
-                .anyRequest().access("isAuthenticated() or hasIpAddress('127.0.0.1/24') or hasIpAddress('::1')")
-                .and().httpBasic().and().headers().referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.ORIGIN);
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+////        http.authorizeRequests().anyRequest().permitAll();
+////        http.cors().and().csrf().disable();
+//        http.cors()
+//                .and().csrf().disable()
+//                .authorizeRequests()
+//                .anyRequest().access("isAuthenticated() or hasIpAddress('127.0.0.1/24') or hasIpAddress('::1')")
+//                .and().httpBasic().and().headers().referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.ORIGIN);
+//    }
+
+
+    // THis also can be used
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//                .authorizeHttpRequests((authz) -> authz
+//                        .anyRequest().authenticated()
+//                )
+//                .httpBasic(withDefaults());
+//        return http.build();
+//    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
+//                        authorizationManagerRequestMatcherRegistry.requestMatchers(HttpMethod.DELETE).hasRole("ADMIN")
+//                                .requestMatchers("/admin/**").hasAnyRole("ADMIN")
+//                                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+//                                .requestMatchers("/login/**").permitAll()
+//                                .anyRequest().authenticated())
+                        authorizationManagerRequestMatcherRegistry
+                .requestMatchers("*").permitAll()
+                .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        return http.build();
     }
 
     @Bean

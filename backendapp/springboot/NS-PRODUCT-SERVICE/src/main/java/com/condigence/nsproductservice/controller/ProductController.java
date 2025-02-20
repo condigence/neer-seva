@@ -1,11 +1,9 @@
 package com.condigence.nsproductservice.controller;
 
-import java.awt.*;
-import java.net.URI;
+
 import java.util.*;
 import java.util.List;
 
-import ch.qos.logback.core.CoreConstants;
 import com.condigence.nsproductservice.bean.BrandBean;
 
 import com.condigence.nsproductservice.dto.*;
@@ -15,7 +13,6 @@ import com.condigence.nsproductservice.service.BrandService;
 import com.condigence.nsproductservice.service.ItemService;
 import com.condigence.nsproductservice.util.AppProperties;
 import com.condigence.nsproductservice.util.CustomErrorType;
-import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -63,12 +60,12 @@ public class ProductController {
 /////////////////////////  Brands Start//////////////////////
 
 	public ResponseEntity<?> userFallback(Exception exception) {
+
 		return ResponseEntity.status(HttpStatus.OK).body("USER SERVICE IS DOWN! Please contact Admin!");
 	}
 
 	@PostMapping(value = "/brands")
 	public ResponseEntity<?> addBrands(@RequestBody BrandBean brandBean) {
-
 		logger.info("Entering addBrands with Brand Details >>>>>>>>  : {}", brandBean);
 		HttpHeaders headers = new HttpHeaders();
 		brandService.save(brandBean);
