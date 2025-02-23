@@ -11,11 +11,11 @@ import Swal from 'sweetalert2';
   styleUrls: ['./otp.component.scss']
 })
 export class OTPComponent implements OnInit {
-  otpForm: FormGroup;  
+  otpForm!: FormGroup;  
   submitted = false;
-  returnUrl: string;
-  userExist: false;
-  error: string;
+  returnUrl!: string;
+  userExist!: false;
+  error!: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -40,7 +40,7 @@ export class OTPComponent implements OnInit {
     });
 
     // get return url from route parameters or default to '/'
-    this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
   // convenience getter for easy access to form fields
@@ -52,7 +52,7 @@ export class OTPComponent implements OnInit {
       return;
     }
     const contact = localStorage.getItem('userContact');
-    this.otpForm.controls.contact.setValue(contact);    
+    this.otpForm.controls['contact'].setValue(contact);    
     if (this.route.snapshot.queryParamMap.get('registered') == 'true') {
       this.authenticationService.verifyOTP(this.otpForm.value)
         .pipe(first())

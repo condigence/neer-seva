@@ -10,7 +10,8 @@ let  paginate = require('jw-paginate');
   styleUrls: ['./pagination.component.scss']
 })
 export class PaginationComponent implements OnInit, OnChanges  {
-  @Input() items: Array<any>;
+  @Input()
+  items: Array<any> = [];
   @Output() changePage = new EventEmitter<any>(true);
   @Input() initialPage = 1;
   @Input() pageSize = 5;
@@ -27,7 +28,7 @@ export class PaginationComponent implements OnInit, OnChanges  {
 
   ngOnChanges(changes: SimpleChanges) {
     // reset page if items array has changed
-    if (changes.items.currentValue !== changes.items.previousValue) {
+    if (changes['items'].currentValue !== changes['items'].previousValue) {
       this.setPage(this.initialPage);
     }
   }

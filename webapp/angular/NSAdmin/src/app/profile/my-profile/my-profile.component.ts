@@ -1,10 +1,12 @@
 import { Component, OnInit } from "@angular/core";
-import { User } from "src/app/model/user.model";
+// import { User } from "src/app/model/user.model";
 import { Router } from "@angular/router";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { first } from "rxjs/operators";
-import { UserService } from "src/app/service/user.service";
+// import { UserService } from "src/app/service/user.service";
 import Swal from "sweetalert2";
+import { UserService } from "../../service/user.service";
+import { User } from "../../model/user.model";
 
 @Component({
   selector: "app-my-profile",
@@ -14,9 +16,9 @@ import Swal from "sweetalert2";
 export class MyProfileComponent implements OnInit {
   convertedImage: any;
   isUserActive: any;
-  user: User;
-  editForm: FormGroup;
-  imageId: number;
+  user: User = new User;
+  editForm!: FormGroup;
+  imageId!: number;
   messageToSendP = "PROFILE";
 
   constructor(
@@ -38,18 +40,19 @@ export class MyProfileComponent implements OnInit {
   }
 
   getProfileView(): void {
+   
     const currentUser = localStorage.getItem("currentUser");
     console.log(currentUser);
     this.userService
       .getUserById(JSON.parse(currentUser).id)
-      .subscribe((data) => {
+      .subscribe((data: any) => {
         this.user = data;
       });
   }
 
-  receiveMessage($event) {
+  receiveMessage($event: number) {
     this.imageId = $event;
-    this.editForm.controls.imageId.setValue(this.imageId);
+    this.editForm.controls["imageId"].setValue(this.imageId);
   }
 
   get f() {
@@ -59,12 +62,12 @@ export class MyProfileComponent implements OnInit {
   onSubmit() {
     console.log(this.editForm.value);
     console.log(this.editForm.valid);
-    this.editForm.controls.id.setValue(this.user.id);
+    this.editForm.controls["id"].setValue(this.user.id);
     this.userService
       .updateUser(this.editForm.value)
       .pipe(first())
       .subscribe(
-        (data) => {
+        () => {
           Swal.fire({
             position: "top-end",
             icon: "success",
@@ -75,7 +78,7 @@ export class MyProfileComponent implements OnInit {
           // this.router.navigate(['/profile/my-profile']);
           this.router.navigate(["/"]);
         },
-        (error) => {
+        (error: any) => {
           alert(error);
         }
       );

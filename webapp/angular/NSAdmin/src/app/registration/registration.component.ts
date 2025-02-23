@@ -5,7 +5,7 @@ import { AuthenticationService } from "../service/auth.service";
 import { AlertService } from "../service/alert.service";
 import { first } from "rxjs/operators";
 import Swal from "sweetalert2";
-import { MyValidationService } from "src/app/service/myValidatorService";
+// import { MyValidationService } from "src/app/service/myValidatorService";
 
 @Component({
   selector: "app-registration",
@@ -13,12 +13,12 @@ import { MyValidationService } from "src/app/service/myValidatorService";
   styleUrls: ["./registration.component.scss"],
 })
 export class RegistrationComponent implements OnInit {
-  registerForm: FormGroup;
+  registerForm!: FormGroup;
   loading = false;
   submitted = false;
-  returnUrl: string;
-  userExist: false;
-  error: string;
+  returnUrl!: string;
+  userExist!: false;
+  error!: string;
   mandatoryFields = "*Mandatory fields";
 
   constructor(

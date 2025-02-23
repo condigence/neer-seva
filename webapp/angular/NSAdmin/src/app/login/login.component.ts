@@ -13,11 +13,11 @@ import { UserService } from '../service/user.service';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup; 
+  loginForm!: FormGroup; 
   submitted = false;
-  returnUrl: string;
-  userExist: false;
-  error: string;
+  returnUrl!: string;
+  userExist!: false;
+  error!: string;
   users: any;
 
   constructor(
@@ -57,8 +57,10 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
+   
     let userInput = this.loginForm.value.contact;
-    let store = this.users.filter((value) => value.contact == userInput);    
+    console.log(userInput);
+    let store = this.users.filter((value: { contact: any; }) => value.contact == userInput);    
     if (store.length === 0) {
       Swal.fire({
         icon: "error",

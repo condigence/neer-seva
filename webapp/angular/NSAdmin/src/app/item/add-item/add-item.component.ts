@@ -12,9 +12,9 @@ import Swal from 'sweetalert2';
 })
 export class AddItemComponent implements OnInit {
   brands: any;
-  addForm: FormGroup;
+  addForm!: FormGroup;
   submitted = false;
-  imageId: number;
+  imageId!: number;
   messageToSendP = 'ITEM';
   mandatoryFields = '*Mandatory fields';
 
@@ -53,9 +53,9 @@ export class AddItemComponent implements OnInit {
     });
   }
 
-  receiveMessage($event) {
+  receiveMessage($event: number) {
     this.imageId = $event;
-    this.addForm.controls.imageId.setValue(this.imageId);
+    this.addForm.controls['imageId'].setValue(this.imageId);
   }
   /* Select Dropdown error handling */
   public handleError = (controlName: string, errorName: string) => {

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../service/user.service';
+import { User } from '../model/user.model';
 
 @Component({
   selector: 'app-header',
@@ -9,7 +10,7 @@ import { UserService } from '../service/user.service';
 export class HeaderComponent implements OnInit {
 
   constructor(private userService: UserService) { }
-  user;
+  user: User = new User;
   ngOnInit() {
 
     const currentUser = localStorage.getItem('currentUser');

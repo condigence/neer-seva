@@ -31,11 +31,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="
-                      let user of pageOfItems;
-                      trackBy: trackUser;
-                      let i = index;
-                    ">
+                  <tr *ngFor="let user of pageOfItems; trackBy: trackUser; let i = index;">
                     <td>{{ i + 1 }}</td>
                     <td>
                       <img [src]="'data:image/jpeg;base64,' + user.pic" class="rounded-circle customer-img"
@@ -46,8 +42,9 @@
                     <td>{{ user.email || "N/A" }}</td>
                     <td>{{ user.type || "N/A" }}</td>
                     <td>
-                      <a (click)="updateUser(user)" class="btn btn-sm btn-primary" style="margin: 5px;"><i
-                          class="zmdi zmdi-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>
+                      <a (click)="updateUser(user)" class="btn btn-sm btn-primary" style="margin: 5px;">
+                        <i class="zmdi zmdi-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i>
+                      </a>
                       <a class="btn btn-sm btn-danger" (click)="deleteTheUser(user)" style="color: white;">
                         <i class="zmdi zmdi-delete" data-toggle="tooltip" data-placement="top" title="Delete"></i>
                       </a>

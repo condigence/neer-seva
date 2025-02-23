@@ -5,7 +5,7 @@
     <li [ngClass]="{disabled:pager.currentPage === 1}" title="PREVIOUS" class="page-item previous-item">
         <a (click)="setPage(pager.currentPage - 1)" class="page-link"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
     </li>
-    <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}" title="Current Page" class="page-item number-item">
+    <li *ngFor="let page of pager.pages"  title="Current Page" class="page-item number-item">
         <a (click)="setPage(page)" class="page-link">{{page}}</a>
     </li>
     <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}" title="NEXT" class="page-item next-item">

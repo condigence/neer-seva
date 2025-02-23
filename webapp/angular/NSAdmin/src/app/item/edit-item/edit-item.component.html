@@ -24,7 +24,7 @@
                     class="form-control"
                     formControlName="brandId"
                     id="brandId"
-                    [ngClass]="{ 'is-invalid': submitted && f.brandId.errors }"
+                    
                   >
                     <option value="" selected="true">Choose Brand</option>
                     <option *ngFor="let b of brands" [value]="b.id">

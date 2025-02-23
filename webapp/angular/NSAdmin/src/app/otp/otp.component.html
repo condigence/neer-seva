@@ -22,7 +22,7 @@
                   class="form-control"
                   maxlength="4"              
                   placeholder="One Time password (4 digits)"
-                  [ngClass]="{ 'is-invalid': submitted && f.otp.errors }"
+                  
                 />
                 <div *ngIf="submitted && f.otp.errors" class="invalid-feedback">
                   <div *ngIf="f.otp.errors.required">OTP is required</div>              

@@ -14,12 +14,12 @@ import Swal from 'sweetalert2';
 export class EditItemComponent implements OnInit {
   brands: any;
   item: any;
-  editForm: FormGroup;
+  editForm!: FormGroup;
   submitted = false;
-  imageId: number;
+  imageId!: number;
   messageToSendP = 'ITEM';
   mandatoryFields = '*Mandatory fields';
-  err;
+  err: any;
   capacity = [
     { id: 1, capcityName: '500' },
     { id: 2, capcityName: '1' },
@@ -45,13 +45,13 @@ export class EditItemComponent implements OnInit {
 
     this.itemService.getItemById(+itemId).subscribe(
       (data) => {
-        this.editForm.controls.id.setValue(data.id);
-        this.editForm.controls.brandId.setValue(data.brandId);
-        this.editForm.controls.imageId.setValue(data.imageId);
-        this.editForm.controls.name.setValue(data.name);
-        this.editForm.controls.mrp.setValue(data.mrp);
-        this.editForm.controls.capacity.setValue(data.capacity);
-        this.editForm.controls.pic.setValue(data.pic);
+        this.editForm.controls['id'].setValue(data.id);
+        this.editForm.controls['brandId'].setValue(data.brandId);
+        this.editForm.controls['imageId'].setValue(data.imageId);
+        this.editForm.controls['name'].setValue(data.name);
+        this.editForm.controls['mrp'].setValue(data.mrp);
+        this.editForm.controls['capacity'].setValue(data.capacity);
+        this.editForm.controls['pic'].setValue(data.pic);
         this.item = data;
       },
       (error) => {
@@ -85,9 +85,9 @@ export class EditItemComponent implements OnInit {
     );
   }
 
-  receiveMessage($event) {
+  receiveMessage($event: number) {
     this.imageId = $event;
-    this.editForm.controls.imageId.setValue(this.imageId);
+    this.editForm.controls['imageId'].setValue(this.imageId);
   }
 
   get f() {

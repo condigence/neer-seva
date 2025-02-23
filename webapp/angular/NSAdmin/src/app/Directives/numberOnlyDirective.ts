@@ -7,7 +7,7 @@ import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 export class NumberDirective {
 
   constructor(private element: ElementRef) { }
-  @HostListener('input', ['$event']) onInputChange(event) {
+  @HostListener('input', ['$event']) onInputChange(event: { stopPropagation: () => void; }) {
     const initalValue = this.element.nativeElement.value;
     this.element.nativeElement.value = initalValue.replace(/[^0-9]*/g, '');
     if ( initalValue !== this.element.nativeElement.value) {

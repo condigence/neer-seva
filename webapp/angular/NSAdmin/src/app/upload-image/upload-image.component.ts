@@ -2,7 +2,8 @@ import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
+// import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -14,26 +15,27 @@ export class UploadImageComponent implements OnInit {
 
   constructor(private httpClient: HttpClient) { }
   title = 'ImageUploadApp';
-  public selectedFile;
-  public event1;
+  public selectedFile: any;
+  public event1: any;
   imgURL: any;
   receivedImageData: any;
   base64Data: any;
   convertedImage: any;
-  imageId: number;
-  imageModuleName: string;
-  dispalyPreview: boolean;
+  imageId!: number;
+  imageModuleName!: string;
+  dispalyPreview!: boolean;
 
    imageURL = environment.IMAGES_API_URL+'upload';
 
-  @Input() receivedParentMessage: string;
+  @Input()
+  receivedParentMessage!: string;
   @Output() messageEvent = new EventEmitter<number>();
 
   ngOnInit() {
     this.dispalyPreview = false;
   }
 
-  public onFileChanged(event) {
+  public onFileChanged(event: { target: { files: Blob[]; }; }) {
     this.imageModuleName = this.receivedParentMessage;
     this.selectedFile = event.target.files[0];
     // Below part is used to display the selected image

@@ -16,7 +16,7 @@ export class ListItemComponent implements OnInit {
   public cancelClicked = false;
 
   items: Item[] = [];
-  name: string;
+  name!: string;
   constructor(private router: Router, private itemService: ItemService) {}
 
   ngOnInit() {
