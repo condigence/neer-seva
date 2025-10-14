@@ -13,7 +13,7 @@ export class CustomerService {
 
   constructor(private http: HttpClient) {}
 
-  private baseUrl = 'http://localhost:3000/api/customers';
+  private baseUrl = 'http://localhost:9092/api/customers';
 
   getCustomers() {
     return this.http.get<Customer[]>(this.baseUrl);

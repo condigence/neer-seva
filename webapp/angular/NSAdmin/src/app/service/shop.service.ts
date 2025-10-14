@@ -14,7 +14,7 @@ export class ShopService {
 
   constructor(private http: HttpClient) {}
 
-  private baseUrl = 'http://localhost:3000/neerseva/shops';
+  private baseUrl = 'http://localhost:9092/neerseva/shops';
 
   getAllShops() {
     return this.http.get<Shop[]>(this.baseUrl);

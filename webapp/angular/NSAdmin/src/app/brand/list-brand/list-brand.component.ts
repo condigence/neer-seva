@@ -52,7 +52,7 @@ export class ListBrandComponent implements OnInit {
       confirmButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, keep it'
-    }).then((result) => {
+    }).then((result: any) => {
       if (result.value) {
         this.brandService.deleteBrand(brand.id).subscribe((data) => {
           this.getAllBrandsView();
@@ -63,7 +63,7 @@ export class ListBrandComponent implements OnInit {
         'success'
       );
 
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
+  } else if (result.dismiss === Swal.DismissReason.cancel) {
       Swal.fire(
         'Cancelled',
         'Your Brand is safe :)',
@@ -93,7 +93,7 @@ export class ListBrandComponent implements OnInit {
   }
 
 
-  trackBrand(brand: { id: any }) {
+  trackBrand(index: number, brand: { id: any }) {
     return brand ? brand.id : undefined;
   }
 

@@ -30,20 +30,25 @@ export class UploadImageComponent implements OnInit {
   @Input()
   receivedParentMessage!: string;
   @Output() messageEvent = new EventEmitter<number>();
+  childMessage: string | undefined;
 
   ngOnInit() {
     this.dispalyPreview = false;
   }
 
-  public onFileChanged(event: { target: { files: Blob[]; }; }) {
+  public onFileChanged(event: any) {
     this.imageModuleName = this.receivedParentMessage;
-    this.selectedFile = event.target.files[0];
+    // event may be a DOM Event; guard for target/files
+    const files = event?.target?.files || (event?.files ? event.files : null);
+    this.selectedFile = files ? files[0] : null;
     // Below part is used to display the selected image
-    const reader = new FileReader();
-    reader.readAsDataURL(event.target.files[0]);
-    reader.onload = (event2) => {
-      this.imgURL = reader.result;
-    };
+    if (this.selectedFile) {
+      const reader = new FileReader();
+      reader.readAsDataURL(this.selectedFile);
+      reader.onload = (event2) => {
+        this.imgURL = reader.result;
+      };
+    }
   }
 
 

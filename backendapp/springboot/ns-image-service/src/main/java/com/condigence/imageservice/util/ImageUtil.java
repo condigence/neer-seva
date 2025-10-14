@@ -51,7 +51,13 @@ public class ImageUtil {
 		byte[] imagePic = null;
 		File file = null;
 		final File dir = new File(filePath);
-		for (final File imgFile : dir.listFiles()) {
+		File[] files = dir.listFiles();
+		if (files == null) {
+			// Directory does not exist or is not a directory
+			logger.warn("Directory does not exist or is not a directory: {}", filePath);
+			return null;
+		}
+		for (final File imgFile : files) {
 			if (imageFilter.accept(imgFile)) {
 				if (fileName.equals(imgFile.getName())) {
 					file = imgFile;

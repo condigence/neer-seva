@@ -1,5 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
@@ -33,7 +35,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ItemService } from './service/item.service';
 import { BrandService } from './service/brand.service';
 import { UploadImageComponent } from './upload-image/upload-image.component';
-import { ConfirmationPopoverModule } from 'angular-confirmation-popover';
 import { AlertComponent } from './_directives';
 import { AuthGuard } from './_guards';
 import { ListUserComponent } from './user/list-user/list-user.component';
@@ -84,9 +85,9 @@ import { PaginationComponent } from './pagination/pagination.component';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    ConfirmationPopoverModule.forRoot({
-      confirmButtonType: 'danger'
-    })
+    CommonModule,
+    RouterModule,
+    
 
   ],
   providers: [

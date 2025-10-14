@@ -15,7 +15,7 @@ export class AddressService {
 
   constructor(private http: HttpClient) {}
 
-  private baseUrl = 'http://localhost:3000/neerseva/';
+  private baseUrl = 'http://localhost:9092/neerseva/';
 
   getAllAddress() {
     return this.http.get<Address[]>(this.baseUrl + 'addresses');

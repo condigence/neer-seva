@@ -17,7 +17,7 @@ export class AddUserComponent implements OnInit {
   addForm: FormGroup;
   submitted = false;
   message: string;
-  error: string;
+  error: any;
   imageId: number;
   messageToSendP = 'PROFILE';
   mandatoryFields = '* Mandatory fields';
@@ -113,7 +113,7 @@ export class AddUserComponent implements OnInit {
     return this.addForm.controls[controlName].hasError(errorName);
   }
 
-  changeUserType(e: { target: { value: any; }; }) {
+  changeUserType(e: any) {
     this.addForm.get('type').setValue(e.target.value, {
       onlySelf: true,
     });

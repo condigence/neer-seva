@@ -59,7 +59,7 @@ export class ListUserComponent implements OnInit {
     }
   }
 
-  trackUser(user: { id: any }) {
+  trackUser(index: number, user: { id: any }) {
     return user ? user.id : undefined;
   }
 
@@ -101,7 +101,7 @@ export class ListUserComponent implements OnInit {
       confirmButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, keep it'
-    }).then((result) => {
+    }).then((result: any) => {
       if (result.isConfirmed) {
         this.userService.deleteUser(user.id).subscribe(() => {
           this.getAllUsers();
@@ -111,7 +111,7 @@ export class ListUserComponent implements OnInit {
           `<strong style="color:red;">Your selected User has been deleted.</strong>`,
           'success'
         );
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
+  } else if (result.dismiss === Swal.DismissReason.cancel) {
         Swal.fire(
           'Cancelled',
           'Your selected user is safe :)',

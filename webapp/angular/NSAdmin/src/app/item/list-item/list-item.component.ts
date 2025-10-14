@@ -51,7 +51,7 @@ export class ListItemComponent implements OnInit {
       confirmButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, keep it'
-    }).then((result) => {
+    }).then((result: any) => {
       if (result.value) {
         this.itemService.deleteItem(item.id).subscribe((data) => {
           this.getAllItems();
@@ -88,7 +88,11 @@ export class ListItemComponent implements OnInit {
     });
   }
 
-  trackUser(item: { id: any }) {
+  trackUser(index: number, item: { id: any }) {
+    return item ? item.id : undefined;
+  }
+
+  trackItem(index: number, item: { id: any }) {
     return item ? item.id : undefined;
   }
 }

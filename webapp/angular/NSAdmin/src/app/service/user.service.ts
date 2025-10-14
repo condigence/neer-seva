@@ -13,7 +13,7 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   
-  private nodeBaseUrl = 'http://localhost:3000/neerseva/api/v1';
+  private nodeBaseUrl = 'http://localhost:9092/neerseva/api/v1';
 
   private usersAPI = environment.USERS_API_URL;
 

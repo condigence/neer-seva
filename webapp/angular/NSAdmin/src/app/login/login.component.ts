@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
   returnUrl!: string;
   userExist!: false;
   error!: string;
-  users: any;
+  users: any = [];
 
   constructor(
     private formBuilder: FormBuilder,    
@@ -46,7 +46,14 @@ export class LoginComponent implements OnInit {
       }
 
     );
-    this.userService.getAllUsers().subscribe((user) => (this.users = user));
+    this.userService.getAllUsers().subscribe({
+      next: (user) => (this.users = user || []),
+      error: (err) => {
+        console.error('Failed to load users', err);
+        // ensure users is an array to avoid runtime errors
+        this.users = [];
+      },
+    });
     // get return url from route parameters or default to '/'
     // this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
@@ -60,7 +67,9 @@ export class LoginComponent implements OnInit {
    
     let userInput = this.loginForm.value.contact;
     console.log(userInput);
-    let store = this.users.filter((value: { contact: any; }) => value.contact == userInput);    
+    // Guard: ensure users is an array before calling filter
+    const usersArray = Array.isArray(this.users) ? this.users : [];
+    let store = usersArray.filter((value: { contact: any; }) => value.contact == userInput);    
     if (store.length === 0) {
       Swal.fire({
         icon: "error",
@@ -77,20 +86,38 @@ export class LoginComponent implements OnInit {
         this.authenticationService
           .verifyLogin(this.loginForm.value)
           .pipe(first())
-          .subscribe((data) => {
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Your are Redirected to otp page",
-              text: "Proceed for OTP!",
-              showConfirmButton: true,
-              timerProgressBar: true,
-              timer: 5000,
-              footer: `<strong style="color:purple;">Go for OTP!</strong>`,
-            });
-            this.router.navigate(["/otp"], {
-              queryParams: { registered: true },
-            });
+          .subscribe({
+            next: (data) => {
+              Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Your are Redirected to otp page",
+                text: "Proceed for OTP!",
+                showConfirmButton: true,
+                timerProgressBar: true,
+                timer: 5000,
+                footer: `<strong style="color:purple;">Go for OTP!</strong>`,
+              });
+              this.router.navigate(["/otp"], {
+                queryParams: { registered: true },
+              });
+            },
+            error: (err) => {
+              console.error('Login error:', err);
+              // If network error or server unavailable, HttpErrorResponse will be present
+              let message = 'An error occurred. Please try again later.';
+              if (err?.status === 0) {
+                // A client-side or network error occurred. Status 0 indicates network failure
+                message = 'Network Error! Please contact Admin!';
+              } else if (err?.error?.message) {
+                message = err.error.message;
+              }
+              Swal.fire({
+                icon: 'error',
+                title: 'Login failed',
+                text: message,
+              });
+            }
           });        
       } else {
         Swal.fire({
