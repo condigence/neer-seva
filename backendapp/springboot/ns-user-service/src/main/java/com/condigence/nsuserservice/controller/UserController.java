@@ -469,4 +469,16 @@ public class UserController {
 
 		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
+
+	@GetMapping("/v1/users/active/count")
+	public ResponseEntity<Long> countActiveUsers() {
+		logger.info("Counting active users");
+		List<User> users = service.getAll();
+		long activeCount = users.stream()
+				.filter(u -> u.getIsActive() != null && "Y".equalsIgnoreCase(u.getIsActive()))
+				.count();
+		return ResponseEntity.ok(activeCount);
+	}
+
+
 }

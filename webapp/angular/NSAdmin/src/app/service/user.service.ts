@@ -13,7 +13,7 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   
-  private nodeBaseUrl = 'http://localhost:9092/neerseva/api/v1';
+  private nodeBaseUrl = 'http://localhost:9092/neerseva/api/v1/users';
 
   private usersAPI = environment.USERS_API_URL;
 
@@ -43,7 +43,7 @@ export class UserService {
   }
 
   getAllUsersCount() {
-    return this.http.get(this.nodeBaseUrl + '/usercounts');
+    return this.http.get(this.nodeBaseUrl + '/active/count');
   }
 
   getAllVendorCount() {

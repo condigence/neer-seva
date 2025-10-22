@@ -1,0 +1,55 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# Build / output
+dist/
+build/
+coverage/
+.temp/
+.bundle/
+
+# Angular cache
+.angular/
+.angular-cache/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.iml
+*.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# Misc
+.cache/
+tmp/
+*.tmp
+
+# Ignore local node binary
+node_modules/.bin/
+
+# Ignore compiled output
+*.tsbuildinfo
+
+# Keep package-lock if you prefer it in repo; remove the above package-lock line if you want it tracked
