@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.5.2</version>
+		<version>3.3.13</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.condigence</groupId>
@@ -14,8 +14,8 @@
 	<name>ns-service-registry</name>
 	<description>Service Registry  project for NeerSeva</description>
 	<properties>
-		<java.version>11</java.version>
-		<spring-cloud.version>2020.0.3</spring-cloud.version>
+		<java.version>21</java.version>
+		<spring-cloud.version>2023.0.6</spring-cloud.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -25,7 +25,13 @@
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-actuator</artifactId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- Provide a Bean Validation provider to avoid NoProviderFoundException at startup -->
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
 		<dependency>
@@ -38,6 +44,18 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
+		</dependency>
+
+		<!-- Security: protect actuator and eureka endpoints -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!-- Observability: expose Prometheus metrics -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -57,8 +75,70 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
+				<configuration>
+					<release>${java.version}</release>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>use-java-25</id>
+			<activation>
+				<property>
+					<name>forceJava25</name>
+				</property>
+			</activation>
+			<properties>
+				<java.version>25</java.version>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.13.0</version>
+						<configuration>
+							<release>${java.version}</release>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Fallback profile for developers who don't have JDK 25 installed -->
+		<profile>
+			<id>use-java-21</id>
+			<activation>
+				<property>
+					<name>forceJava21</name>
+				</property>
+			</activation>
+			<properties>
+				<java.version>21</java.version>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.13.0</version>
+						<configuration>
+							<release>${java.version}</release>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

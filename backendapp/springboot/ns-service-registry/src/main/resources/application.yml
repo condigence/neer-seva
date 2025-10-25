@@ -1,6 +1,24 @@
+server:
+  port: 8761
 
-server:  port: 8761
-  
-eureka:  client:
-    register-with-eureka: false    fetch-registry: false
-     
+spring:
+  security:
+    user:
+      name: ${EUREKA_ADMIN_USER:admin}
+      password: ${EUREKA_ADMIN_PASSWORD:admin123}
+
+management:
+  server:
+    port: 8761
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
