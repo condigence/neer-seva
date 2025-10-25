@@ -2,7 +2,6 @@ package com.condigence.nsserviceregistry.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,12 +20,11 @@ public class SecurityConfig {
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/index.html").permitAll()
                 .requestMatchers("/static/**").permitAll()
-                // allow unauthenticated GET access to eureka (read-only listing)
-                .requestMatchers(HttpMethod.GET, "/eureka/**").permitAll()
+                // allow all access to eureka endpoints for development (read + write)
+                // IMPORTANT: remove or tighten this in production (use mTLS or client credentials)
+                .requestMatchers("/eureka/**").permitAll()
                 // actuator endpoints require authentication
                 .requestMatchers("/actuator/**").authenticated()
-                // other eureka operations (POST/DELETE) require authentication
-                .requestMatchers("/eureka/**").authenticated()
                 .anyRequest().permitAll()
             )
             .httpBasic(Customizer.withDefaults());

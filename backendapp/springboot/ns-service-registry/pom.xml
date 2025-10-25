@@ -92,14 +92,14 @@
 
 	<profiles>
 		<profile>
-			<id>use-java-25</id>
+			<id>use-java-21</id>
 			<activation>
 				<property>
-					<name>forceJava25</name>
+					<name>forceJava21</name>
 				</property>
 			</activation>
 			<properties>
-				<java.version>25</java.version>
+				<java.version>21</java.version>
 			</properties>
 			<build>
 				<plugins>

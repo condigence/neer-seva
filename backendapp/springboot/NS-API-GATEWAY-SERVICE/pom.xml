@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.5.3</version>
+        <version>3.3.13</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.condigence</groupId>
@@ -14,10 +14,10 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>NS-API-GATEWAY-SERVICE</name>
 	<description>Demo project for Spring Boot</description>
-	<properties>
-		<java.version>11</java.version>
-		<spring-cloud.version>2020.0.3</spring-cloud.version>
-	</properties>
+    <properties>
+        <java.version>21</java.version>
+        <spring-cloud.version>2023.0.6</spring-cloud.version>
+    </properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -72,6 +72,15 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- Ensure the compiler targets Java 21 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<release>${java.version}</release>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

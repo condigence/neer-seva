@@ -1,5 +1,6 @@
 server:
   port: 8761
+  address: 127.0.0.1
 
 spring:
   security:
@@ -18,7 +19,26 @@ management:
     health:
       show-details: when-authorized
 
+logging:
+  level:
+    com.netflix.discovery: DEBUG
+    org.springframework.cloud: DEBUG
+
+# Eureka configuration
 eureka:
+  instance:
+    hostname: localhost
+    # Use library defaults for lease timings in production. Avoid overriding here unless you know the client behavior.
   client:
     register-with-eureka: false
     fetch-registry: false
+  server:
+    # IMPORTANT: enable self-preservation in production to protect instance expiry during network issues
+    enable-self-preservation: true
+    enableSelfPreservation: true
+    # Use a conservative renewal percent threshold (85% of expected renewals)
+    renewal-percent-threshold: 0.85
+    renewalPercentThreshold: 0.85
+    # Keep default eviction interval; adjust via metrics/observation if needed
+    eviction-interval-timer-in-ms: 60000
+    evictionIntervalTimerInMs: 60000
