@@ -1,6 +1,6 @@
 package com.condigence.imageservice.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Arrays;
 
 @Table(name = "image")
@@ -9,7 +9,7 @@ public class Image {
 
 	@Id
 	@Column(name = "id")
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "module_name")
