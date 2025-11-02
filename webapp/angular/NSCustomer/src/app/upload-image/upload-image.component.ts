@@ -20,6 +20,7 @@ export class UploadImageComponent implements OnInit {
   base64Data: any;
   convertedImage: any;
   imageId: number;
+  childMessage: any;
   imageModuleName: string;
   dispalyPreview: boolean;
 
@@ -58,6 +59,8 @@ export class UploadImageComponent implements OnInit {
           console.log(this.base64Data);
           console.log(this.convertedImage);
           this.imageId = this.receivedImageData.id;
+          // set childMessage so the template can display image id or any message
+          this.childMessage = this.imageId;
           //Emit Data
           this.messageEvent.emit(this.imageId);
         },

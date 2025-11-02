@@ -38,6 +38,10 @@ spring:
     username: sa
     password: ""
     driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-h2.sql
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
@@ -50,8 +54,8 @@ eureka:
     enabled: true
     service-url:
       defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
+  register-with-eureka: true
+  fetch-registry: true
   instance:
     instance-id: ${vcap.application.instance_id:${spring.application.name}:${spring.application.instance_id:${random.value}}}
     lease-renewal-interval-in-seconds: 10

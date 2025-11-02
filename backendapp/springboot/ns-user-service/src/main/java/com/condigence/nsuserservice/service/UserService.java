@@ -118,4 +118,15 @@ public class UserService {
     public Boolean addBalance(Long amount) {
 		return true;
     }
+
+    // New: count active users using repository
+    public long countActiveUsers() {
+        return repository.countByIsActive("Y");
+    }
+
+    // New: count users by type (case-insensitive)
+    public long countByType(String type) {
+        if (type == null) return 0L;
+        return repository.countByTypeIgnoreCase(type);
+    }
 }

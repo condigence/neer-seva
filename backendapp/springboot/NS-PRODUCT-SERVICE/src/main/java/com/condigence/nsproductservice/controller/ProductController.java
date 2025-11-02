@@ -20,11 +20,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4500")
+@CrossOrigin(origins = "*")
 @RequestMapping("/neerseva/api/v1/products")
 public class ProductController {
 
@@ -64,6 +64,27 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.OK).body("USER SERVICE IS DOWN! Please contact Admin!");
 	}
 
+	/**
+	 * Safely fetch image pic from image-service. If any exception occurs or the
+	 * response/body is null, this returns null. This prevents the controller
+	 * from throwing when image-service returns 401/404 or is down.
+	 */
+	private byte[] getImagePicSafe(Long imageId) {
+		if (imageId == null) return null;
+		try {
+			ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + imageId, ImageDTO.class);
+			if (imageDTO != null) {
+				return imageDTO.getPic();
+			}
+		} catch (RestClientException ex) {
+			// Log and continue without failing the whole request.
+			logger.warn("Unable to fetch image from image-service for id {}: {}", imageId, ex.getMessage());
+		} catch (Exception ex) {
+			logger.error("Unexpected error while fetching image {}: {}", imageId, ex.getMessage());
+		}
+		return null;
+	}
+
 	@PostMapping(value = "/brands")
 	public ResponseEntity<?> addBrands(@RequestBody BrandBean brandBean) {
 		logger.info("Entering addBrands with Brand Details >>>>>>>>  : {}", brandBean);
@@ -72,7 +93,7 @@ public class ProductController {
 		return new ResponseEntity<>(headers, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/brands")
+	@GetMapping("/brands/")
 //	@CircuitBreaker(name=USER_SERVICE,fallbackMethod = "userFallback")
 	public ResponseEntity<?> getAllBrands() {
 
@@ -90,10 +111,11 @@ public class ProductController {
 			//UserDTO userDTO = restTemplate.getForObject("http://NS-USER-SERVICE/neerseva/api/v1/users/"+brand.getCreatedByUser(), UserDTO.class); // Working
 			//System.out.println(brand);
 			if (brand.getImageId() != null) {
-				ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+brand.getImageId(), ImageDTO.class); // Working
-				//System.out.println(imageDTO);
-
-				dto.setPic(imageDTO.getPic());
+				// Use safe helper to avoid failing the whole request if image-service returns 401/other errors
+				byte[] pic = getImagePicSafe(brand.getImageId());
+				if (pic != null) {
+					dto.setPic(pic);
+				}
 			}
 			dtos.add(dto);
 		}
@@ -130,10 +152,10 @@ public class ProductController {
 			dto.setName(brand.get().getName());
 			dto.setCreatedByUser(brand.get().getCreatedByUser());
 			if (brand.get().getImageId() != null) {
-				ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+brand.get().getImageId(), ImageDTO.class); // Working
-				//System.out.println(imageDTO);
-
-				dto.setPic(imageDTO.getPic());
+				byte[] pic = getImagePicSafe(brand.get().getImageId());
+				if (pic != null) {
+					dto.setPic(pic);
+				}
 
 			}
 		} else {
@@ -245,9 +267,10 @@ public class ProductController {
 			dto.setDispPrice(item.getDispPrice());
 			if (item.getImageId() != null) {
 				dto.setImageId(item.getImageId());
-				ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+item.getImageId(), ImageDTO.class); // Working
-				//System.out.println(imageDTO);
-				dto.setPic(imageDTO.getPic());
+				byte[] pic = getImagePicSafe(item.getImageId());
+				if (pic != null) {
+					dto.setPic(pic);
+				}
 			}
 
 			dtos.add(dto);
@@ -278,9 +301,10 @@ public class ProductController {
 			if (item.get().getImageId() != null) {
 				dto.setImageId(item.get().getImageId());
 
-				ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+item.get().getImageId(), ImageDTO.class); // Working
-				//System.out.println(imageDTO);
-				dto.setPic(imageDTO.getPic());
+				byte[] pic = getImagePicSafe(item.get().getImageId());
+				if (pic != null) {
+					dto.setPic(pic);
+				}
 			}
 
 

@@ -5,8 +5,8 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'add',
-  templateUrl: './address.pages.html',
-  styleUrls: ['./address.pages.scss']
+  templateUrl: './listaddress.pages.html',
+  styleUrls: ['./listaddress.pages.scss']
 })
 
 export class AddressPage {

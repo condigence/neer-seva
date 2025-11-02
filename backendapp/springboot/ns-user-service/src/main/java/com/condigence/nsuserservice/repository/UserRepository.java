@@ -15,4 +15,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	long countByType(String type);
 
+	// Count active users (is_active = 'Y')
+	long countByIsActive(String isActive);
+
+	// Case-insensitive type count convenience
+	long countByTypeIgnoreCase(String type);
+
 }

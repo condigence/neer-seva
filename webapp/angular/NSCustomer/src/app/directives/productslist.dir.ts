@@ -56,9 +56,9 @@ export class ProductsListDir {
   ngOnInit() {
     this.sortByOption;
   }
-  addToCart(itemId, itemQty) {
+  addToCart(itemId, itemQty, note?: string) {
     this.cart.allItems = this.items;
-    this.cart.addToCart(itemId, itemQty, '');
+    this.cart.addToCart(itemId, itemQty, note || '');
     this.refresh.emit('true');
   }
 }

@@ -63,6 +63,7 @@ export class ProductsPage implements OnInit {
   public sortBy: string = '';
   public sortOption: string = 'name|asc';
   items: ItemView[] = [];
+  searchText: string = '';
   vendors:any;
 
 /////
@@ -99,7 +100,7 @@ messageToSendP: string = '';
   //     console.log(this.vendors);
   //   });
   // }
-  ref() {
+  ref(event?: any) {
     this.cartflag = false;
     setTimeout(() => {
       this.cartflag = true;

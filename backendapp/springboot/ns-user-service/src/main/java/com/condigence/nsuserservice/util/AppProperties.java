@@ -13,7 +13,10 @@ public class AppProperties {
 	private Environment env;
 
 	private String location;
-	
+
+	// New: optional fallback image (could be base64 or URL)
+	private String fallbackImage;
+
 	public String getLocation() {
 		return location;
 	}
@@ -22,13 +25,21 @@ public class AppProperties {
 		this.location = location;
 	}
 
+	public String getFallbackImage() {
+		return fallbackImage;
+	}
+
+	public void setFallbackImage(String fallbackImage) {
+		this.fallbackImage = fallbackImage;
+	}
+
 	public String getProperty(String pPropertyKey) {
         return env.getProperty(pPropertyKey);
     }
 
 	@Override
 	public String toString() {
-		return "AppProperties [env=" + env + ", location=" + location + "]";
+		return "AppProperties [env=" + env + ", location=" + location + ", fallbackImage=" + fallbackImage + "]";
 	}
 
 	

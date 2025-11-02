@@ -15,6 +15,7 @@ import { ProductsModel } from '../../model/products.model';
 
 export class CheckoutPage{
   public cartflag:boolean= false;
+  public items: any[] = [];
   constructor(
     public cart: CartService,
     public products: ProductsModel

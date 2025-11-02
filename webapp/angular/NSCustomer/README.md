@@ -1,27 +1,111 @@
-# ShopProject
+# ShopProject (NSCustomer)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.2.
+This repository contains the frontend web application for the NSCustomer project. It's an Angular application scaffolded with the Angular CLI and configured for local development and testing.
+
+## Quick overview
+
+- Framework: Angular (v18)
+- Language: TypeScript
+- App entry: `src/main.ts`
+- App code: `src/app/`
+
+## Prerequisites
+
+- Node.js (recommended 18.x or later)
+- npm (comes with Node) or yarn/pnpm if you prefer (this project uses npm by default)
+- Angular CLI (optional globally): `npm i -g @angular/cli`
+
+## Install
+
+Open a terminal at the project root (`d:/gitrepo/neer-seva/webapp/angular/NSCustomer`) and run:
+
+```powershell
+npm install
+```
+
+This will install dependencies listed in `package.json`.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run the dev server with:
 
-## Code scaffolding
+```powershell
+npm start
+# or
+ng serve
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Open http://localhost:4200/ in your browser. The app reloads on file changes.
 
-## Build
+## Available scripts
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+The `package.json` includes these npm scripts (aliases to Angular CLI commands):
 
-## Running unit tests
+- `npm start` — `ng serve` (run dev server)
+- `npm run build` — `ng build` (build app to `dist/`)
+- `npm test` — `ng test` (run unit tests via Karma)
+- `npm run lint` — `ng lint` (run linter)
+- `npm run e2e` — `ng e2e` (run e2e tests)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Example: create a production build:
 
-## Running end-to-end tests
+```powershell
+npm run build -- --configuration production
+```
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+## Environments
 
-## Further help
+Environment files are in `src/environments/` (`environment.ts`, `environment.prod.ts`). Add local overrides as needed but avoid committing secrets. If you need per-developer local settings, use a `.env` file and keep it out of source control.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## Testing
+
+Unit tests run with Karma/Jasmine:
+
+```powershell
+npm test
+```
+
+End-to-end tests (Protractor) run with:
+
+```powershell
+npm run e2e
+```
+
+## Linting
+
+Run ESLint/TS linting with:
+
+```powershell
+npm run lint
+```
+
+## Project structure (important folders)
+
+- `src/app/` — main application code (components, services, modules)
+- `src/assets/` — images, fonts, styles
+- `src/environments/` — environment configs
+
+## Contributing / Notes for developers
+
+- Commit lockfiles only if your team wants deterministic installs. The default `.gitignore` in this repo currently ignores `package-lock.json` — remove it from `.gitignore` if you want to commit it.
+- Keep shared configuration (lint, tsconfig) consistent across the team.
+- If you add native modules or change Node targets, update `engines` in `package.json` and document any extra setup steps here.
+
+## Troubleshooting
+
+- If `npm install` fails, remove `node_modules` and retry: `rm -r node_modules; npm install` (PowerShell: `Remove-Item -Recurse node_modules; npm install`).
+- If the dev server port 4200 is busy, run: `ng serve --port 4300` or change in the `start` script.
+
+## License & Contact
+
+Add your license and contact/maintainer info here (e.g., `MIT` or company policy).
+
+---
+
+If you'd like, I can also:
+
+- add a short CONTRIBUTING.md
+- add badges (build, coverage)
+- add a developer quick-start script
+
+Tell me which you prefer and I will add them.

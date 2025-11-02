@@ -13,6 +13,9 @@ import { AddAddressDir } from './directives/address/add/address.component';
 import { UploadImageComponent } from './upload-image/upload-image.component';
 import { EditAddressDir } from './directives/address/edit/addressdir';
 import { PaymentPage } from './pages/payment/payment.pages';
+import { AddressPage } from './pages/address/list/listaddress.pages';
+import { AddAddreddPage } from './pages/address/add/add-address.pages';
+import { EditAddressPages } from './pages/address/edit/edit-address.pages';
 
 
 const appRoutes: Routes = [
@@ -45,6 +48,17 @@ export const RouterConfig = [
 
 ];
 
-export const RouterDeclarations = [ProductsPage, BillingPage, CheckoutPage, PaymentPage, LoginComponent, OTPComponent];
+export const RouterDeclarations = [
+  ProductsPage,
+  BillingPage,
+  CheckoutPage,
+  PaymentPage,
+  LoginComponent,
+  OTPComponent,
+  // address pages
+  AddressPage,
+  AddAddreddPage,
+  EditAddressPages
+];
 
 

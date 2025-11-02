@@ -17,9 +17,9 @@ export class LoginComponent implements OnInit {
   loading = false;
   submitted = false;
   returnUrl: string;
-  userExist: false;
+  userExist: boolean = false;
   error: string;
-  users: any;
+  users: any = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -59,7 +59,17 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     let userInput = this.loginForm.value.contact;
-    let store = this.users.filter((value) => value.contact == userInput);    
+    // Guard against users not yet loaded
+    if (!this.users || !Array.isArray(this.users) || this.users.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please wait...",
+        text: "User data is still loading. Try again in a moment.",
+      });
+      return;
+    }
+
+    let store = this.users.filter((value) => value.contact == userInput);
     if (store.length === 0) {
       Swal.fire({
         icon: "error",

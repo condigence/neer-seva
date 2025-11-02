@@ -22,7 +22,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.Arrays;
 import java.util.List;
 
-@Profile("dev")
 @Configuration
 @EnableWebSecurity
 @EnableWebMvc
@@ -62,7 +61,11 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 //                                .requestMatchers("/login/**").permitAll()
 //                                .anyRequest().authenticated())
                         authorizationManagerRequestMatcherRegistry
-                .requestMatchers("*").permitAll()
+                // Permit unauthenticated GET access to brand endpoints used by clients
+                .requestMatchers(HttpMethod.GET, "/neerseva/api/v1/products/brands", "/neerseva/api/v1/products/brands/**").permitAll()
+                // Allow preflight requests
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // Keep other requests authenticated
                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

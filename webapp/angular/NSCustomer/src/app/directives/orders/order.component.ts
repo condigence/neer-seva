@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 //import { UserView } from 'src/app/viewmodel/user.view.model';
 //import { ProfileService } from 'src/app/service/profile.service';
-import { HttpClient } from 'selenium-webdriver/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
@@ -44,9 +44,9 @@ export class OrderComponent implements OnInit {
     });
   }
 
-  openModal(id: string, order: any) {
-    console.log(order)
-    const modalRef = this.modalService.open(id, order);
+  openModal(id: string, order?: any) {
+    console.log(order);
+    const modalRef = this.modalService.open(id, order || null);
     this.order = order;
   }
 
