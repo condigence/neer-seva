@@ -16,7 +16,7 @@ import { ModalService } from '../../modal';
 })
 export class OrderComponent implements OnInit {
 
-  orders: any;
+  orders: any[] = [];
   order: any;
   currentUser: any;
 
@@ -38,10 +38,28 @@ export class OrderComponent implements OnInit {
 
   getMyOrders(): void {
     let currentUser = localStorage.getItem('currentUser');
-    this.orderService.getOrderByUserById(JSON.parse(currentUser).id).subscribe(data => {
-      this.orders = data;
-      console.log(this.orders);
-    });
+    this.orderService.getOrderByUserById(JSON.parse(currentUser).id).subscribe(
+      data => {
+        console.log('raw orders response:', data);
+        if (Array.isArray(data)) {
+          this.orders = data;
+        } else if (data && Array.isArray(data.data)) {
+          this.orders = data.data;
+        } else if (data && Array.isArray(data.orders)) {
+          this.orders = data.orders;
+        } else if (data && Array.isArray(data.items)) {
+          this.orders = data.items;
+        } else {
+          // fallback: coerce single object to an array or keep empty
+          this.orders = data ? [data] : [];
+        }
+        console.log('normalized orders:', this.orders);
+      },
+      err => {
+        console.error('Failed to load orders', err);
+        this.orders = [];
+      }
+    );
   }
 
   openModal(id: string, order?: any) {

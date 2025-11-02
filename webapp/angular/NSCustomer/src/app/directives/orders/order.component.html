@@ -105,9 +105,9 @@
                                                         <!-- <img class="img-fluid" src="assets/images/mypic.jpg" alt="Card image cap"> -->
                                                 </div>
                                                 <div class="card-body pt-5">
-                                                        <img alt="profile-image" [src]="'data:image/jpeg;base64,'+order.orderDetail.vendor.pic"  class="profile">
+                                                        <img alt="profile-image" [src]="order?.orderDetail?.vendor?.pic ? ('data:image/jpeg;base64,' + order?.orderDetail?.vendor?.pic) : ''"  class="profile">
                                                        
-                                                        <h5 class="card-title">{{order.orderDetail.vendor.name}}</h5>
+                                                        <h5 class="card-title">{{order?.orderDetail?.vendor?.name}}</h5>
                                                         <!-- <p class="card-text">{{user.description}}</p> -->
                                                         <div class="icon-block">
                                                         </div>
@@ -144,22 +144,22 @@
                                                                                 <div class="col-lg-9"
                                                                                         style="margin-bottom: 15px;">
 
-                                                                                        <span>{{order.orderDetail.vendor.name}}</span>
+                                                                                        <span>{{order?.orderDetail?.vendor?.name}}</span>
                                                                                 </div>
                                                                                 <label
                                                                                         class="col-lg-3 col-form-label form-control-label">Email</label>
                                                                                 <div class="col-lg-9"
                                                                                         style="margin-bottom: 15px;">
 
-                                                                                        <span>{{order.orderDetail.vendor.email}}</span>
+                                                                                        <span>{{order?.orderDetail?.vendor?.email}}</span>
                                                                                 </div>
                                                                                 <label
                                                                                         class="col-lg-3 col-form-label form-control-label">Phone</label>
                                                                                 <div class="col-lg-9"
                                                                                         style="margin-bottom: 15px;">
 
-                                                                                        <span>{{order.orderDetail.vendor.contact}}</span>
-                                                                                </div>
+                                                                                        <span>{{order?.orderDetail?.vendor?.contact}}</span>
+                                                                                        </div>
                                                                         </div>
                                                                 </div>
 
