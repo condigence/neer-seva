@@ -72,7 +72,7 @@ public class ProductController {
 	private byte[] getImagePicSafe(Long imageId) {
 		if (imageId == null) return null;
 		try {
-			ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + imageId, ImageDTO.class);
+			ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + imageId+"/data", ImageDTO.class);
 			if (imageDTO != null) {
 				return imageDTO.getPic();
 			}
