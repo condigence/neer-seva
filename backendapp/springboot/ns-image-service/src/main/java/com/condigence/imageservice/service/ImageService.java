@@ -1,5 +1,6 @@
 package com.condigence.imageservice.service;
 
+import com.condigence.imageservice.dto.ImageSummary;
 import com.condigence.imageservice.entity.Image;
 import com.condigence.imageservice.repository.ImageRepository;
 
@@ -8,6 +9,10 @@ import com.condigence.imageservice.util.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,5 +96,14 @@ public class ImageService {
 
     public List<Image> getAlI() {
         return imageRepository.findAll();
+    }
+
+    public Page<ImageSummary> getImageSummaries(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Image> all = imageRepository.findAll(pageable).getContent();
+        List<ImageSummary> summaries = all.stream()
+                .map(img -> new ImageSummary(img.getId(), img.getName(), img.getImageName(), img.getImageSize(), img.getModuleName(), img.getType()))
+                .toList();
+        return new PageImpl<>(summaries, pageable, imageRepository.count());
     }
 }

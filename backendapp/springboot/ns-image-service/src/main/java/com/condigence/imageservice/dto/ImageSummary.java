@@ -1,24 +1,22 @@
 package com.condigence.imageservice.dto;
 
-public class ImageDTO {
+public class ImageSummary {
     private Long id;
     private String name;
-    private String imageName; // unique_name
+    private String imageName;
     private Long imageSize;
     private String moduleName;
     private String type;
-    private String pic; // base64 string of the image
 
-    public ImageDTO() {}
+    public ImageSummary() {}
 
-    public ImageDTO(Long id, String name, String imageName, Long imageSize, String moduleName, String type, String pic) {
+    public ImageSummary(Long id, String name, String imageName, Long imageSize, String moduleName, String type) {
         this.id = id;
         this.name = name;
         this.imageName = imageName;
         this.imageSize = imageSize;
         this.moduleName = moduleName;
         this.type = type;
-        this.pic = pic;
     }
 
     public Long getId() { return id; }
@@ -38,8 +36,5 @@ public class ImageDTO {
 
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
-
-    public String getPic() { return pic; }
-    public void setPic(String pic) { this.pic = pic; }
 }
 
