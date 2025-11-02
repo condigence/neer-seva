@@ -39,7 +39,8 @@ public class Image {
 	private String imageName;
 
 	@Lob
-	@Column(name = "pic")
+	@Basic(fetch = FetchType.LAZY)
+	@Column(name = "pic", columnDefinition = "LONGBLOB")
 	private byte[] pic;
 
 	/**
