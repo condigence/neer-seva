@@ -117,7 +117,7 @@
 
 		<!-- Fallback profile for developers who don't have JDK 25 installed -->
 		<profile>
-			<id>use-java-21</id>
+			<id>use-java-21-fallback</id>
 			<activation>
 				<property>
 					<name>forceJava21</name>

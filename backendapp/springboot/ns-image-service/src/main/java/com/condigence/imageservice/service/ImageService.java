@@ -33,7 +33,7 @@ public class ImageService {
 
 	@Autowired
 	public ImageService(AppProperties properties) {
-		this.rootLocation = Paths.get(properties.getLocation());
+		this.rootLocation = Paths.get("D://gitrepo//neer-seva//backendapp//springboot//ns-image-service/neerseva-images");
 	}
 
 	public static final Logger logger = LoggerFactory.getLogger(ImageService.class);
