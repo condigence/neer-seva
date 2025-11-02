@@ -517,7 +517,7 @@ public class UserController {
 			return ci.pic;
 		}
 		// Not cached or stale: fetch from remote
-		ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + imageId, ImageDTO.class);
+		ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + imageId+"/data", ImageDTO.class);
 		if (imageDTO == null || imageDTO.getPic() == null) {
 			logger.warn("Image service returned null or empty pic for imageId {}", imageId);
 			throw new RestClientException("Image empty for id " + imageId);
