@@ -5,6 +5,7 @@ import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../services/auth.service';
 import { OrderService } from '../services/order.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'billing-dir',
@@ -67,6 +68,7 @@ export class BillingDir {
     private authenticationService: AuthenticationService,
     public cart: CartService,
     private orderService: OrderService,
+    private http: HttpClient,
     public router: Router
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
@@ -117,30 +119,56 @@ export class BillingDir {
         let currentUser = localStorage.getItem('currentUser');
         let custId = JSON.parse(currentUser).id;
 
-        //Get current customer
+        // Get current customer
         let customer = { "customerId": custId };
-        //Get Selected vendor
-        let shopId = localStorage.getItem('selectedShop');
-        let shop = { "id": shopId };
 
-        let items = [];
-        let i;
+        const prepareAndPlace = (shopIdValue: any) => {
+          const shop = { id: Number(shopIdValue) };
 
-        //Prepare items
-        for (i = 0; i < this.cart.cartItemsList.length; i++) {
-          let item = { "id": this.cart.cartItemsList[i].id, "quantity": this.cart.cartItemsList[i].qty }
-          items.push(item);
-        }
+          let items = [];
+          for (let i = 0; i < this.cart.cartItemsList.length; i++) {
+            let item = { id: this.cart.cartItemsList[i].id, quantity: this.cart.cartItemsList[i].qty };
+            items.push(item);
+          }
 
-        // prepare Order data
-        this.order = { "customer": customer, "shop": shop, "items": items };
-        this.orderService.placeMyOrder(this.order)
-          .subscribe(data => {
-            console.log(data);
-            this.router.navigate(['/checkout']);
-          });
-          // Clear cart ofter placing order
+          // prepare Order data
+          this.order = { customer: customer, shop: shop, items: items };
+          this.orderService.placeMyOrder(this.order)
+            .subscribe(data => {
+              console.log(data);
+              this.router.navigate(['/checkout']);
+            });
+          // Clear cart after placing order
           this.clearCart();
+        };
+
+        // Get Selected vendor from localStorage; if not present, fetch shops and pick first
+        let storedShop = localStorage.getItem('selectedShop');
+        if (storedShop && storedShop !== 'undefined' && storedShop !== 'null') {
+          prepareAndPlace(storedShop);
+        } else {
+          // fetch shops and pick the first one
+          const shopsUrl = 'http://localhost:9093/neerseva/api/v1/stocks/shops';
+          this.http.get<any[]>(shopsUrl).subscribe(
+            (shops) => {
+              if (shops && shops.length > 0) {
+                const first = shops[0];
+                const firstId = first.id ?? first.shopId ?? first.shop_id ?? first._id ?? null;
+                if (firstId !== null && firstId !== undefined) {
+                  localStorage.setItem('selectedShop', String(firstId));
+                  prepareAndPlace(firstId);
+                } else {
+                  console.error('No id found on first shop item', first);
+                }
+              } else {
+                console.error('No shops returned from', shopsUrl);
+              }
+            },
+            (err) => {
+              console.error('Failed to load shops for default selection', err);
+            }
+          );
+        }
       }
     } else {
       this.router.navigate(['/login']);
