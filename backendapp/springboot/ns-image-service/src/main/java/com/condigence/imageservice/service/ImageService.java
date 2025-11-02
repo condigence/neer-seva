@@ -13,117 +13,83 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ImageService {
 
 	@Autowired
-	ImageRepository imageRepository;
-
-//	@Autowired
-//	private ItemRepository itemRepo;
-//
-//	@Autowired
-//	BrandRepository brandRepository;
+	ImageRepository imageRepository; // repository expected when prod profile active
 
 	private final Path rootLocation;
 
 	@Autowired
 	public ImageService(AppProperties properties) {
-		this.rootLocation = Paths.get("D://gitrepo//neer-seva//backendapp//springboot//ns-image-service/neerseva-images");
+		String configured = properties.getResolvedLocation();
+		this.rootLocation = Paths.get(configured);
+		// Ensure directory exists
+		try {
+			Files.createDirectories(this.rootLocation);
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to initialize storage location: " + this.rootLocation, e);
+		}
+		logger.info("ImageService rootLocation={}", this.rootLocation);
 	}
 
 	public static final Logger logger = LoggerFactory.getLogger(ImageService.class);
 
+
 	public Image store(MultipartFile file, String moduleName, String imgPath) throws IOException {
-		
-		// To store at external/internal directory
 		ImageUtil imgutil = new ImageUtil();
-		imgutil.createDirectory(imgPath);
-		try {
-			imgutil.storeImageinDirectory(file,rootLocation);
-		} catch (Exception e) {
-			throw new RuntimeException("FAIL! -> message = " + e.getMessage());
+		// Ensure path exists (imgPath could be from AppProperties.getLocation())
+		Path dir = this.rootLocation;
+		if (imgPath != null && !imgPath.isBlank()) {
+			dir = Paths.get(imgPath.replace('\\', '/'));
 		}
-		// To Store into DB
+		Files.createDirectories(dir);
+
+		String originalFilename = file.getOriginalFilename();
+		String fileName = StringUtils.cleanPath((originalFilename == null) ? "unknown" : originalFilename);
+		Path destination = dir.resolve(fileName);
+		Files.copy(file.getInputStream(), destination);
+
 		Image image = new Image();
-		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-		// logger.info("*************file name******************* " + fileName);
 		image.setName(fileName);
 		image.setType(file.getContentType());
-		image.setImagePath(rootLocation.resolve(file.getOriginalFilename()).toString());
-
-		String cwd = System.getProperty("user.dir");
-		
-
+		// imagePath removed: do not persist filesystem path in DB
 		image.setImageSize(file.getSize());
-		image.setImageName(fileName.substring(0, 3) + "_" + imgutil.getDateTimeFormatter());
-		image.setPic(file.getBytes());// not storing the byte since byte length is too long
-
+		image.setImageName((fileName.length() >= 3 ? fileName.substring(0, 3) : fileName) + "_" + imgutil.getDateTimeFormatter());
 		image.setModuleName(moduleName);
 
-		final Image savedImage = imageRepository.save(image);
-
-		savedImage.getId();
-		//System.out.println(savedImage.getPic());
-
-		//logger.info("***************Image saved*******************");
+		Image savedImage = imageRepository.save(image);
+		logger.info("Saved image metadata id={}", savedImage.getId());
 		return savedImage;
 	}
 
-	public Image getImage(Long id, String imgpath) {
-		//logger.info("In ImageService:::::getImage");
-		Image image = null;
-		ImageUtil imgutil = new ImageUtil();
-		try {
-			image = imageRepository.findById(id).get();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (null != image) {
-			image.setPic(imgutil.getImageWithFileName(image.getName(), imgpath));
-		}
-		//logger.info("Image is " + image);
-		return image;
-
+	public Image getImage(Long id) {
+		return imageRepository.findByImageId(id).orElse(null);
 	}
 
-	public Image getImageId(String name, String imgpath) {
-		// TODO Auto-generated method stub
-		//logger.info("In ImageService:::::getImageId");
-		ImageUtil imgutil = new ImageUtil();
-		Image image = null;
-		try {
-			image = imageRepository.getimageId(name).get();
-
-			//logger.info("Image detail is " + image);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (null != image) {
-			image.setPic(imgutil.getImageWithFileName(image.getName(), imgpath));
-		}
-		return image;
+	public Optional<Image> getImageByName(String name) {
+		return imageRepository.getByName(name);
 	}
 
-//	public List<Brand> getBrands() {
-//		return brandRepository.findAll();
-//	}
-//
-//	public Brand getBrand(Long id) {
-//		return brandRepository.findById(id).get();
-//	}
-//
-//	public List<Item> getItems() {
-//		return itemRepo.findAll();
-//	}
-//
-//	public Item getItem(Long id) {
-//		return itemRepo.findById(id).get();
-//	}
+	/**
+	 * Read the image bytes from filesystem for the given image.
+	 * The file is expected to be stored under rootLocation with the original file name (image.getName()).
+	 */
+	public byte[] readImageBytes(Image image) throws IOException {
+		if (image == null || image.getName() == null) return null;
+		Path p = this.rootLocation.resolve(image.getName());
+		if (!Files.exists(p)) return null;
+		return Files.readAllBytes(p);
+	}
+
+    public List<Image> getAlI() {
+        return imageRepository.findAll();
+    }
 }

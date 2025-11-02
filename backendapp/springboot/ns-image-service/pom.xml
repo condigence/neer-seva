@@ -23,12 +23,6 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
-		<!-- Flyway for production-safe schema migrations -->
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -65,12 +59,6 @@
 		</dependency>
 
 		<!-- NOTE: H2 (in-memory DB) removed; tests now expect an external DB or mocks. -->
-		<!-- Re-add H2 for local development/runtime so local profile can start without MySQL. -->
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
 
 	</dependencies>
 

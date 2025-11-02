@@ -8,8 +8,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @EnableDiscoveryClient
 public class ImageServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ImageServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ImageServiceApplication.class, args);
+    }
 
 }

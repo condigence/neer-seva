@@ -8,8 +8,6 @@ public class ImageDTO {
 	
 	private Long imageId;
 
-	private byte[] pic;
-
 	public String getName() {
 		return name;
 	}
@@ -33,15 +31,5 @@ public class ImageDTO {
 	public void setImageId(Long imageId) {
 		this.imageId = imageId;
 	}
-
-	public byte[] getPic() {
-		return pic;
-	}
-
-	public void setPic(byte[] pic) {
-		this.pic = pic;
-	}
-
-	
 
 }

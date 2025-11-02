@@ -1,11 +1,13 @@
 package com.condigence.imageservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 
-@Table(name = "image")
 @Entity
+@Table(name = "nsimage")
+@SuppressWarnings("unused")
 public class Image implements Serializable {
 
 	@Serial
@@ -33,19 +35,11 @@ public class Image implements Serializable {
 	@Column(name = "type")
 	private String type;
 
-	@Column(name = "path", length = 512)
-	private String imagePath;
-
 	@Column(name = "size")
 	private Long imageSize;
 
 	@Column(name = "unique_name")
 	private String imageName;
-
-	@Lob
-	@Basic(fetch = FetchType.LAZY)
-	@Column(name = "pic")
-	private byte[] pic;
 
 	public Image() {
 		// JPA requires a no-arg constructor
@@ -67,6 +61,7 @@ public class Image implements Serializable {
 		this.name = name;
 	}
 
+	@JsonProperty("type")
 	public String getType() {
 		return type;
 	}
@@ -75,22 +70,7 @@ public class Image implements Serializable {
 		this.type = type;
 	}
 
-	public byte[] getPic() {
-		return pic;
-	}
-
-	public void setPic(byte[] pic) {
-		this.pic = pic;
-	}
-
-	public String getImagePath() {
-		return imagePath;
-	}
-
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
-	}
-
+	@JsonProperty("imageSize")
 	public Long getImageSize() {
 		return imageSize;
 	}
@@ -109,9 +89,7 @@ public class Image implements Serializable {
 
 	@Override
 	public String toString() {
-		int picLen = pic == null ? 0 : pic.length;
-		return "Image [id=" + id + ", moduleName=" + moduleName + ", name=" + name + ", type=" + type + ", imagePath="
-				+ imagePath + ", imageSize=" + imageSize + ", imageName=" + imageName + ", picLength=" + picLen + "]";
+		return "Image [id=" + id + ", moduleName=" + moduleName + ", name=" + name + ", type=" + type + ", imageSize=" + imageSize + ", imageName=" + imageName + "]";
 	}
 
 	@Override

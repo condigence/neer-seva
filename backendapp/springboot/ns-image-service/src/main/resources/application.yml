@@ -2,20 +2,20 @@ server:
   port: 9095
   address: localhost
 
+app:
+  # Use forward-slash style and the requested absolute path
+  location: "D://gitrepo//neer-seva//backendapp//springboot//ns-image-service//neerseva-images"
+
 spring:
   application:
     name: NS-IMAGE-SERVICE
-  jpa:
-    # Default: don't validate or update schema when no profile is active.
-    hibernate:
-      ddl-auto: none
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-  flyway:
-    enabled: false
 
+  # Provide datasource at the root so env.getProperty("spring.datasource.url") is available for diagnostics
+  datasource:
+    url: jdbc:mysql://localhost:3306/ns-image-db?autoReconnect=true&useSSL=false
+    username: root
+    password: "ConDyn6!"
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 # Default Eureka settings (can be overridden per-profile)
 eureka:
@@ -26,58 +26,3 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka/
-
----
-# Local profile: embedded H2 datasource for local development + Eureka registration enabled
-spring:
-  config:
-    activate:
-      on-profile: local
-  datasource:
-    url: jdbc:h2:mem:neerseva;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password: ""
-    driver-class-name: org.h2.Driver
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema-h2.sql
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-  flyway:
-    enabled: false
-
-eureka:
-  client:
-    enabled: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-  register-with-eureka: true
-  fetch-registry: true
-  instance:
-    instance-id: ${vcap.application.instance_id:${spring.application.name}:${spring.application.instance_id:${random.value}}}
-    lease-renewal-interval-in-seconds: 10
-    lease-expiration-duration-in-seconds: 30
-
----
-# Prod profile: MySQL datasource and Flyway enabled
-spring:
-  config:
-    activate:
-      on-profile: prod
-  datasource:
-    url: jdbc:mysql://localhost:3306/ns-image-db?autoReconnect=true&useSSL=false
-    username: root
-    password: "ConDyn6!"
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
-    hibernate:
-      ddl-auto: validate
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-    validate-on-migrate: true
