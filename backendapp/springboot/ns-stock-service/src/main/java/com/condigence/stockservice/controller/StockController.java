@@ -61,14 +61,20 @@ public class StockController {
 			dto.setBranch(shop.get().getShopBranch());
 			if(shop.get().getImageId() != null) {
 				dto.setImageId(shop.get().getImageId());
-				ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+shop.get().getImageId(), ImageDTO.class); // Working
-				dto.setPic(imageDTO.getPic());
+				try {
+					ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+shop.get().getImageId(), ImageDTO.class); // Working
+					if (imageDTO != null) {
+						dto.setPic(imageDTO.getPic());
+					}
+				} catch (Exception ex) {
+					logger.warn("Unable to fetch image for imageId {}: {}", shop.get().getImageId(), ex.getMessage());
+				}
 			}
 			return ResponseEntity.status(HttpStatus.OK).body(dto);
 		} else {
 			logger.error("Unable to Find. Brand with id {} not found.", id);
 			return new ResponseEntity(new CustomErrorType("Unable to Find. Shop with id " + id + " not found."),
-					HttpStatus.NOT_FOUND);
+						HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -87,8 +93,14 @@ public class StockController {
 				dto.setBranch(s.getShopBranch());
 				if(s.getImageId() != null) {
 					dto.setImageId(s.getImageId());
-					ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+s.getImageId(), ImageDTO.class); // Working
-					dto.setPic(imageDTO.getPic());
+					try {
+						ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+s.getImageId(), ImageDTO.class); // Working
+						if (imageDTO != null) {
+							dto.setPic(imageDTO.getPic());
+						}
+					} catch (Exception ex) {
+						logger.warn("Unable to fetch image for imageId {}: {}", s.getImageId(), ex.getMessage());
+					}
 				}
 
 				dtos.add(dto);
@@ -118,10 +130,14 @@ public class StockController {
 				dto.setBranch(shop.getShopBranch());
 				if(shop.getImageId() != null) {
 					dto.setImageId(shop.getImageId());
-					//dto.setPic(getPicById(shop.getImageId()).getPic());
-					ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+shop.getImageId(), ImageDTO.class); // Working
-					//System.out.println(imageDTO);
-					dto.setPic(imageDTO.getPic());
+					try {
+						ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+shop.getImageId(), ImageDTO.class); // Working
+						if (imageDTO != null) {
+							dto.setPic(imageDTO.getPic());
+						}
+					} catch (Exception ex) {
+						logger.warn("Unable to fetch image for imageId {}: {}", shop.getImageId(), ex.getMessage());
+					}
 				}
 
 				dtos.add(dto);

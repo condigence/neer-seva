@@ -53,21 +53,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // For now permit all requests (development convenience). Revert before production.
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
-//                        authorizationManagerRequestMatcherRegistry.requestMatchers(HttpMethod.DELETE).hasRole("ADMIN")
-//                                .requestMatchers("/admin/**").hasAnyRole("ADMIN")
-//                                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-//                                .requestMatchers("/login/**").permitAll()
-//                                .anyRequest().authenticated())
-                        authorizationManagerRequestMatcherRegistry
-                // Permit unauthenticated GET access to brand endpoints used by clients
-                .requestMatchers(HttpMethod.GET, "/neerseva/api/v1/products/brands", "/neerseva/api/v1/products/brands/**").permitAll()
-                // Allow preflight requests
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Keep other requests authenticated
-                .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                // Keep httpBasic disabled for now since all is permitted
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
