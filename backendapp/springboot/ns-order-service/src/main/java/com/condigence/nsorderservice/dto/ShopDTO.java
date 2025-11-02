@@ -2,7 +2,7 @@ package com.condigence.nsorderservice.dto;
 
 public class ShopDTO {
 
-	private long id;
+	private Long id;
 
 	private String name;
 
@@ -28,7 +28,7 @@ public class ShopDTO {
 
 	private String branch;
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
@@ -60,7 +60,7 @@ public class ShopDTO {
 		return branch;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -48,7 +50,35 @@ public class OrderService {
 
 			order.setOrderFromCustId(orderdetailDTO.getCustomer().getCustomerId());
 
-			ShopDTO shopData = restTemplate.getForObject("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/shops/"+orderdetailDTO.getShop().getId(), ShopDTO.class); // Working
+			// Validate shop is present and has a valid id
+			ShopDTO shopDto = orderdetailDTO.getShop();
+			long shopId = -1L;
+			if (shopDto == null) {
+				logger.error("Shop information is missing in OrderDetailDTO");
+				return false;
+			} else {
+				shopId = shopDto.getId();
+				if (shopId <= 0) {
+					logger.error("Invalid shop id in OrderDetailDTO: {}", shopId);
+					return false;
+				}
+			}
+
+			ShopDTO shopData = null;
+			try {
+				shopData = restTemplate.getForObject("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/shops/" + shopId, ShopDTO.class); // Working
+			} catch (HttpClientErrorException.NotFound nf) {
+				logger.error("Shop not found for id {}", shopId);
+				return false;
+			} catch (RestClientException rce) {
+				logger.error("Error while fetching shop data for id {}: {}", shopId, rce.getMessage());
+				return false;
+			}
+
+			if (shopData == null) {
+				logger.error("Shop service returned null for id {}", shopId);
+				return false;
+			}
 
 			order.setOrderToVendorId(shopData.getUserId());
 

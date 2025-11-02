@@ -40,7 +40,11 @@ public class OrderController {
 
         logger.info("Entering placeOrder with Order Details >>>>>>>>  : {}", orderdetailDTO);
         HttpHeaders headers = new HttpHeaders();
-        orderService.saveOrderDetail(orderdetailDTO);
+        boolean saved = orderService.saveOrderDetail(orderdetailDTO);
+        if (!saved) {
+            // Could be invalid input (400) or not found (404) or server error; return 400 with message
+            return new ResponseEntity<>(new CustomErrorType("Unable to save order. Check shop id and payload."), HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
@@ -84,8 +88,8 @@ public class OrderController {
         boolean orderDetail = false;
         orderDetail = orderService.saveOrderDetail(orderdetailDTO);
         if (orderDetail == false) {
-            return new ResponseEntity(new CustomErrorType("Issue while saving order"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(new CustomErrorType("Unable to save order. Check shop id and payload."),
+                    HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<String>(headers, HttpStatus.CREATED);
     }
