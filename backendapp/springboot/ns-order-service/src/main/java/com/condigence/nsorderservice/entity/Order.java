@@ -2,7 +2,7 @@ package com.condigence.nsorderservice.entity;
 
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;

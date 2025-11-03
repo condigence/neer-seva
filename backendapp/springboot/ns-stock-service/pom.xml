@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.5.3</version>
+		<version>3.2.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.condigence</groupId>
@@ -14,8 +14,8 @@
 	<name>Stock Service</name>
 	<description>Condigence project for NeerSeva</description>
 	<properties>
-		<java.version>11</java.version>
-		<spring-cloud.version>2020.0.3</spring-cloud.version>
+		<java.version>21</java.version>
+		<spring-cloud.version>2023.0.6</spring-cloud.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -41,6 +41,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.33</version>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -71,6 +72,14 @@
 
 	<build>
 		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>21</release>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

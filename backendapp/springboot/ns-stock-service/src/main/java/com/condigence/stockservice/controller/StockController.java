@@ -270,9 +270,43 @@ public class StockController {
 	@PostMapping(value = "/update/on/order")
 	public ResponseEntity<?> updateStockByOrder(@RequestBody OrderDetailDTO orderDetail) {
 		logger.info("Updating Stock on orderDetails {}", orderDetail);
-		for (ItemDTO item: orderDetail.getItems()) {
-			Stock stock = stockService.getStockByShopAndItemId(item.getId(),orderDetail.getShop().getId());
-			stock.setStockQuantity(stock.getStockQuantity() - item.getQuantity());
+
+		// Validate request payload
+		if (orderDetail == null || orderDetail.getShop() == null || orderDetail.getShop().getId() == 0L) {
+			logger.error("Invalid order detail or shop in request: {}", orderDetail);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Invalid order detail or shop"));
+		}
+		Long shopId = orderDetail.getShop().getId();
+		if (orderDetail.getItems() == null || orderDetail.getItems().isEmpty()) {
+			logger.error("No items present in orderDetail: {}", orderDetail);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("No items in order detail"));
+		}
+
+		// Validate and apply updates
+		for (ItemDTO item : orderDetail.getItems()) {
+			if (item == null || item.getId() == null) {
+				logger.error("Invalid item in orderDetail: {}", item);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Invalid item in order detail"));
+			}
+
+			Stock stock = stockService.getStockByShopAndItemId(item.getId(), shopId);
+			if (stock == null) {
+				logger.error("Stock not found for item {} in shop {}", item.getId(), shopId);
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Stock not found for item " + item.getId() + " in shop " + shopId));
+			}
+
+			long currentQty = stock.getStockQuantity();
+			long reqQty = (item.getQuantity() == null ? 0L : item.getQuantity());
+			if (reqQty <= 0) {
+				logger.warn("Ignoring non-positive quantity for item {}: {}", item.getId(), reqQty);
+				continue; // nothing to update for this item
+			}
+			if (currentQty < reqQty) {
+				logger.error("Insufficient stock for item {} in shop {}: available={}, required={}", item.getId(), shopId, currentQty, reqQty);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Insufficient stock for item " + item.getId()));
+			}
+
+			stock.setStockQuantity((int)(currentQty - reqQty));
 			stockService.saveStock(stock);
 		}
 		return ResponseEntity.ok().build();
@@ -417,9 +451,17 @@ public class StockController {
 		return ResponseEntity.status(HttpStatus.OK).body(itemDtos);
 	}
 
-	@GetMapping(value = "/quantity/by/Shops/{id}/items/{id}")
-	public ResponseEntity<Long> getStockQuantityByShopIdAndItemId() {
-		return null;
+	@GetMapping(value = "/quantity/by/shops/{shopId}/items/{itemId}")
+	public ResponseEntity<Long> getStockQuantityByShopIdAndItemId(@PathVariable("shopId") Long shopId,
+							@PathVariable("itemId") Long itemId) {
+		if (shopId == null || itemId == null) {
+			return ResponseEntity.badRequest().build();
+		}
+		Stock stock = stockService.getStockByShopAndItemId(itemId, shopId);
+		if (stock == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		return ResponseEntity.ok((long) stock.getStockQuantity());
 	}
 
 }

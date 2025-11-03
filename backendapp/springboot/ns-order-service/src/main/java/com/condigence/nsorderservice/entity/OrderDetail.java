@@ -1,6 +1,6 @@
 package com.condigence.nsorderservice.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "order_detail")
@@ -16,7 +16,7 @@ public class OrderDetail {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long orderDetailId;
 
-	@Column(name = "order_tem_id")
+	@Column(name = "order_item_id")
 	private Long orderItemId;
 
 	@Column(name = "order_item_quantity")

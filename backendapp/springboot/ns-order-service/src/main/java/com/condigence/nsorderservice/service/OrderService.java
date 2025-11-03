@@ -6,6 +6,8 @@ import com.condigence.nsorderservice.entity.Order;
 import com.condigence.nsorderservice.entity.OrderDetail;
 import com.condigence.nsorderservice.repository.OrderRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,7 @@ public class OrderService {
 
 	public boolean saveOrderDetail(OrderDetailDTO orderdetailDTO) {
 
-		logger.info("Order detail in order Service " + getJsonString(orderdetailDTO));
+
 
 		Order order = new Order();
 		List<OrderDetail> orderDetailList = new ArrayList<>();
@@ -177,40 +179,65 @@ public class OrderService {
 		List<ItemDTO> itemDtos = new ArrayList<>();
 
 		for (OrderDetail orderDetail : order.getOrderDetail()) {
-			// TODO :
+			// fetch item data from product service
 
-			ItemDTO itemDTO = new ItemDTO();
+			Long itemId = orderDetail.getOrderItemId();
+			if (itemId == null) {
+				logger.warn("OrderDetail {} for Order {} has null itemId; skipping item.", orderDetail.getOrderDetailId(), order.getOrderId());
+				continue;
+			}
 
-			//TODO:
-			// Product Service call
+			ItemDTO itemData = null;
+			try {
+				itemData = restTemplate.getForObject("http://NS-PRODUCT-SERVICE/neerseva/api/v1/products/items/" + itemId, ItemDTO.class); // Working
+			} catch (Exception e) {
+				logger.warn("Failed to fetch item {} from product service: {}", itemId, e.getMessage());
+			}
+			if (itemData == null) {
+				logger.warn("Product service returned null for itemId {}. Skipping item.", itemId);
+				continue;
+			}
 
-
-			ItemDTO itemData = restTemplate.getForObject("http://NS-PRODUCT-SERVICE/neerseva/api/v1/products/items/"+orderDetail.getOrderItemId(), ItemDTO.class); // Working
-			itemDTO.setId(itemData.getId());
 			ItemDTO itemDto = new ItemDTO();
-			// itemDto.setItemCode(item.getCode());
 			itemDto.setId(itemData.getId());
 			itemDto.setName(itemData.getName());
-			//itemDto.setPic(getPicById(item.getImageId()).getPic());
+			// populate item pic via image service (if available)
+			if (itemData.getImageId() != null) {
+				try {
+					ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + itemData.getImageId() + "/data", ImageDTO.class);
+					if (imageDTO != null) {
+						itemDto.setPic(imageDTO.getPic());
+					}
+				} catch (Exception e) {
+					logger.debug("Unable to fetch image for item {} (imageId={}): {}", itemData.getId(), itemData.getImageId(), e.getMessage());
+				}
+			}
 			itemDto.setQuantity(orderDetail.getOrderItemQuantity());
-			// itemDto.setItemPrice(item.getItemPrice() *
-			// orderDetail.getOrderItemQuantity());
 			itemDtos.add(itemDto);
 
-			// itemList.add(item);
 			//System.out.println("itemDtos  :$$$$ " + itemDtos);
 		}
-		//System.out.println("order by customer id :$$$$ " + order);
-		
-		//User customer = userRepo.findById(order.getOrderFromCustId()).get();
-		UserDTO customer = restTemplate.getForObject("http://NS-USER-SERVICE/neerseva/api/v1/users/"+order.getOrderFromCustId(), UserDTO.class); // Working
+
+		// fetch customer only if present
+		UserDTO customer = null;
+		if (order.getOrderFromCustId() != null) {
+			try {
+				customer = restTemplate.getForObject("http://NS-USER-SERVICE/neerseva/api/v1/users/" + order.getOrderFromCustId(), UserDTO.class); // Working
+			} catch (Exception e) {
+				logger.warn("Failed to fetch customer {}: {}", order.getOrderFromCustId(), e.getMessage());
+			}
+		} else {
+			logger.warn("Order {} has null orderFromCustId", order.getOrderId());
+		}
 		//logger.info("Customer is " + customer);
 		UserDTO vendor = null;
 		if(order.getOrderToVendorId() != null){
 			logger.info("vendor Id " + order.getOrderToVendorId());
-			//User vendor = userRepo.findById(order.getOrderToVendorId()).get();
-			vendor = restTemplate.getForObject("http://NS-USER-SERVICE/neerseva/api/v1/users/"+order.getOrderToVendorId(), UserDTO.class); // Working
-			//logger.info("vendor is " + vendor);
+			try {
+				vendor = restTemplate.getForObject("http://NS-USER-SERVICE/neerseva/api/v1/users/"+order.getOrderToVendorId(), UserDTO.class); // Working
+			} catch (Exception e) {
+				logger.warn("Failed to fetch vendor {}: {}", order.getOrderToVendorId(), e.getMessage());
+			}
 		}
 
 
@@ -222,93 +249,105 @@ public class OrderService {
 	}
 
 	private OrderDTO createOrderDTOObject(Order order, List<ItemDTO> itemList, UserDTO customer, UserDTO vendor) {
-		// TODO Auto-generated method stub
-
 		OrderDTO orderDto = new OrderDTO();
-		// orderDto.(order.getEta());
 		orderDto.setOrderDate(order.getOrderDate());
-		orderDto.setOrderDeliveryStatus(order.getOrderDeliveryStatus());
-		orderDto.setOrderId(order.getOrderId());
-		orderDto.setOrderStatus(order.getOrderStatus());
 		orderDto.setOrderTime(order.getOrderTime());
+		orderDto.setOrderStatus(order.getOrderStatus());
+		orderDto.setOrderDeliveryStatus(order.getOrderDeliveryStatus());
+		// ETA
+		orderDto.setEta(order.getEta());
 
-		VendorDTO vendorDto = new VendorDTO();
-		if(vendor!= null){
-			vendorDto.setName(vendor.getName());
-			vendorDto.setVendorId(vendor.getId());
-			vendorDto.setContact(vendor.getContact());
-			vendorDto.setEmail(vendor.getEmail());
-			if (vendor.getImageId() != null) {
-				vendorDto.setImageId(vendor.getImageId());
-				ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+vendor.getImageId(), ImageDTO.class); // Working
-				//System.out.println(imageDTO);
-				vendorDto.setPic(imageDTO.getPic());
-			}
-		}
+		// grand total
+		orderDto.setOrderGrandTotal(convertGrandTotal(order.getOrderGrandTotal()));
 
+		// build nested DTOs
+		VendorDTO vendorDto = buildVendorDto(vendor);
+		CustomerDTO custDto = buildCustomerDto(customer);
+		ShopDTO shopData = fetchShopData(order.getOrderToShopId(), order.getOrderId());
 
-		ShopDTO shopData = restTemplate.getForObject("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/shops/"+order.getOrderToShopId(), ShopDTO.class); // Working
-
-//		vendorDto.setAddressList(getUserAddress(vendor.getAddress()));
-
-		CustomerDTO custDto = new CustomerDTO();
-		custDto.setContact(customer.getContact());
-		custDto.setCustomerId(customer.getId());
-		custDto.setEmail(customer.getEmail());
-		custDto.setName(customer.getName());
-		if (customer.getImageId() != null) {
-			custDto.setImageId(customer.getImageId());
-			//custDto.setPic(getPicById(customer.getImageId()).getPic());
-			ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/"+customer.getImageId(), ImageDTO.class); // Working
-			//System.out.println(imageDTO);
-			custDto.setPic(imageDTO.getPic());
-		}
-//		custDto.setAddressList(getUserAddress(customer.getAddress()));
-
-		// List<ItemDTO> itemDtoList = getItemList(itemList);
-
-		OrderDetailDTO orderDetaildto = new OrderDetailDTO();
-		orderDetaildto.setCustomer(custDto);
-		orderDetaildto.setVendor(vendorDto);
-		orderDetaildto.setItems(itemList);
-		orderDetaildto.setShop(shopData);
+		OrderDetailDTO orderDetaildto = buildOrderDetailDto(custDto, vendorDto, itemList, shopData);
 		orderDto.setOrderDetail(orderDetaildto);
+
+		// Log final DTO JSON for debugging
+		logger.info("OrderDTO built: {}", getJsonString(orderDto));
 		return orderDto;
 	}
 
-//	private List<ItemDTO> getItemList(List<Item> itemList) {
-//		List<ItemDTO> itemDtoList = new ArrayList<>();
-//		for (Item item : itemList) {
-//
-//			System.out.println(item.getId());
-//			ItemDTO itemDto = new ItemDTO();
-//			// itemDto.setItemCode(item.getCode());
-//			itemDto.setId(item.getId());
-//		    itemDto.setName(item.getName());
-//			//itemDto.setItemQuantity(item.);
-//			// itemDto.setItemPrice(item.getItemPrice() *
-//			// orderDetail.getOrderItemQuantity());
-//			itemDtoList.add(itemDto);
-//		}
-//		return itemDtoList;
-//	}
+	// Helper: convert Long grand total to Integer safely
+	private Integer convertGrandTotal(Long grandTotal) {
+		if (grandTotal == null) return null;
+		if (grandTotal > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+		return grandTotal.intValue();
+	}
 
-//	private List<AddressDTO> getUserAddress(List<Address> addressList) {
-//		// TODO Auto-generated method stub
-//		List<AddressDTO> addressDtoList = new ArrayList<>();
-//		for (Address address : addressList) {
-//			AddressDTO addressDto = new AddressDTO();
-//			String locality = address.getLocality();
-//			addressDto.setAddress(locality);
-//			long id = address.getAddressId();
-//			addressDto.setAddressId(id);
-//			addressDtoList.add(addressDto);
-//		}
-//		return addressDtoList;
-//	}
+	// Helper: build VendorDTO from UserDTO
+	private VendorDTO buildVendorDto(UserDTO vendor) {
+		VendorDTO vendorDto = new VendorDTO();
+		if (vendor == null) return vendorDto;
+		vendorDto.setName(vendor.getName());
+		vendorDto.setVendorId(vendor.getId());
+		vendorDto.setContact(vendor.getContact());
+		vendorDto.setEmail(vendor.getEmail());
+		if (vendor.getImageId() != null) {
+			vendorDto.setImageId(vendor.getImageId());
+			try {
+				ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + vendor.getImageId()+"/data", ImageDTO.class);
+				if (imageDTO != null) vendorDto.setPic(imageDTO.getPic());
+			} catch (Exception e) {
+				logger.debug("Vendor image fetch failed for imageId {}: {}", vendor.getImageId(), e.getMessage());
+			}
+		}
+		return vendorDto;
+	}
+
+	// Helper: build CustomerDTO from UserDTO
+	private CustomerDTO buildCustomerDto(UserDTO customer) {
+		CustomerDTO custDto = new CustomerDTO();
+		if (customer == null) return custDto;
+		custDto.setCustomerId(customer.getId());
+		custDto.setName(customer.getName());
+		custDto.setEmail(customer.getEmail());
+		custDto.setContact(customer.getContact());
+		if (customer.getImageId() != null) {
+			custDto.setImageId(customer.getImageId());
+			try {
+				ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + customer.getImageId()+"/data", ImageDTO.class);
+				if (imageDTO != null) custDto.setPic(imageDTO.getPic());
+			} catch (Exception e) {
+				logger.debug("Customer image fetch failed for imageId {}: {}", customer.getImageId(), e.getMessage());
+			}
+		}
+		return custDto;
+	}
+
+	// Helper: fetch shop data with safe error handling
+	private ShopDTO fetchShopData(Long shopId, Long orderId) {
+		if (shopId == null) return null;
+		try {
+			return restTemplate.getForObject("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/shops/" + shopId, ShopDTO.class);
+		} catch (HttpClientErrorException.NotFound nf) {
+			logger.debug("Shop not found for id {} while building DTO for order {}", shopId, orderId);
+		} catch (RestClientException rce) {
+			logger.debug("Error fetching shop {} for order {}: {}", shopId, orderId, rce.getMessage());
+		}
+		return null;
+	}
+
+	// Helper: build OrderDetailDTO
+	private OrderDetailDTO buildOrderDetailDto(CustomerDTO customer, VendorDTO vendor, List<ItemDTO> items, ShopDTO shop) {
+		OrderDetailDTO detail = new OrderDetailDTO();
+		detail.setCustomer(customer);
+		detail.setVendor(vendor);
+		detail.setItems(items);
+		detail.setShop(shop);
+		return detail;
+	}
 
 	public String getJsonString(Object obj) {
 		ObjectMapper Obj = new ObjectMapper();
+		// register Java Time module to support LocalDate/LocalTime
+		Obj.registerModule(new JavaTimeModule());
+		Obj.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		String jsonStr = "";
 		try {
 			jsonStr = Obj.writeValueAsString(obj);
