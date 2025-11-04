@@ -68,7 +68,6 @@ public class ImageController {
             String dsUrl = env.getProperty("spring.datasource.url", "<not configured>");
             String[] activeProfiles = env.getActiveProfiles();
             String active = activeProfiles.length > 0 ? String.join(",", activeProfiles) : "<none>";
-            logger.info("getImageWithId diagnostics: id={}, datasourceUrl={}, activeProfiles={}", id, dsUrl, active);
 
             image = imageService.getImage(id);
         } catch (Exception e) {

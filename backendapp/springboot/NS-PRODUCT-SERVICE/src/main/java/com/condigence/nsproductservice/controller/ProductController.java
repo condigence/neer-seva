@@ -127,7 +127,6 @@ public class ProductController {
 	@DeleteMapping(value = "/brands/{id}")
 	public ResponseEntity<?> deleteBrand(@PathVariable("id") long id) {
 		logger.info("Fetching & Deleting Brand with id {}", id);
-		System.out.println("Inside delete mapping! ");
 		Optional<Brand> brand = brandService.getById(id);
 		if (brand.isPresent()) {
 			brandService.deleteById(id);
@@ -142,7 +141,6 @@ public class ProductController {
 	@GetMapping("/brands/{id}")
 	public ResponseEntity<?> getBrand(@PathVariable("id") Long id) {
 
-		System.out.println("inside brandimage!");
 		BrandDTO dto = new BrandDTO();
 		Optional<Brand> brand = brandService.getById(id);
 		if (brand.isPresent()) {
@@ -281,7 +279,6 @@ public class ProductController {
 	@GetMapping("/items/{id}")
 	public ResponseEntity<?> getItemWithImage(@PathVariable("id") Long id) {
 
-		System.out.println("inside itemImage!");
 		ItemDTO dto = new ItemDTO();
 		Optional<Item> item = itemService.getItemById(id);
 		if (item.isPresent()) {
@@ -325,7 +322,6 @@ public class ProductController {
 	@GetMapping("/items/by/brands/{id}")
 	public ResponseEntity<?> getItemsByBrandId(@PathVariable("id") Long id) {
 
-		System.out.println("inside itemImage with brand Id {} is!" + id);
 		List<ItemDTO> dtos = new ArrayList<>();
 		List<Item> items = itemService.getItemByBrandId(id);
 		System.out.println(items);

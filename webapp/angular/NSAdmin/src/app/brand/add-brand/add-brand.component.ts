@@ -55,7 +55,7 @@ export class AddBrandComponent implements OnInit {
           timer: 3000,
           timerProgressBar: true,
         });
-        this.router.navigate(['brand/list-brand']);
+  this.router.navigate(['/brand', 'list-brand']);
       });
     }
   }

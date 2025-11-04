@@ -6,6 +6,8 @@ export const environment = {
   production: false,
   // Use relative path to enable the Angular dev-server proxy during development
   apiUrl: '/neerseva/api',
+  // Full backend URLs (useful during development if you want to bypass the Angular proxy)
+  AUTH_API_URL: 'http://localhost:9092/neerseva/api',
   USERS_API_URL: 'http://localhost:9092/neerseva/api/v1/users/',
   BRANDS_API_URL: 'http://localhost:9091/neerseva/api/v1/products/brands/',
   ITEMS_API_URL: 'http://localhost:9091/neerseva/api/v1/products/items/',

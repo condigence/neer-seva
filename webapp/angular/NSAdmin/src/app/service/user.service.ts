@@ -43,15 +43,15 @@ export class UserService {
   }
 
   getAllUsersCount() {
-    return this.http.get(this.nodeBaseUrl + '/active/count');
+    return this.http.get(this.nodeBaseUrl + '/counts');
   }
 
   getAllVendorCount() {
-    return this.http.get(this.nodeBaseUrl + '/vendorscount');
+    return this.http.get(this.nodeBaseUrl + '/counts');
   }
   
   getAllCustomerCount() {
-    return this.http.get(this.nodeBaseUrl + '/customerscount');
+    return this.http.get(this.nodeBaseUrl + '/counts');
   }
 
   getAllOrderCount() {

@@ -73,7 +73,7 @@ export class OTPComponent implements OnInit {
                   no-repeat
                 `
               });
-              this.router.navigate(['']);
+              this.router.navigateByUrl('/');
             } else {
               Swal.fire({
                 icon: 'success',
@@ -90,7 +90,8 @@ export class OTPComponent implements OnInit {
                   no-repeat
                 `
               });
-              this.router.navigate(['profile/my-profile']);
+              // Use absolute URL to ensure correct navigation
+              this.router.navigateByUrl('/profile/my-profile');
             }
           },
           error => {
@@ -113,7 +114,24 @@ export class OTPComponent implements OnInit {
         this.authenticationService.register(newuser)
           .pipe(first())
           .subscribe(
-            data => {
+            response => {
+              // If backend returns 201 (Created) navigate to profile page
+              if (response && response.status === 201) {
+                Swal.fire({
+                  position: 'center',
+                  icon: 'success',
+                  title: 'You are Registered',
+                  text: 'Registration successful — opening your profile',
+                  showConfirmButton: true,
+                  timer: 3000,
+                  timerProgressBar: true,
+                });
+                // Use absolute URL to ensure correct navigation
+                this.router.navigateByUrl('/profile/my-profile');
+                return;
+              }
+
+              // Fallback: if server returned a normal success body, behave as before
               Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -123,14 +141,13 @@ export class OTPComponent implements OnInit {
                 timer: 5000,
                 timerProgressBar: true,
               });
-              this.router.navigate(['/']);
-              this.router.navigate(['login']);
+              this.router.navigate(['profile/my-profile']);
             },
             error => {
-
               //  this.router.navigate(['/register'], { queryParams: { registered: false } });
-              this.alertService.error(error.errorMessage);
-              this.error = error;              
+              const msg = error?.error?.errorMessage || error?.message || 'Registration failed';
+              this.alertService.error(msg);
+              this.error = error;
             });
 
       } else {
