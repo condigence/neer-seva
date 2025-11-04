@@ -15,7 +15,8 @@ public class Image implements Serializable {
 
 	@Id
 	@Column(name = "id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@SequenceGenerator(name = "hibernate_sequence", sequenceName = "hibernate_sequence", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
 	private Long id;
 
 	@Column(name = "module_name")

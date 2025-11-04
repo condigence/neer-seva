@@ -17,7 +17,7 @@ export class ListUserComponent implements OnInit {
   name: string = '';
   currentUser: any;
   items = [];
-  pageOfItems: Array<any> = [];
+  // pagination removed for now; keep simple res list
 
   constructor(
     private router: Router,
@@ -25,18 +25,46 @@ export class ListUserComponent implements OnInit {
     private authenticationService: AuthenticationService
   ) {}
 
+
+
   ngOnInit() {
     this.getAllUsers();
     this.currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
   }
 
   getAllUsers() {
-    this.userService.getAllUsers().subscribe((data) => {
-      this.users = data;
-      console.log(this.users);
-      let combined = this.users.filter(object => (object.type == 'VENDOR' || object.type == 'CUSTOMER'));
-      this.res = [...combined];
-    });
+    this.userService.getAllUsers().subscribe(
+      (data) => {
+        // Resolve common envelope shapes: array, { data: [] }, { users: [] }, { results: [] }
+        let usersArray: any[] = [];
+        if (Array.isArray(data)) {
+          usersArray = data;
+        } else if (data && Array.isArray((data as any).data)) {
+          usersArray = (data as any).data;
+        } else if (data && Array.isArray((data as any).users)) {
+          usersArray = (data as any).users;
+        } else if (data && Array.isArray((data as any).results)) {
+          usersArray = (data as any).results;
+        } else if (data && typeof data === 'object') {
+          // fallback: pick the first array-valued property if any
+          for (const k of Object.keys(data)) {
+            if (Array.isArray((data as any)[k])) {
+              usersArray = (data as any)[k];
+              break;
+            }
+          }
+        }
+
+        this.users = usersArray || [];
+        // For now, show all users (don't filter by type) so the list is visible in UI.
+        this.res = [...this.users];
+        console.log('users loaded into res, length=', this.res.length);
+      },
+      (err) => {
+        this.users = [];
+        this.res = [];
+      }
+    );
   }
 
   addUser(): void {
@@ -60,11 +88,12 @@ export class ListUserComponent implements OnInit {
   }
 
   trackUser(index: number, user: { id: any }) {
-    return user ? user.id : undefined;
+    return user && user.id ? user.id : index;
   }
 
-  onChangePage(pageOfItems: Array<any>) {
-    this.pageOfItems = pageOfItems;
+  // image error handler used by template
+  onImgError(event: any) {
+    try { (event.target as HTMLImageElement).src = 'assets/images/df_user.png'; } catch (e) { }
   }
 
   deleteTheUser(user: User) {

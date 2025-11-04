@@ -21,8 +21,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ImageService {
@@ -59,15 +62,31 @@ public class ImageService {
 
 		String originalFilename = file.getOriginalFilename();
 		String fileName = StringUtils.cleanPath((originalFilename == null) ? "unknown" : originalFilename);
-		Path destination = dir.resolve(fileName);
-		Files.copy(file.getInputStream(), destination);
+
+		// Create a unique stored filename to avoid collisions on disk
+		String baseUnique = (fileName.length() >= 3 ? fileName.substring(0, 3) : fileName) + "_" + imgutil.getDateTimeFormatter();
+		// keep extension if present
+		String ext = "";
+		int dot = fileName.lastIndexOf('.');
+		if (dot >= 0) {
+			ext = fileName.substring(dot);
+		}
+		String storedFileName = baseUnique + "_" + UUID.randomUUID().toString().replaceAll("-", "") + ext;
+
+		// Sanitize filename: allow alphanumeric, dot, underscore, hyphen; replace others with '_'
+		storedFileName = storedFileName.replaceAll("[^A-Za-z0-9._-]", "_");
+
+		Path destination = dir.resolve(storedFileName);
+		// Copy and replace if something unexpected exists with same name
+		Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
 
 		Image image = new Image();
-		image.setName(fileName);
+		// Store the actual stored filename in the DB 'name' column so reads use this filename
+		image.setName(storedFileName);
 		image.setType(file.getContentType());
 		// imagePath removed: do not persist filesystem path in DB
 		image.setImageSize(file.getSize());
-		image.setImageName((fileName.length() >= 3 ? fileName.substring(0, 3) : fileName) + "_" + imgutil.getDateTimeFormatter());
+		image.setImageName(baseUnique);
 		image.setModuleName(moduleName);
 
 		Image savedImage = imageRepository.save(image);
@@ -103,7 +122,7 @@ public class ImageService {
         List<Image> all = imageRepository.findAll(pageable).getContent();
         List<ImageSummary> summaries = all.stream()
                 .map(img -> new ImageSummary(img.getId(), img.getName(), img.getImageName(), img.getImageSize(), img.getModuleName(), img.getType()))
-                .toList();
+                .collect(Collectors.toList());
         return new PageImpl<>(summaries, pageable, imageRepository.count());
     }
 }

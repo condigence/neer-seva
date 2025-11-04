@@ -25,6 +25,19 @@ export class AuthenticationService {
     return this.currentUserSubject.value;
   }
 
+  /**
+   * Update the current user stored in localStorage and notify subscribers.
+   */
+  public setCurrentUser(user: User) {
+    if (!user) return;
+    try {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      this.currentUserSubject.next(user);
+    } catch (e) {
+      console.error('setCurrentUser error', e);
+    }
+  }
+
 
   verifyOTP(user: User) {
     return this.http.post<any>(`${this.baseUrl}/v1/verify/otp`, user)

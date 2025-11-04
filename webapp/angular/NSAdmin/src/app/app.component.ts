@@ -33,6 +33,23 @@ export class AppComponent implements OnInit {
       if (this.user.active) {
         this.isUserActive = true;
 
+        // Update stored currentUser's picture with the fetched user profile picture
+        try {
+          const raw = localStorage.getItem('currentUser');
+          if (raw) {
+            const cu = JSON.parse(raw);
+            // prefer backend picture if present
+            if (this.user.pic) {
+              cu.pic = this.user.pic;
+            }
+            // persist and notify other components
+            this.authenticationService.setCurrentUser(cu as any);
+            this.currentUser = cu;
+          }
+        } catch (e) {
+          console.error('Error updating currentUser pic:', e);
+        }
+
         console.log(this.user);
        // console.log(this.isUserActive);
       } else {
