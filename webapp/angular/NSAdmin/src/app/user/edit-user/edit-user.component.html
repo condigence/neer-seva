@@ -126,15 +126,9 @@
                 >
                 <div class="col-lg-10">
                   <img
-                    [src]="'data:image/jpeg;base64,' + user.pic"
-                    style="
-                      height: 100px;
-                      display: block;
-                      margin-top: 10px;
-                      margin-bottom: 15px;
-                    "
+                    [src]="(editForm.get('pic')?.value) ? ('data:image/jpeg;base64,' + editForm.get('pic')?.value) : 'assets/images/df_user.png'"
+                    style="height: 100px; display: block; margin-top: 10px; margin-bottom: 15px;"
                     class="brandImg"
-                    onerror="this.onerror=null; this.src='assets/images/df_user.png'"
                     alt=""
                   />
                 </div>

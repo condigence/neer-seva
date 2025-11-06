@@ -1,26 +1,11 @@
 package com.condigence.messagingservice.controller;
 
-import com.condigence.messagingservice.kafka.JsonKafkaProducer;
-import com.condigence.messagingservice.payload.User;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-@RequestMapping("/api/v1/kafka")
+/**
+ * Legacy Kafka controller removed during migration to RabbitMQ.
+ * Kept as a placeholder to avoid IDE/CI unresolved-import issues.
+ * The application now exposes RabbitMQ-based endpoints via
+ * `MessageApiController` and message handling via `MessageService`.
+ */
 public class JsonMessageController {
-
-    private JsonKafkaProducer kafkaProducer;
-
-    public JsonMessageController(JsonKafkaProducer kafkaProducer) {
-        this.kafkaProducer = kafkaProducer;
-    }
-
-    @PostMapping("/publish")
-    public ResponseEntity<String> publish(@RequestBody User user){
-        kafkaProducer.sendMessage(user);
-        return ResponseEntity.ok("Json message sent to kafka topic");
-    }
+    // Intentionally empty - legacy code removed.
 }

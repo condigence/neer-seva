@@ -1,10 +1,10 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import Swal from 'sweetalert2';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 // import { environment } from 'src/environments/environment';
-
 
 @Component({
   selector: 'app-upload-image',
@@ -29,7 +29,8 @@ export class UploadImageComponent implements OnInit {
 
   @Input()
   receivedParentMessage!: string;
-  @Output() messageEvent = new EventEmitter<number>();
+  // Emit the uploaded image metadata (id, pic, etc.) so parent can use base64 immediately
+  @Output() messageEvent = new EventEmitter<any>();
   childMessage: string | undefined;
 
   ngOnInit() {
@@ -69,10 +70,41 @@ export class UploadImageComponent implements OnInit {
           console.log(this.base64Data);
           console.log(this.convertedImage);
           this.imageId = this.receivedImageData.id;
-          // Emit Data
-          this.messageEvent.emit(this.imageId);
+          // Emit full received image data so parent can set preview (pic) and id
+          this.messageEvent.emit(this.receivedImageData);
         },
-        err => console.log('Error Occured duringng saving: ' + err)
+        err => {
+          console.error('Error Occured during saving:', err);
+          // Prefer explicit server message when available
+          let msg = 'Upload failed. Please try again.';
+          try {
+            if (err && err.status === 413) {
+              msg = 'Maximum upload size exceeded.';
+            } else if (err && err.error) {
+              if (typeof err.error === 'string') {
+                msg = err.error;
+              } else if (err.error.message) {
+                msg = err.error.message;
+              } else if (err.error.error) {
+                msg = err.error.error;
+              } else {
+                msg = JSON.stringify(err.error);
+              }
+            } else if (err && err.message) {
+              msg = err.message;
+            }
+          } catch (e) {
+            console.error('Error parsing upload error', e);
+          }
+
+          // Show a user-friendly alert with the specific server message when available
+          Swal.fire({
+            icon: 'error',
+            title: 'Upload failed',
+            text: msg,
+            confirmButtonText: 'OK'
+          });
+        }
       );
   }
 }

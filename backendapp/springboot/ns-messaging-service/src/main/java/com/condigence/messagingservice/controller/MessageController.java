@@ -1,6 +1,7 @@
 package com.condigence.messagingservice.controller;
 
-import com.condigence.messagingservice.kafka.KafkaProducer;
+import com.condigence.messagingservice.config.RabbitMQConfig;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,19 +9,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/kafka")
+@RequestMapping("/api/v1/rabbit")
 public class MessageController {
 
-    private KafkaProducer kafkaProducer;
+    private final RabbitTemplate rabbitTemplate;
 
-    public MessageController(KafkaProducer kafkaProducer) {
-        this.kafkaProducer = kafkaProducer;
+    public MessageController(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
     }
 
-    // http:localhost:8080/api/v1/kafka/publish?message=hello world
+    // http://localhost:8080/api/v1/rabbit/publish?message=hello
     @GetMapping("/publish")
     public ResponseEntity<String> publish(@RequestParam("message") String message){
-        kafkaProducer.sendMessage(message);
-        return ResponseEntity.ok("Message sent to the topic");
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY, message);
+        return ResponseEntity.ok("Message sent to RabbitMQ exchange");
     }
 }

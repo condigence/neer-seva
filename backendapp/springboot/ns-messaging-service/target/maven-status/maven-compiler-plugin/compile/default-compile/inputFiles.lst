@@ -1,0 +1,10 @@
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\repo\MessageRepository.java
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\NsMessagingServiceApplication.java
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\payload\MessageRequest.java
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\service\MessageService.java
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\config\RabbitMQConfig.java
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\controller\JsonMessageController.java
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\entity\MessageEntity.java
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\payload\User.java
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\controller\MessageApiController.java
+D:\gitrepo\neer-seva\backendapp\springboot\ns-messaging-service\src\main\java\com\condigence\messagingservice\controller\MessageController.java

@@ -69,10 +69,23 @@ export class EditUserComponent implements OnInit {
     });
   }
 
-  receiveMessage($event) {
-    this.imageId = $event;
+  onImgError(event: any) {
+    try { (event.target as HTMLImageElement).src = 'assets/images/df_user.png'; } catch (e) { }
+  }
 
-    this.editForm.controls.imageId.setValue(this.imageId);
+  receiveMessage($event) {
+    // $event now contains the full image response { id, pic, ... }
+    if ($event && typeof $event === 'object') {
+      this.imageId = $event.id;
+      this.editForm.controls.imageId.setValue(this.imageId);
+      if ($event.pic) {
+        // set the pic form control so template preview shows the uploaded image immediately
+        this.editForm.controls.pic.setValue($event.pic);
+      }
+    } else {
+      this.imageId = $event;
+      this.editForm.controls.imageId.setValue(this.imageId);
+    }
   }
 
   get f() {

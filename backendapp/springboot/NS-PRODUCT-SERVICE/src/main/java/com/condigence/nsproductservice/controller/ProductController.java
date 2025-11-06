@@ -85,7 +85,7 @@ public class ProductController {
 		return null;
 	}
 
-	@PostMapping(value = "/brands")
+	@RequestMapping(path = {"/brands", "/brands/"}, method = RequestMethod.POST)
 	public ResponseEntity<?> addBrands(@RequestBody BrandBean brandBean) {
 		logger.info("Entering addBrands with Brand Details >>>>>>>>  : {}", brandBean);
 		HttpHeaders headers = new HttpHeaders();
@@ -93,7 +93,7 @@ public class ProductController {
 		return new ResponseEntity<>(headers, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/brands/")
+	@RequestMapping(path = {"/brands", "/brands/"}, method = RequestMethod.GET)
 //	@CircuitBreaker(name=USER_SERVICE,fallbackMethod = "userFallback")
 	public ResponseEntity<?> getAllBrands() {
 
