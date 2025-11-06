@@ -493,6 +493,21 @@ Tabs
     }
   };
 
-  $(document).ready(function(){
-    $('ul.tabs').tabs();
-  });
+    $(document).ready(function(){
+        try {
+            if (window.$ && $.fn && typeof $.fn.tabs === 'function') {
+                $('ul.tabs').tabs();
+            } else {
+                // tabs plugin is not available on this jQuery instance.
+                // This can happen if jQuery is loaded multiple times or if the plugin
+                // failed to attach. Skip initialization to avoid runtime errors.
+                if (window && window.console) {
+                    console.warn('tabs plugin not available - skipping tabs initialization');
+                }
+            }
+        } catch (e) {
+            if (window && window.console) {
+                console.warn('tabs initialization failed:', e);
+            }
+        }
+    });

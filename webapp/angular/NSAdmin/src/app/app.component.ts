@@ -21,31 +21,32 @@ export class AppComponent implements OnInit {
     private userService: UserService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this.currentUser = JSON.parse(localStorage.getItem('currentUser'));    
+    // Initialize synchronously from the AuthenticationService current value instead of reading localStorage directly
+    this.currentUser = this.authenticationService.currentUserValue;
   }
 
   ngOnInit(): void {
+    // Use the AuthenticationService currentUser value (keeps auth centralized in the AuthGuard)
+    const parsed = this.authenticationService.currentUserValue;
+    if (!parsed || !parsed.id) {
+      // No logged-in user at app init; nothing to fetch here. AuthGuard handles route protection.
+      return;
+    }
 
-    const currentUser = localStorage.getItem('currentUser');
-
-    this.userService.getUserById(JSON.parse(currentUser).id).subscribe(data => {
+    this.userService.getUserById(parsed.id).subscribe(data => {
       this.user = data;
       if (this.user.active) {
         this.isUserActive = true;
 
         // Update stored currentUser's picture with the fetched user profile picture
         try {
-          const raw = localStorage.getItem('currentUser');
-          if (raw) {
-            const cu = JSON.parse(raw);
-            // prefer backend picture if present
-            if (this.user.pic) {
-              cu.pic = this.user.pic;
-            }
-            // persist and notify other components
-            this.authenticationService.setCurrentUser(cu as any);
-            this.currentUser = cu;
+          // Merge fetched profile picture into currentUser and notify subscribers
+          const cu = this.authenticationService.currentUserValue || {} as any;
+          if (this.user.pic) {
+            cu.pic = this.user.pic;
           }
+          this.authenticationService.setCurrentUser(cu as any);
+          this.currentUser = cu;
         } catch (e) {
           console.error('Error updating currentUser pic:', e);
         }
