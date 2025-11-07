@@ -4,7 +4,7 @@ import { Router } from "@angular/router";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { first } from "rxjs/operators";
 // import { UserService } from "src/app/service/user.service";
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2/dist/sweetalert2.esm.js';
 import { UserService } from "../../service/user.service";
 import { User } from "../../model/user.model";
 

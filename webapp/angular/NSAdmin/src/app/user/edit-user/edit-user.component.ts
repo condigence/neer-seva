@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { User } from '../../model/user.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2/dist/sweetalert2.esm.js';
 
 @Component({
   selector: 'app-edit-user',

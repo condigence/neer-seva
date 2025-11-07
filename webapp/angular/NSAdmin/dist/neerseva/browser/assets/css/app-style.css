@@ -248,35 +248,64 @@ hr {
 	margin-left: 0px;
 }
 
-#wrapper.toggled .content-wrapper {
-    margin-left: 0;
+/* removed legacy rule for .content-wrapper here — layout offset is handled by the
+   desktop media query (.content-wrapper margin-left: 240px at min-width:768px) */
+
+/* Sidebar overlay for mobile: covers content when sidebar is open on small screens */
+.sidebar-overlay {
+    /* overlay is present but hidden by default (opacity 0) to allow transitions */
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 999; /* under the sidebar (1000) but above content */
+    transition: opacity 180ms ease-in-out;
 }
 
-/* Page Content Wrapper */
+.sidebar-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Page Content Wrapper
+   Default: no left margin so mobile/tablet view is full-width.
+   On desktop (min-width:768px) the content is offset to make room for the sidebar. */
 .content-wrapper {
-    margin-left: 240px;
-	padding-top: 70px;
-	padding-left: 15px;
+    margin-left: 0; /* default for small screens */
+    padding-top: 70px;
+    padding-left: 15px;
     padding-right: 15px;
     padding-bottom: 70px;
     overflow-x: hidden;
-	-webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-  }
-  .content-wrapper1 {
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+.content-wrapper1 {
     margin-left: 0px;
-	padding-top: 0px;
-	padding-left: 15px;
+    padding-top: 0px;
+    padding-left: 15px;
     padding-right: 15px;
     padding-bottom: 70px;
     overflow-x: hidden;
-	-webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-  } 
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+/* Desktop breakpoint: apply left offset to make room for the fixed sidebar */
+@media (min-width: 768px) {
+    .content-wrapper {
+        margin-left: 240px;
+    }
+}
 
  
 
@@ -290,15 +319,21 @@ hr {
 }
 
 .toggle-menu i {
-   margin-left: 240px;
-   font-size: 14px;
-   font-weight: 600;
-   color: #172b4d;
-   cursor: pointer;
-   -webkit-transition: all 0.3s ease;
-   -moz-transition: all 0.3s ease;
-   -o-transition: all 0.3s ease;
-   transition: all 0.3s ease;
+    margin-left: 0; /* default for small screens */
+    font-size: 14px;
+    font-weight: 600;
+    color: #172b4d;
+    cursor: pointer;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .toggle-menu i {
+        margin-left: 240px;
+    }
 }
 
 .right-nav-link a.nav-link {
@@ -4699,7 +4734,7 @@ table.grid td {
 [class*="icheck-material"] {
   min-height: 22px;
   margin-top: 6px;
-  margin-bottom: 6px
+    margin-bottom: 6px;
   padding-left: 0px; }
   [class*="icheck-material"] > label {
     padding-left: 29px !important;
@@ -4777,7 +4812,7 @@ table.grid td {
       -ms-transform: scale(0);
       opacity: 1;
       transition: opacity 0s, transform 0s; }
-  [class*="icheck-material" > input[type="radio"]:first-child + label::before,
+    [class*="icheck-material"] > input[type="radio"]:first-child + label::before,
   [class*="icheck-material"] > input[type="radio"]:first-child + input[type="hidden"] + label::before {
     border-radius: 50%; }
   [class*="icheck-material"] > input[type="radio"]:first-child:checked + label::before,
@@ -5136,12 +5171,15 @@ table.grid td {
   -o-transform: translateZ(0);
   transform: translateZ(0);
   -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
+    mask-image: radial-gradient(circle, white 100%, black 100%);
+    -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
   text-align: center;
   width: 2.5em;
   height: 2.5em;
   line-height: 2.5em;
   border-radius: 50%;
-  -webkit-mask-image: none;
+    mask-image: none;
+    -webkit-mask-image: none;
 }
 .waves-input-wrapper {
   border-radius: 0.2em;

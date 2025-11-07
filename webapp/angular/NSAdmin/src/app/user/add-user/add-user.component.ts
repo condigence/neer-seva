@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../service/user.service';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2/dist/sweetalert2.esm.js';
 import { MyValidationService } from 'src/app/service/myValidatorService';
 import { ValidateContactNotTaken } from 'src/app/validator/contact.validator';
 

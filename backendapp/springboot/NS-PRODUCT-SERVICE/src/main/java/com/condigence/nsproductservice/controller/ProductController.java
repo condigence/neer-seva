@@ -71,17 +71,58 @@ public class ProductController {
 	 */
 	private byte[] getImagePicSafe(Long imageId) {
 		if (imageId == null) return null;
+
+		// Try configured absolute fallback URL first (avoid discovery)
+		String fallbackBase = null;
+		if (this.app != null) {
+			// try a few possible property keys
+			String[] keys = {"app.image-service.url", "app.image.service.url", "app.image_service.url", "app.imageService.url"};
+			for (String k : keys) {
+				String v = this.app.getProperty(k);
+				if (v != null && !v.isBlank()) { fallbackBase = v; break; }
+			}
+		}
+		if (fallbackBase != null && !fallbackBase.isBlank()) {
+			String fbPath = fallbackBase;
+			if (!fbPath.endsWith("/")) fbPath += "/";
+			fbPath += "neerseva/api/v1/images/" + imageId + "/data";
+			try {
+				org.springframework.web.client.RestTemplate direct = new org.springframework.web.client.RestTemplate();
+				ImageDTO imageDTO = direct.getForObject(fbPath, ImageDTO.class);
+				if (imageDTO != null) return imageDTO.getPic();
+			} catch (Exception ex) {
+				logger.warn("Unable to fetch image from fallback path {}: {}", fbPath, ex.getMessage());
+			}
+		} else {
+			logger.debug("No fallback image-service URL configured (app.image-service.url or alternatives)");
+		}
+
+		// Decide whether to try discovery; check both kebab and camel property names
+		boolean tryDiscovery = true;
+		if (this.app != null) {
+			String fetch1 = this.app.getProperty("eureka.client.fetchRegistry");
+			String fetch2 = this.app.getProperty("eureka.client.fetch-registry");
+			if ((fetch1 != null && fetch1.equalsIgnoreCase("false")) || (fetch2 != null && fetch2.equalsIgnoreCase("false"))) {
+				tryDiscovery = false;
+			}
+		}
+		if (!tryDiscovery) {
+			logger.debug("Skipping service discovery for NS-IMAGE-SERVICE because eureka.client.fetchRegistry is false");
+			return null;
+		}
+
+		String servicePath = "http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + imageId + "/data";
 		try {
-			ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + imageId+"/data", ImageDTO.class);
+			ImageDTO imageDTO = restTemplate.getForObject(servicePath, ImageDTO.class);
 			if (imageDTO != null) {
 				return imageDTO.getPic();
 			}
-		} catch (RestClientException ex) {
-			// Log and continue without failing the whole request.
-			logger.warn("Unable to fetch image from image-service for id {}: {}", imageId, ex.getMessage());
+		} catch (IllegalStateException ise) {
+			logger.warn("Service discovery failed for NS-IMAGE-SERVICE (no instances): {}", ise.getMessage());
 		} catch (Exception ex) {
-			logger.error("Unexpected error while fetching image {}: {}", imageId, ex.getMessage());
+			logger.warn("Unable to fetch image from discovery path {}: {}", servicePath, ex.getMessage());
 		}
+
 		return null;
 	}
 
@@ -315,8 +356,16 @@ public class ProductController {
 
 	@GetMapping("/items/by/vendors/{id}")
 	public ResponseEntity<?> getItemsByvendorid(@PathVariable("id") Long id) {
-		List<ItemDTO> items = restTemplate.getForObject("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/items/by/vendor/"+id, List.class); // Working
-		return ResponseEntity.status(HttpStatus.OK).body(items);
+		try {
+			List<ItemDTO> items = restTemplate.getForObject("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/items/by/vendor/" + id, List.class); // Working
+			return ResponseEntity.status(HttpStatus.OK).body(items);
+		} catch (IllegalStateException ise) {
+			logger.warn("Service discovery failed for NS-STOCK-SERVICE when fetching items for vendor {}: {}", id, ise.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(Collections.emptyList());
+		} catch (Exception ex) {
+			logger.warn("Unable to fetch items by vendor {} from stock service: {}", id, ex.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(Collections.emptyList());
+		}
 	}
 
 	@GetMapping("/items/by/brands/{id}")

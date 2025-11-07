@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Item } from '../../model/item.model';
 import { Router } from '@angular/router';
 import { ItemService } from '../../service/item.service';
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2/dist/sweetalert2.esm.js';
 
 @Component({
   selector: 'app-list-item',

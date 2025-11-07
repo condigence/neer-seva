@@ -19,3 +19,7 @@ spring.h2.console.enabled: true
 spring.h2.console.path: /h2-console
 
 logging.level.org.springframework: INFO
+
+
+server:
+  port=9096:

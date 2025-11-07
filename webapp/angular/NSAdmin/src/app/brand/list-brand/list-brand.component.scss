@@ -1,12 +1,136 @@
 .brandImg {
-  height: 70px;
-  width: auto;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  padding-top: 10px;
+  max-height: 120px; /* cap image height on large screens */
 }
 
+/* ensure icons in tables stay white where intended */
 table .zmdi {
   color: #fff !important;
 }
+
 .title {
   color: #1f1f1f;
   background: #d0dff7;
+}
+
+/* Card product tweaks for responsiveness */
+.card-product {
+  border: 1px solid #e9eef8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.card-product .info-wrap {
+  flex: 0 0 auto;
+}
+
+/* Make the card fully flexible and responsive */
+.card-product {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.card-product:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(31,45,77,0.12);
+}
+
+.card-product .img-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.75rem;
+  background: #fff;
+  min-height: 110px;
+}
+
+.brandImg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  max-height: 110px;
+}
+
+.info-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.75rem 0.75rem 1rem 0.75rem;
+  flex: 1 1 auto;
+}
+
+.title {
+  color: #1f1f1f;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-group.d-flex {
+  gap: 0.5rem;
+}
+
+/* On small screens, make action buttons a bit larger and full width for easy tapping */
+@media (max-width: 576px) {
+  .card-product .img-wrap {
+    min-height: 80px;
+  }
+  .brandImg {
+    max-height: 72px;
+  }
+  .btn-group.d-flex {
+    flex-direction: row;
+  }
+  .btn-group.d-flex .btn {
+    flex: 1 1 auto;
+  }
+  .title {
+    font-size: 0.95rem;
+  }
+}
+
+/* Button spacing */
+.card-product .btn-group .btn {
+  min-width: 36px;
+}
+
+@media (max-width: 576px) {
+  .brandImg {
+    max-height: 80px;
+    padding-top: 6px;
+  }
+  .card-product .title {
+    font-size: 0.95rem;
+  }
+}
+
+/* Search bar responsiveness for brand list */
+.search-bar {
+  display: flex;
+  align-items: center;
+}
+.search-bar .search-input {
+  min-width: 180px;
+  max-width: 360px;
+}
+
+@media (max-width: 768px) {
+  .search-bar {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  .search-bar .search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
 }
