@@ -134,7 +134,7 @@ public class ProductController {
 		return new ResponseEntity<>(headers, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(path = {"/brands", "/brands/"}, method = RequestMethod.GET)
+	@GetMapping(path = {"/brands", "/brands/"})
 //	@CircuitBreaker(name=USER_SERVICE,fallbackMethod = "userFallback")
 	public ResponseEntity<?> getAllBrands() {
 
@@ -225,15 +225,15 @@ public class ProductController {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	@PostMapping(value = "/items")
+	@PostMapping(path = {"/items", "/items/"})
 	public ResponseEntity<?> addItems(@RequestBody ItemDTO itemDTO) {
-		logger.info("Entering addBrands with Brand Details >>>>>>>>  : {}", itemDTO);
+		logger.info("Entering addItems with Item Details >>>>>>>>  : {}", itemDTO);
 		HttpHeaders headers = new HttpHeaders();
 		Item item = itemService.saveItem(itemDTO);
 		if (item == null) {
 			return new ResponseEntity(new CustomErrorType("Issue while saving Item"), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<String>(headers, HttpStatus.CREATED);
+		return new ResponseEntity<>(headers, HttpStatus.CREATED);
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
@@ -289,7 +289,7 @@ public class ProductController {
 		return new ResponseEntity<Item>(HttpStatus.OK);
 	}
 
-	@GetMapping("/items")
+	@GetMapping(path = {"/items", "/items/"})
 	public ResponseEntity<?> getAllItems() {
 		List<ItemDTO> dtos = new ArrayList<>();
 		List<Item> items = null;
