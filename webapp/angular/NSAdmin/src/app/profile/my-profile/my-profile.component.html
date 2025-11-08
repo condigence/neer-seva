@@ -26,16 +26,14 @@
       <div class="col-lg-4">
         <div class="card profile-card-2">
           <div class="card-img-block">
-            <img class="img-fluid" src="assets/images/bgg.jpg" alt="Card image cap" />
+            <img class="img-fluid" [src]="'data:image/jpeg;base64,' + user.pic" alt="Card image cap" />
           </div>
 
           <div class="card-body myPic">
             <div class="text-center text-lg-start mb-3">
               <img [src]="'data:image/jpeg;base64,' + user.pic" alt="profile-image" class="profile img-fluid rounded-circle" />
             </div>
-            <!-- <img [src]="convertedImage"> -->
-            <!-- <h5 class="card-title">{{user.name}}</h5> -->
-            <!-- <p class="card-text">{{profile.description}}</p> -->
+      
             <div class="icon-block"></div>
           </div>
         </div>

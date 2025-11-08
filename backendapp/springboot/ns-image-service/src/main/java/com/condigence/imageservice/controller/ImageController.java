@@ -30,9 +30,6 @@ public class ImageController {
 
     public static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
-    // Default images directory (forward-slash style). Made a constant to avoid repeated literals.
-    private static final String DEFAULT_IMAGES_BASE = "D:/gitrepo/neer-seva/backendapp/springboot/ns-image-service/neerseva-images";
-
     public ImageController(ImageService imageService, AppProperties app, Environment env) {
         this.imageService = imageService;
         this.app = app;
@@ -43,6 +40,12 @@ public class ImageController {
     public ResponseEntity<?> uplaodImage(@RequestParam("myFile") MultipartFile file,
                                          @RequestParam("moduleName") String moduleName) throws Exception {
         String imagePath = app.getResolvedLocation();
+        if (imagePath == null || imagePath.isBlank()) {
+            logger.error("app.location is not configured (application.yml / APP_LOCATION / -Dapp.base.path)");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CustomErrorType("Server misconfiguration: app.location not set"));
+        }
+
         Image savedImageObj;
         try {
             // save image into db and directory
@@ -64,11 +67,7 @@ public class ImageController {
 
         // Read the stored file and set pic as Base64 string
         try {
-            String baseDirRaw = app.getResolvedLocation();
-            if (baseDirRaw == null || baseDirRaw.isBlank()) {
-                baseDirRaw = DEFAULT_IMAGES_BASE;
-            }
-            java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
+            java.nio.file.Path imagesBase = java.nio.file.Paths.get(imagePath.replace('/', java.io.File.separatorChar));
             java.nio.file.Path imgPath = imagesBase.resolve(savedImageObj.getName()).normalize();
             if (java.nio.file.Files.exists(imgPath) && imgPath.startsWith(imagesBase)) {
                 byte[] bytes = java.nio.file.Files.readAllBytes(imgPath);
@@ -136,9 +135,11 @@ public class ImageController {
             // Resolve base images directory from AppProperties (normalized, forward-slash style)
             String baseDirRaw = app.getResolvedLocation();
             if (baseDirRaw == null || baseDirRaw.isBlank()) {
-                // fallback to default constant if AppProperties didn't provide it
-                baseDirRaw = DEFAULT_IMAGES_BASE;
+                logger.error("app.location is not configured; cannot read image files from disk");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new CustomErrorType("Server misconfiguration: app.location not set"));
             }
+
             // Normalize to system path separators and build Path
             java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
 
@@ -183,7 +184,11 @@ public class ImageController {
             if (image == null) return ResponseEntity.notFound().build();
 
             String baseDirRaw = app.getResolvedLocation();
-            if (baseDirRaw == null || baseDirRaw.isBlank()) baseDirRaw = DEFAULT_IMAGES_BASE;
+            if (baseDirRaw == null || baseDirRaw.isBlank()) {
+                logger.error("app.location is not configured; cannot read image files from disk");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new CustomErrorType("Server misconfiguration: app.location not set"));
+            }
             java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
 
             String rawName = image.getName();
