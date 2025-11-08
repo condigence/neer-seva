@@ -6,13 +6,13 @@
 
     </div>
   </div>
-  <div class="col-sm-6" style="left:10% !important"> <input type="button" (click)="onUpload()"
-      value="upload" class="btn btn-info btn-xs imgUploadBtn">
+  <div class="col-sm-6 d-flex align-items-start">
+    <input type="button" (click)="onUpload()" value="upload" class="btn btn-info btn-xs imgUploadBtn ms-2">
   </div>
 </div>
 <div class="row">
-  <div class="col-sm-6">
-    <img [src]="imgURL" height="100" *ngIf="imgURL" alt="N/A">
+    <div class="col-sm-6">
+    <img [src]="imgURL" class="img-fluid" style="max-height:100px;" *ngIf="imgURL" alt="N/A">
   </div>
 
 
@@ -20,7 +20,7 @@
     <div *ngIf='dispalyPreview'>
       <span>Preview:</span>
       {{childMessage}}
-      <img height="100" class="preImg" [src]="convertedImage">
+  <img class="preImg img-fluid" style="max-height:100px;" [src]="convertedImage">
     </div>
   </div>
 </div>

@@ -14,6 +14,83 @@ html{
   height: 100%;
 }
 
+/* SweetAlert / SweetAlert2 centering overrides
+     Force modal containers to use flex centering and ensure
+     both older SweetAlert (swal-modal/swaw-overlay) and
+     SweetAlert2 (swal2-container/swaw2-popup) are centered.
+     These rules are intentionally specific and use !important
+     to override plugin styles that may apply transforms.
+*/
+.swal2-container,
+.swal-overlay,
+.swal-overlay--show-modal {
+    /* make overlay transparent and use flex centering for responsiveness */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 20000 !important;
+    background-color: transparent !important; /* transparent backdrop requested */
+    padding: 1rem !important; /* keeps popup away from screen edges on small devices */
+    box-sizing: border-box !important;
+}
+
+.swal2-popup,
+.swal-modal {
+    /* responsive popup card */
+    background-color: rgba(255,255,255,0.96) !important;
+    color: inherit !important;
+    width: 100% !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    position: relative !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+    border-radius: 0.5rem !important;
+    padding: 1.25rem !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    max-height: calc(100vh - 2rem) !important;
+    overflow: auto !important;
+}
+
+/* make action buttons wrap and centered on small screens */
+.swal2-actions,
+.swal-button-container {
+    display: flex !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    margin-top: 1rem !important;
+}
+
+/* smaller padding on very small screens */
+@media (max-width: 480px) {
+    .swal2-container,
+    .swal-overlay,
+    .swal-overlay--show-modal {
+        padding: 0.5rem !important;
+    }
+    .swal2-popup,
+    .swal-modal {
+        padding: 0.75rem !important;
+        max-width: calc(100% - 1rem) !important;
+    }
+}
+
+/* ensure old swal buttons are centered too */
+.swal-button,
+.swal-button--cancel,
+.swal-button--confirm {
+    min-width: 100px !important;
+}
+
+
 
 @-ms-viewport {
 	width: device-width
@@ -305,6 +382,14 @@ hr {
     .content-wrapper {
         margin-left: 240px;
     }
+}
+
+/* When the app is rendering auth pages (no header/sidebar), ensure content takes full width
+   and remove top padding that was reserved for the fixed topbar. This rule targets the
+   wrapper when the Angular template sets the `no-sidebar` class (see app.component.html). */
+#wrapper.no-sidebar .content-wrapper {
+    margin-left: 0 !important;
+    padding-top: 0 !important;
 }
 
  

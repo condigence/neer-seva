@@ -1,3 +1,18 @@
 .card-title{
     background: antiquewhite;
 }
+
+.login-wrapper{ 
+    display:flex; align-items:center; justify-content:center; min-height:100vh; padding:2rem; 
+    background-repeat:no-repeat; background-size:cover; background-position:center; background-image: url('../../assets/images/login_bg.jpg');
+}
+
+.card-authentication1{ max-width:420px; width:100%; margin:0 auto; border-radius:8px; }
+.card-authentication1 .card-body{ padding:1.25rem; }
+.card-authentication1 img{ max-width:160px; width:50%; height:auto; }
+
+@media (max-width:576px){
+    .login-wrapper{ padding:1rem; }
+    .card-authentication1{ max-width:360px; }
+    .card-authentication1 img{ max-width:140px; }
+}

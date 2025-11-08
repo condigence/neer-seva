@@ -38,8 +38,8 @@ export class LoginComponent implements OnInit {
           '',
            [
              Validators.required,
-            Validators.minLength(10),
-            Validators.maxLength(10),
+             // only digits and exactly 10 characters
+             Validators.pattern(/^[0-9]{10}$/),
            ],
         ],
       }
