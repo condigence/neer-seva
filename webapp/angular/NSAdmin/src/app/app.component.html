@@ -107,9 +107,10 @@
 </header>
 
 <!-- Single wrapper contains sidebar + content so the existing app-script toggle and app-style CSS work correctly -->
-<div id="wrapper" *ngIf="currentUser">
+<!-- Always render wrapper so routes like /login can be displayed; show header and sidebar only when a user is logged in -->
+<div id="wrapper">
   <!--Start sidebar-wrapper-->
-  <div id="sidebar-wrapper" data-simplebar="" data-simplebar-auto-hide="true" aria-hidden="false">
+  <div id="sidebar-wrapper" *ngIf="currentUser" data-simplebar="" data-simplebar-auto-hide="true" aria-hidden="false">
     <div class="brand-logo">
       <a routerLink="home">
         <img src="assets/images/logo-new.png" class="logo-icon" alt="logo icon" />
