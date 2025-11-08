@@ -20,6 +20,10 @@ export class MyProfileComponent implements OnInit {
   editForm!: FormGroup;
   imageId!: number;
   messageToSendP = "PROFILE";
+  // whether a file has been selected in the child upload component
+  fileChosen: boolean = false;
+  // validation error shown when Update is clicked but chosen file not uploaded
+  uploadValidationError: string | null = null;
 
   constructor(
     private userService: UserService,
@@ -53,6 +57,16 @@ export class MyProfileComponent implements OnInit {
   receiveMessage($event: number) {
     this.imageId = $event;
     this.editForm.controls["imageId"].setValue(this.imageId);
+    // upload completed
+    this.fileChosen = false;
+    this.uploadValidationError = null;
+  }
+
+  onFileSelected(flag: boolean) {
+    this.fileChosen = flag;
+    if (!flag) {
+      this.uploadValidationError = null;
+    }
   }
 
   get f() {
@@ -62,6 +76,11 @@ export class MyProfileComponent implements OnInit {
   onSubmit() {
     console.log(this.editForm.value);
     console.log(this.editForm.valid);
+    // If user selected a file but didn't upload it, prevent update
+    if (this.fileChosen && !this.editForm.controls['imageId'].value) {
+      this.uploadValidationError = 'Please upload the selected file before updating your profile.';
+      return;
+    }
     this.editForm.controls["id"].setValue(this.user.id);
     this.userService
       .updateUser(this.editForm.value)

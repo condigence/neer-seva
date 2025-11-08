@@ -24,6 +24,8 @@ export class UploadImageComponent implements OnInit {
   imageId!: number;
   imageModuleName!: string;
   dispalyPreview!: boolean;
+  // validation error for file input
+  fileError: string | null = null;
 
    imageURL = environment.IMAGES_API_URL+'upload';
 
@@ -31,6 +33,7 @@ export class UploadImageComponent implements OnInit {
   receivedParentMessage!: string;
   // Emit the uploaded image metadata (id, pic, etc.) so parent can use base64 immediately
   @Output() messageEvent = new EventEmitter<any>();
+  @Output() fileSelected = new EventEmitter<boolean>();
   childMessage: string | undefined;
 
   ngOnInit() {
@@ -42,6 +45,12 @@ export class UploadImageComponent implements OnInit {
     // event may be a DOM Event; guard for target/files
     const files = event?.target?.files || (event?.files ? event.files : null);
     this.selectedFile = files ? files[0] : null;
+    // notify parent whether a file is selected
+    this.fileSelected.emit(!!this.selectedFile);
+    // clear any previous validation error when user selects a file
+    if (this.selectedFile) {
+      this.fileError = null;
+    }
     // Below part is used to display the selected image
     if (this.selectedFile) {
       const reader = new FileReader();
@@ -55,6 +64,13 @@ export class UploadImageComponent implements OnInit {
 
   // This part is for uploading
   onUpload() {
+    // validate file selected
+    if (!this.selectedFile) {
+      this.fileError = 'Please choose a file before uploading.';
+      this.dispalyPreview = false;
+      return;
+    }
+    this.fileError = null;
     this.dispalyPreview = true;
     const uploadData = new FormData();
     uploadData.append('moduleName',  this.imageModuleName);
@@ -72,6 +88,8 @@ export class UploadImageComponent implements OnInit {
           this.imageId = this.receivedImageData.id;
           // Emit full received image data so parent can set preview (pic) and id
           this.messageEvent.emit(this.receivedImageData);
+          // uploading completed -> indicate no pending file selection
+          this.fileSelected.emit(false);
         },
         err => {
           console.error('Error Occured during saving:', err);

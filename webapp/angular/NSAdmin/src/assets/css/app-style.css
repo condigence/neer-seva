@@ -398,6 +398,26 @@ hr {
 .topbar-nav .navbar{
    padding: 0px 15px;
    z-index: 999;
+
+/* Defensive fix for a selector parsing warning observed during builds.
+   Some build pipelines reported a skipped selector: ".form-floating>~label".
+   That selector is malformed (successive traversals). The original Bootstrap
+   rule should be like ".form-floating > .form-control:focus ~ label". To
+   ensure floating labels still behave correctly across browsers and to
+   remove missing behavior when the optimizer skips a rule, add explicit
+   rules here that implement the expected transform for floating labels.
+*/
+.form-floating > label {
+    transform-origin: 0 0;
+    transition: transform .2s ease, color .2s ease;
+}
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-control-plaintext ~ label,
+.form-floating > .form-select ~ label {
+    transform: translateY(-0.6rem) scale(.85);
+    opacity: .85;
+}
    height: 60px;
    -webkit-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);

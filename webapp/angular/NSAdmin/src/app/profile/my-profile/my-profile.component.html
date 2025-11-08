@@ -5,15 +5,18 @@
         <h4 class="page-title">My Profile</h4>
       </div>
       <div class="col-sm-3">
-        <div class="btn-group float-sm-right">
-          <button type="button" class="btn btn-outline-primary waves-effect waves-light">
-            <i class="fa fa-cog mr-1"></i> Setting
-          </button>
-          <button type="button"
-            class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split waves-effect waves-light"
-            data-toggle="dropdown">
-            <span class="caret"></span>
-          </button>
+        <!-- Right-aligned settings button (responsive) -->
+        <div class="d-flex justify-content-sm-end">
+          <div class="btn-group">
+            <button type="button" class="btn btn-outline-primary waves-effect waves-light">
+              <i class="fa fa-cog me-1"></i> Setting
+            </button>
+            <button type="button"
+              class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split waves-effect waves-light"
+              data-toggle="dropdown" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -27,8 +30,8 @@
           </div>
 
           <div class="card-body myPic">
-            <div>
-              <img [src]="'data:image/jpeg;base64,' + user.pic" alt="profile-image" class="profile" />
+            <div class="text-center text-lg-start mb-3">
+              <img [src]="'data:image/jpeg;base64,' + user.pic" alt="profile-image" class="profile img-fluid rounded-circle" />
             </div>
             <!-- <img [src]="convertedImage"> -->
             <!-- <h5 class="card-title">{{user.name}}</h5> -->
@@ -97,8 +100,10 @@
                     <label class="col-lg-3 col-form-label form-control-label">Change profile Image</label>
                     <div class="col-lg-9">
                       <app-upload-image  (messageEvent)="receiveMessage($event)"
+                        (fileSelected)="onFileSelected($event)"
                         [receivedParentMessage]="messageToSendP">
                       </app-upload-image>
+                      <div *ngIf="uploadValidationError" class="text-danger small mt-1">{{ uploadValidationError }}</div>
                     </div>
                   </div>
                  
@@ -106,10 +111,14 @@
                   <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-9">
-                      <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-check-square-o"></i> Update
-                      </button>
-                      <a type="button" class="btn btn-info ms-2" href="javascript:history.go(-1)">Go Back</a>
+                      <!-- Buttons: stacked full-width on small screens, inline on md+ -->
+                      <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <button type="submit" class="btn btn-primary w-100 w-md-auto"
+                          [disabled]="fileChosen && !editForm.controls['imageId'].value">
+                          <i class="fa fa-check-square-o"></i> Update
+                        </button>
+                        <a role="button" class="btn btn-info ms-md-2 w-100 w-md-auto" href="javascript:history.go(-1)">Go Back</a>
+                      </div>
                     </div>
                   </div>
                 </form>

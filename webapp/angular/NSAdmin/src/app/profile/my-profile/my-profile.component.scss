@@ -4,3 +4,22 @@
 .card-body{
     padding: 0px !important;;
 }
+
+/* Profile image sizing */
+.profile{
+    max-width: 150px;
+    width: 100%;
+    height: auto;
+}
+
+@media (min-width: 768px) {
+    .profile{
+        width: 150px;
+    }
+}
+
+/* Ensure upload-image previews align nicely inside profile form */
+.preview-img{
+    max-width: 100%;
+    height: auto;
+}
