@@ -30,6 +30,9 @@ public class ImageController {
 
     public static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
+    // Default images directory (forward-slash style). Made a constant to avoid repeated literals.
+    private static final String DEFAULT_IMAGES_BASE = "D:/gitrepo/neer-seva/backendapp/springboot/ns-image-service/neerseva-images";
+
     public ImageController(ImageService imageService, AppProperties app, Environment env) {
         this.imageService = imageService;
         this.app = app;
@@ -63,7 +66,7 @@ public class ImageController {
         try {
             String baseDirRaw = app.getResolvedLocation();
             if (baseDirRaw == null || baseDirRaw.isBlank()) {
-                baseDirRaw = "D:/gitrepo/neer-seva/backendapp/springboot/ns-image-service/neerseva-images";
+                baseDirRaw = DEFAULT_IMAGES_BASE;
             }
             java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
             java.nio.file.Path imgPath = imagesBase.resolve(savedImageObj.getName()).normalize();
@@ -133,8 +136,8 @@ public class ImageController {
             // Resolve base images directory from AppProperties (normalized, forward-slash style)
             String baseDirRaw = app.getResolvedLocation();
             if (baseDirRaw == null || baseDirRaw.isBlank()) {
-                // fallback to original default if AppProperties didn't provide it
-                baseDirRaw = "D:/gitrepo/neer-seva/backendapp/springboot/ns-image-service/neerseva-images";
+                // fallback to default constant if AppProperties didn't provide it
+                baseDirRaw = DEFAULT_IMAGES_BASE;
             }
             // Normalize to system path separators and build Path
             java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
@@ -180,7 +183,7 @@ public class ImageController {
             if (image == null) return ResponseEntity.notFound().build();
 
             String baseDirRaw = app.getResolvedLocation();
-            if (baseDirRaw == null || baseDirRaw.isBlank()) baseDirRaw = "D:/gitrepo/neer-seva/backendapp/springboot/ns-image-service/neerseva-images";
+            if (baseDirRaw == null || baseDirRaw.isBlank()) baseDirRaw = DEFAULT_IMAGES_BASE;
             java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
 
             String rawName = image.getName();
