@@ -179,12 +179,28 @@ var ctx = document.getElementById("dashboard3-chart-1").getContext('2d');
       });
 
    
- //donut
-
-    $("span.donut").peity("donut",{
-          width: 120,
-          height: 120 
+ // Replace peity donut with Chart.js doughnuts
+  function _createDoughnutFromSpan(spanEl) {
+    try {
+      const txt = spanEl.textContent.trim();
+      const parts = txt.indexOf(',')>-1 ? txt.split(',') : (txt.indexOf('/')>-1 ? txt.split('/') : txt.split(/\s+/));
+      const values = parts.map(p => parseFloat(p) || 0);
+      const canvas = document.createElement('canvas');
+      canvas.width = 120; canvas.height = 120;
+      spanEl.parentNode.replaceChild(canvas, spanEl);
+      const ctx = canvas.getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: values.map((v,i) => ''),
+          datasets: [{ data: values, backgroundColor: ['#5e72e4','#ff2fa0','#2dce89','#f5365c','#fb6340','#11cdef'], borderWidth: 1 }]
+        },
+        options: { cutoutPercentage: 25, legend: { display: false }, tooltips: { displayColors: false } }
       });
+    } catch (e) { console.debug('createDoughnutFromSpan error', e); }
+  }
+
+  document.querySelectorAll('span.donut').forEach(el => _createDoughnutFromSpan(el));
 
 
 

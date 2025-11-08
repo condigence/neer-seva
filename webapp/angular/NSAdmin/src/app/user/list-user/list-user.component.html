@@ -11,7 +11,7 @@
             <button [routerLink]="['/user/add-user']" type="submit" class="btn btn-primary">
               <i class="zmdi zmdi-plus"></i> Add User
             </button>
-            <form class="search-bar pull-right">
+            <form class="search-bar float-end">
               <input class="form-control" type="text" name="search" (input)="Search()" [(ngModel)]="name"
                 autocomplete="off" placeholder="Search By User Name" />
             </form>
@@ -44,10 +44,10 @@
                     <td>{{ user.type || 'N/A' }}</td>
                     <td>
                       <a (click)="updateUser(user)" class="btn btn-sm btn-primary me-2">
-                        <i class="zmdi zmdi-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i>
+                        <i class="zmdi zmdi-edit" data-bs-toggle="tooltip" data-placement="top" title="Edit"></i>
                       </a>
                       <a class="btn btn-sm btn-danger text-white" (click)="deleteTheUser(user)">
-                        <i class="zmdi zmdi-delete" data-toggle="tooltip" data-placement="top" title="Delete"></i>
+                        <i class="zmdi zmdi-delete" data-bs-toggle="tooltip" data-placement="top" title="Delete"></i>
                       </a>
                     </td>
                   </tr>

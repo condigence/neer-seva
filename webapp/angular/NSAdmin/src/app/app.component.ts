@@ -1,5 +1,5 @@
 import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { AuthenticationService } from './service/auth.service';
 import { UserService } from './service/user.service';
 
@@ -25,6 +25,30 @@ export class AppComponent implements OnInit {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     // Initialize synchronously from the AuthenticationService current value instead of reading localStorage directly
     this.currentUser = this.authenticationService.currentUserValue;
+    // Close any open dropdowns after successful navigation to keep the UI tidy
+    this.router.events.subscribe(evt => {
+      if (evt instanceof NavigationEnd) {
+        this.closeOpenDropdowns();
+      }
+    });
+    // Close dropdowns immediately when a dropdown item is clicked (delegated)
+    this.renderer.listen('document', 'click', (event: Event) => {
+      try {
+        const target = event.target as HTMLElement | null;
+        if (!target) return;
+
+        // If the click originated from a dropdown toggle, ignore — let bootstrap handle it
+        if (target.closest && target.closest('.dropdown-toggle')) return;
+
+        // If clicked inside a dropdown-menu (likely a dropdown item), close menus
+        if (target.closest && target.closest('.dropdown-menu')) {
+          // Slight delay so any navigation or click handlers run first
+          setTimeout(() => this.closeOpenDropdowns(), 0);
+        }
+      } catch (e) {
+        // ignore
+      }
+    });
   }
 
   // Toggle sidebar visibility by adding/removing the 'toggled' class on #wrapper
@@ -38,6 +62,8 @@ export class AppComponent implements OnInit {
         this.renderer.removeClass(overlay, 'visible');
         this.renderer.setAttribute(overlay, 'aria-hidden', 'true');
       }
+      const toggleBtn = document.querySelector('.toggle-menu');
+      if (toggleBtn) { this.renderer.setAttribute(toggleBtn as any, 'aria-expanded', 'false'); }
       this.isSidebarOpen = false;
       try { localStorage.setItem('sidebarToggled','false'); } catch(e) {}
     } else {
@@ -47,12 +73,39 @@ export class AppComponent implements OnInit {
         this.renderer.addClass(overlay, 'visible');
         this.renderer.setAttribute(overlay, 'aria-hidden', 'false');
       }
+      const toggleBtn = document.querySelector('.toggle-menu');
+      if (toggleBtn) { this.renderer.setAttribute(toggleBtn as any, 'aria-expanded', 'true'); }
       this.isSidebarOpen = true;
       try { localStorage.setItem('sidebarToggled','true'); } catch(e) {}
       setTimeout(() => {
         const firstLink = document.querySelector('#sidebar-wrapper a');
         if (firstLink) { (firstLink as HTMLElement).focus(); }
       }, 50);
+    }
+  }
+  
+  /**
+   * Programmatically close any open Bootstrap dropdowns.
+   * This helps when Angular navigation happens and we want dropdowns to vanish
+   * (some dropdowns remain visible depending on markup or JS race conditions).
+   */
+  public closeOpenDropdowns(): void {
+    try {
+      // Close any open .dropdown-menu
+      const openMenus = document.querySelectorAll('.dropdown-menu.show');
+      openMenus.forEach(menu => this.renderer.removeClass(menu, 'show'));
+
+      // Remove .show from parent .dropdown elements
+      const openParents = document.querySelectorAll('.dropdown.show');
+      openParents.forEach(parent => this.renderer.removeClass(parent, 'show'));
+
+      // Ensure toggles reflect collapsed state (aria-expanded=false)
+      const toggles = document.querySelectorAll('.dropdown-toggle[aria-expanded]');
+      toggles.forEach(t => this.renderer.setAttribute(t as HTMLElement, 'aria-expanded', 'false'));
+    } catch (e) {
+      // If anything goes wrong, don't break navigation — console for debug
+      // eslint-disable-next-line no-console
+      console.debug('closeOpenDropdowns error', e);
     }
   }
 
@@ -69,7 +122,8 @@ export class AppComponent implements OnInit {
     this.isSidebarOpen = false;
     try { localStorage.setItem('sidebarToggled','false'); } catch(e) {}
     const toggle = document.querySelector('.menu-icon');
-    if (toggle) { (toggle as HTMLElement).focus(); }
+    const toggleBtn = document.querySelector('.toggle-menu');
+    if (toggleBtn) { (toggleBtn as HTMLElement).focus(); }
   }
 
   // Close the sidebar when Escape is pressed anywhere in the document
@@ -128,12 +182,16 @@ export class AppComponent implements OnInit {
           this.renderer.addClass(overlay, 'visible');
           this.renderer.setAttribute(overlay, 'aria-hidden', 'false');
         }
+        const toggleBtn = document.querySelector('.toggle-menu');
+        if (toggleBtn) { this.renderer.setAttribute(toggleBtn as any, 'aria-expanded', 'true'); }
       } else if (wrapper) {
         this.renderer.removeClass(wrapper, 'toggled');
         if (overlay) {
           this.renderer.removeClass(overlay, 'visible');
           this.renderer.setAttribute(overlay, 'aria-hidden', 'true');
         }
+        const toggleBtn = document.querySelector('.toggle-menu');
+        if (toggleBtn) { this.renderer.setAttribute(toggleBtn as any, 'aria-expanded', 'false'); }
       }
     } catch(e) {
       // ignore
@@ -143,5 +201,26 @@ export class AppComponent implements OnInit {
   logout() {
     this.authenticationService.logout();
     this.router.navigate(['/login']);
+  }
+
+  // Navigate to profile from inline header dropdown
+  goToProfile(event: Event) {
+    event.preventDefault();
+    // eslint-disable-next-line no-console
+    console.log('goToProfile clicked (app component)');
+    this.closeOpenDropdowns();
+    setTimeout(() => {
+      this.router.navigateByUrl('/profile/my-profile').catch(err => {
+        // eslint-disable-next-line no-console
+        console.error('Navigation error to profile:', err);
+      });
+    }, 80);
+  }
+
+  // Handle Space key on the toggle control to emulate native button behavior
+  onToggleKey(event: Event) {
+    // Prevent the page from scrolling when Space is pressed
+    event.preventDefault();
+    this.toggleSidebar();
   }
 }

@@ -45,9 +45,14 @@
               "src/styles.css"
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.slim.min.js",
-              "node_modules/@popperjs/core/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "src/assets/plugins/simplebar/js/simplebar.js",
+              "src/assets/js/waves.js",
+              "src/assets/js/sidebar-menu.js",
+              "src/assets/js/app-script.js",
+              "src/assets/plugins/Chart.js/Chart.min.js",
+              "src/assets/js/index.js"
             ]
           },
           "configurations": {
