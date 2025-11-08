@@ -40,7 +40,6 @@
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/assets/plugins/simplebar/css/simplebar.css",
               "src/assets/css/animate.css",
-              "src/assets/css/icons.css",
               "src/assets/css/sidebar-menu.css",
               "src/assets/css/app-style.css",
               "src/styles.css"
