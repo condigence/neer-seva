@@ -112,7 +112,7 @@
                       <!-- Buttons: stacked full-width on small screens, inline on md+ -->
                       <div class="d-grid gap-2 d-md-flex justify-content-md-start">
                         <button type="submit" class="btn btn-primary w-100 w-md-auto"
-                          [disabled]="fileChosen && !editForm.controls['imageId'].value">
+                          [disabled]="!editForm.controls['imageId'].value">
                           <i class="fa fa-check-square-o"></i> Update
                         </button>
                         <a role="button" class="btn btn-info ms-md-2 w-100 w-md-auto" href="javascript:history.go(-1)">Go Back</a>

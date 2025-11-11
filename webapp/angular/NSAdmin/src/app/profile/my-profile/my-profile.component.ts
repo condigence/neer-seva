@@ -76,9 +76,9 @@ export class MyProfileComponent implements OnInit {
   onSubmit() {
     console.log(this.editForm.value);
     console.log(this.editForm.valid);
-    // If user selected a file but didn't upload it, prevent update
-    if (this.fileChosen && !this.editForm.controls['imageId'].value) {
-      this.uploadValidationError = 'Please upload the selected file before updating your profile.';
+    // Require an uploaded image before allowing update (per UX requirement)
+    if (!this.editForm.controls['imageId'].value) {
+      this.uploadValidationError = 'Please choose and upload a profile image before updating.';
       return;
     }
     this.editForm.controls["id"].setValue(this.user.id);
