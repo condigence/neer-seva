@@ -129,4 +129,10 @@ public class UserService {
         if (type == null) return 0L;
         return repository.countByTypeIgnoreCase(type);
     }
+
+    // ✅ NEW METHOD: Get top 5 vendors
+    public List<User> getTop5Vendors() {
+        return repository.findTop5Vendors();
+    }
+
 }

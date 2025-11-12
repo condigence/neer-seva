@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import com.condigence.nsuserservice.dto.AddressDTO;
 import com.condigence.nsuserservice.dto.ImageDTO;
@@ -252,6 +254,8 @@ public class UserController {
 			dto.setName(user.getName());
 			dto.setEmail(user.getEmail());
 			dto.setType(user.getType());
+            dto.setAddressId(user.getAddressId());
+
 			if (user.getImageId() != null) {
 				dto.setImageId(user.getImageId());
 				logger.debug("Fetching image for user id {} imageId {}", user.getId(), user.getImageId());
@@ -264,7 +268,91 @@ public class UserController {
 
 	}
 
-	@GetMapping("/v1/users/{id:\\d+}")
+
+    @GetMapping("v1/users/customers/top/5")
+    public ResponseEntity<?> gettop5Customers() {
+
+        // Step 1: Fetch all users (you already have a service method for this)
+        List<User> users = service.getAll();
+
+        // Step 2: Sort by type (descending) and limit to top 5
+        List<User> top5Customers = users.stream()
+                .filter(u -> "CUSTOMER".equals(u.getType()))
+                .sorted(
+                        Comparator.comparing(
+                                User::getDateCreated,
+                                Comparator.nullsLast(Comparator.naturalOrder())
+                        ).reversed()
+                )// 🕒 newest first
+                .limit(5)
+                .collect(Collectors.toList());
+
+        // Step 3: Handle case when no users found
+        if (top5Customers.isEmpty()) {
+            return new ResponseEntity<>(new CustomErrorType("No Users Found! Please Register"), HttpStatus.NOT_FOUND);
+        }
+
+        // Step 4: Convert Users → DTOs (like your existing code)
+        List<UserDTO> dtos = new ArrayList<>();
+        for (User user : top5Customers) {
+            UserDTO dto = new UserDTO();
+            dto.setId(user.getId());
+            dto.setContact(user.getContact());
+            dto.setName(user.getName());
+            dto.setEmail(user.getEmail());
+            dto.setType(user.getType());
+            dto.setAddressId(user.getAddressId());
+
+            if (user.getImageId() != null) {
+                dto.setImageId(user.getImageId());
+                byte[] pic = fetchImagePic(user.getImageId());
+                if (pic != null) dto.setPic(pic);
+            }
+            dtos.add(dto);
+        }
+
+        // Step 5: Return response
+        return ResponseEntity.status(HttpStatus.OK).body(dtos);
+    }
+
+    @GetMapping("v1/users/vendors/top/5")
+    public ResponseEntity<?> getTop5Vendors() {
+        // Step 1: Fetch top 5 vendors from service
+        List<User> top5Vendors = userService.getTop5Vendors();
+
+        // Step 2: Handle empty result
+        if (top5Vendors == null || top5Vendors.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new CustomErrorType("No Vendors Found! Please Register"));
+        }
+
+        // Step 3: Convert Users → DTOs
+        List<UserDTO> dtos = new ArrayList<>();
+        for (User user : top5Vendors) {
+            UserDTO dto = new UserDTO();
+            dto.setId(user.getId());
+            dto.setContact(user.getContact());
+            dto.setName(user.getName());
+            dto.setEmail(user.getEmail());
+            dto.setType(user.getType());
+            dto.setAddressId(user.getAddressId());
+
+            if (user.getImageId() != null) {
+                dto.setImageId(user.getImageId());
+                byte[] pic = fetchImagePic(user.getImageId());
+                if (pic != null) dto.setPic(pic);
+            }
+
+            dtos.add(dto);
+        }
+
+        // Step 4: Return response
+        return ResponseEntity.status(HttpStatus.OK).body(dtos);
+    }
+
+
+    @GetMapping("/v1/users/{id:\\d+}")
 	public ResponseEntity<?> getByUserId(@PathVariable("id") Long id) {
 		//System.out.println("Inside getByUserId" + id);
 		Optional<User> user = service.getById(id);

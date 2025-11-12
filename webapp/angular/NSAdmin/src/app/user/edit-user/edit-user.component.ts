@@ -70,7 +70,7 @@ export class EditUserComponent implements OnInit {
   }
 
   receiveMessage($event) {
-    this.imageId = $event;
+    this.imageId = $event.id;
 
     this.editForm.controls.imageId.setValue(this.imageId);
   }

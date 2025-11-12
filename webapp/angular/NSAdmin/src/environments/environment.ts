@@ -6,10 +6,13 @@ export const environment = {
   production: false,
   // Use relative path to enable the Angular dev-server proxy during development
   apiUrl: '/neerseva/api',
+   AUTH_API_URL: 'http://localhost:9092/neerseva/api/',
   USERS_API_URL: 'http://localhost:9092/neerseva/api/v1/users/',
   BRANDS_API_URL: 'http://localhost:9091/neerseva/api/v1/products/brands/',
   ITEMS_API_URL: 'http://localhost:9091/neerseva/api/v1/products/items/',
-  IMAGES_API_URL: 'http://localhost:9090/neerseva/api/v1/images/'
+  IMAGES_API_URL: 'http://localhost:9095/neerseva/api/v1/images/',
+  VENDOR_API_URL: 'http://localhost:9093/neerseva/api/v1/stocks/',
+  ORDER_API_URL: 'http://localhost:9094/neerseva/api/v1/orders/',
 };
 
 /*

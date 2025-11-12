@@ -1,26 +1,22 @@
-<div class="row">
-
-  <div class="col-sm-6">
-    <div>
-      <input type="file" (change)="onFileChanged($event)" class="btn btn-info btn-xs">
-
-    </div>
-  </div>
-  <div class="col-sm-6" style="left:10% !important"> <input type="button" (click)="onUpload()"
-      value="upload" class="btn btn-info btn-xs imgUploadBtn">
-  </div>
+<div class="d-flex align-items-center gap-2">
+  <!-- Hidden native file input - triggered by the visible label button -->
+  <input id="fileInput" type="file" (change)="onFileChanged($event)" class="file-input visually-hidden">
+  <label for="fileInput" class="btn btn-outline-secondary choose-btn mb-0">Choose file</label>
+  <span *ngIf="selectedFile" class="ms-2 small text-muted selected-filename">{{ selectedFile.name }}</span>
+  <button type="button" (click)="onUpload()" class="btn btn-info imgUploadBtn">Upload</button>
 </div>
-<div class="row">
-  <div class="col-sm-6">
-    <img [src]="imgURL" height="100" *ngIf="imgURL" alt="N/A">
+<!-- Validation error appears below when upload is attempted without choosing a file -->
+<div *ngIf="fileError" class="text-danger small mt-1">{{ fileError }}</div>
+
+<div class="row mt-2">
+  <div class="col-12 col-md-6" *ngIf="imgURL">
+    <img [src]="imgURL" class="img-fluid preview-img" alt="Preview">
   </div>
-
-
-  <div class="col-sm-6">
-    <div *ngIf='dispalyPreview'>
-      <span>Preview:</span>
-      {{childMessage}}
-      <img height="100" class="preImg" [src]="convertedImage">
+  <div class="col-12 col-md-6" *ngIf="dispalyPreview">
+    <div>
+      <div class="small mb-1">Preview:</div>
+      <img class="preImg img-fluid preview-img" [src]="convertedImage" alt="Converted Preview">
+      <div class="small text-muted">{{childMessage}}</div>
     </div>
   </div>
 </div>

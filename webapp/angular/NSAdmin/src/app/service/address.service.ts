@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Address } from '../model/address.model';
+import { environment } from 'src/environments/environment';
 
 
 
@@ -15,28 +16,28 @@ export class AddressService {
 
   constructor(private http: HttpClient) {}
 
-  private baseUrl = 'http://localhost:9092/neerseva/';
+  private addAuthAPI = environment.AUTH_API_URL;
 
   getAllAddress() {
-    return this.http.get<Address[]>(this.baseUrl + 'addresses');
+    return this.http.get<Address[]>(this.addAuthAPI + 'addresses');
   }
 
 
-  getAddressById(address_id: any) {
-    return this.http.get<Address>(this.baseUrl + 'addresses' + '/by' + '/'   + address_id);
+  getAddressById(addressId: any) {
+    return this.http.get<Address>(this.addAuthAPI + 'v1/addresses/by/'   + addressId);
   }
 
 
   addAddress(address: Address) {
-    return this.http.post(this.baseUrl + 'addresses', address);
+    return this.http.post(this.addAuthAPI + 'addresses', address);
   }
 
   updateAddress(address: Address) {
-    return this.http.put(this.baseUrl + 'addresses' + '/by' + '/' + 'address_id' , address);
+    return this.http.put(this.addAuthAPI + 'addresses' + '/by' + '/' + 'address_id' , address);
   }
 
   deleteAddress(user_id: string) {
-    return this.http.delete(this.baseUrl + 'addresses' + '/by' + '/'  + user_id);
+    return this.http.delete(this.addAuthAPI + 'addresses' + '/by' + '/'  + user_id);
   }
 
 

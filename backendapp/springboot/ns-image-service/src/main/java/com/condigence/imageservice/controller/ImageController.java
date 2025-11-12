@@ -40,10 +40,13 @@ public class ImageController {
     public ResponseEntity<?> uplaodImage(@RequestParam("myFile") MultipartFile file,
                                          @RequestParam("moduleName") String moduleName) throws Exception {
         String imagePath = app.getResolvedLocation();
+        if (imagePath == null || imagePath.isBlank()) {
+            logger.error("app.location is not configured (application.yml / APP_LOCATION / -Dapp.base.path)");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CustomErrorType("Server misconfiguration: app.location not set"));
+        }
+
         Image savedImageObj;
-        Image image = new Image();
-        image.setModuleName(moduleName);
-        // We store image binary on the filesystem; imagePath contains the file location
         try {
             // save image into db and directory
             savedImageObj = imageService.store(file, moduleName, imagePath);
@@ -51,14 +54,39 @@ public class ImageController {
             logger.warn("FAIL to upload {}: {}", file.getOriginalFilename(), e.getMessage());
             throw e;
         }
-        // Now return back the saved image metadata
-        image.setId(savedImageObj.getId());
-        image.setType(file.getContentType());
-        image.setName(file.getOriginalFilename());
-        image.setImageName(savedImageObj.getImageName());
-        image.setImageSize(savedImageObj.getImageSize());
-        image.setModuleName(savedImageObj.getModuleName());
-        return ResponseEntity.status(HttpStatus.OK).body(image);
+
+        // Build DTO and populate metadata from savedImageObj
+        ImageDTO dto = new ImageDTO();
+        dto.setId(savedImageObj.getId());
+        // name in DB is the stored filename; original filename is available from MultipartFile
+        dto.setName(savedImageObj.getName());
+        dto.setImageName(savedImageObj.getImageName());
+        dto.setImageSize(savedImageObj.getImageSize());
+        dto.setModuleName(savedImageObj.getModuleName());
+        dto.setType(savedImageObj.getType());
+
+        // Read the stored file and set pic as Base64 string
+        try {
+            java.nio.file.Path imagesBase = java.nio.file.Paths.get(imagePath.replace('/', java.io.File.separatorChar));
+            java.nio.file.Path imgPath = imagesBase.resolve(savedImageObj.getName()).normalize();
+            if (java.nio.file.Files.exists(imgPath) && imgPath.startsWith(imagesBase)) {
+                byte[] bytes = java.nio.file.Files.readAllBytes(imgPath);
+                if (bytes.length > 0) {
+                    String base64 = Base64.getEncoder().encodeToString(bytes);
+                    dto.setPic(base64);
+                } else {
+                    dto.setPic("");
+                }
+            } else {
+                logger.warn("Uploaded file was saved but not found on disk for id={} name={}", savedImageObj.getId(), savedImageObj.getName());
+                dto.setPic("");
+            }
+        } catch (Exception ex) {
+            logger.warn("Failed to read stored image file for id={}: {}", savedImageObj.getId(), ex.getMessage());
+            dto.setPic("");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 
     @GetMapping("/{id}")
@@ -68,7 +96,6 @@ public class ImageController {
             String dsUrl = env.getProperty("spring.datasource.url", "<not configured>");
             String[] activeProfiles = env.getActiveProfiles();
             String active = activeProfiles.length > 0 ? String.join(",", activeProfiles) : "<none>";
-            logger.info("getImageWithId diagnostics: id={}, datasourceUrl={}, activeProfiles={}", id, dsUrl, active);
 
             image = imageService.getImage(id);
         } catch (Exception e) {
@@ -108,9 +135,11 @@ public class ImageController {
             // Resolve base images directory from AppProperties (normalized, forward-slash style)
             String baseDirRaw = app.getResolvedLocation();
             if (baseDirRaw == null || baseDirRaw.isBlank()) {
-                // fallback to original default if AppProperties didn't provide it
-                baseDirRaw = "D:/gitrepo/neer-seva/backendapp/springboot/ns-image-service/neerseva-images";
+                logger.error("app.location is not configured; cannot read image files from disk");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new CustomErrorType("Server misconfiguration: app.location not set"));
             }
+
             // Normalize to system path separators and build Path
             java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
 
@@ -155,7 +184,11 @@ public class ImageController {
             if (image == null) return ResponseEntity.notFound().build();
 
             String baseDirRaw = app.getResolvedLocation();
-            if (baseDirRaw == null || baseDirRaw.isBlank()) baseDirRaw = "D:/gitrepo/neer-seva/backendapp/springboot/ns-image-service/neerseva-images";
+            if (baseDirRaw == null || baseDirRaw.isBlank()) {
+                logger.error("app.location is not configured; cannot read image files from disk");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new CustomErrorType("Server misconfiguration: app.location not set"));
+            }
             java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
 
             String rawName = image.getName();

@@ -13,10 +13,11 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   
-  private nodeBaseUrl = 'http://localhost:9092/neerseva/api/v1/users';
+  // private nodeBaseUrl = 'http://localhost:9092/neerseva/api/v1/users';
 
   private usersAPI = environment.USERS_API_URL;
-
+  private vendorsAPI = environment.VENDOR_API_URL;
+  private ordersAPI = environment.ORDER_API_URL;
 
   getAllUsers(): Observable<User[]> {
     return this.http.get<User[]>(this.usersAPI);
@@ -42,20 +43,23 @@ export class UserService {
     return this.http.post(this.usersAPI, user);
   }
 
-  getAllUsersCount() {
-    return this.http.get(this.nodeBaseUrl + '/active/count');
-  }
+  // getAllUsersCount() {
+  //   return this.http.get(this.usersAPI + '/active/count');
+  // }
 
   getAllVendorCount() {
-    return this.http.get(this.nodeBaseUrl + '/vendorscount');
+    return this.http.get(this.vendorsAPI + 'shops');
   }
-  
-  getAllCustomerCount() {
-    return this.http.get(this.nodeBaseUrl + '/customerscount');
+    getTop5VendorCount() {
+    return this.http.get(this.usersAPI + 'vendors/top/5');
+  }
+
+  getTop5CustomerCount() {
+    return this.http.get(this.usersAPI + 'customers/top/5');
   }
 
   getAllOrderCount() {
-    return this.http.get(this.nodeBaseUrl + '/ordercount');
+    return this.http.get(this.ordersAPI + 'v1/orders');
   }
   
 
