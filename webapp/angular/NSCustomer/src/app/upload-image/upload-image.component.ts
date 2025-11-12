@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -23,6 +24,7 @@ export class UploadImageComponent implements OnInit {
   childMessage: any;
   imageModuleName: string;
   dispalyPreview: boolean;
+
 
   ngOnInit() {
     this.dispalyPreview = false;
@@ -49,7 +51,7 @@ export class UploadImageComponent implements OnInit {
     const uploadData = new FormData();
     uploadData.append('moduleName',  this.imageModuleName);
     uploadData.append('myFile', this.selectedFile, this.selectedFile.name);
-    this.httpClient.post('http://localhost:8090/image/upload', uploadData)
+    this.httpClient.post(environment.IMAGES_API_URL + 'upload', uploadData)
       .subscribe(
         res => {
           // console.log(res);

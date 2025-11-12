@@ -143,6 +143,7 @@
     </div>
     <!--End Row-->
 
+    <!-- Users List -->
     <div class="row">
       <div class="col-12 col-lg-12 col-xl-12">
         <div class="card">
@@ -172,55 +173,76 @@
                 </tr>
               </thead>
               <tbody>
+  <tr *ngFor="let customer of userAsCustomer">
+    <img
+  [src]="'data:image/png;base64,' + customer?.pic"
+  class="rounded-circle customer-img"
+  alt="customer avatar"
+/>
+
+    <td>{{ customer.name }}</td>
+    <td>{{ customer.contact }}</td>
+    <td>{{ customer.email }}</td>
+  </tr>
+</tbody>
+
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendors List -->
+
+     <div class="row">
+      <div class="col-12 col-lg-12 col-xl-12">
+        <div class="card">
+          <div class="card-header border-0">
+            New Vendors List
+            <div class="card-action">
+              <div class="dropdown">
+                <a
+                  href="javascript:void();"
+                  class="dropdown-toggle dropdown-toggle-nocaret"
+                  data-toggle="dropdown"
+                >
+                  <i class="icon-options"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+              <thead>
                 <tr>
-                  <td>
-                    <img
-                      src="assets/images/avatars/avatar-1.png"
-                      class="rounded-circle customer-img"
-                      alt="user avatar"
-                    />
-                  </td>
-                  <td>Selina Jccoy</td>
-                  <td>9999999999</td>
-                  <td>xyz&#64;example.com</td>
+                  <th>Photo</th>
+                  <th>Shop Name</th>
+                  <th>Shop Contact</th>
+                  <th>Shop Address</th>
                 </tr>
-                <tr>
-                  <td>
-                    <img
-                      src="assets/images/avatars/avatar-2.png"
-                      class="rounded-circle customer-img"
-                      alt="user avatar"
-                    />
-                  </td>
-                  <td>Michle jhon</td>
-                  <td>8888888888</td>
-                  <td>xyz&#64;example.com</td>
-                </tr>
-                <tr>
-                  <td>
-                    <img
-                      src="assets/images/avatars/avatar-3.png"
-                      class="rounded-circle customer-img"
-                      alt="user avatar"
-                    />
-                  </td>
-                  <td>Jhon Deo</td>
-                  <td>7777777777</td>
-                  <td>xyz&#64;example.com</td>
-                </tr>
-                <tr>
-                  <td>
-                    <img
-                      src="assets/images/avatars/avatar-4.png"
-                      class="rounded-circle customer-img"
-                      alt="user avatar"
-                    />
-                  </td>
-                  <td>Selina Jccoy</td>
-                  <td>8989898989</td>
-                  <td>xyz&#64;example.com</td>
-                </tr>
-              </tbody>
+              </thead>
+              <tbody>
+  <tr *ngFor="let vendor of userAsVendor">
+    <td>
+        <img
+  [src]="'data:image/png;base64,' + vendor?.pic"
+  class="rounded-circle customer-img"
+  alt="vendor avatar"
+/>
+    </td>
+    <td>{{ vendor.name }}</td>
+    <td>{{ vendor.contact }}</td>
+    <td>
+     <!-- address might not be available immediately -->
+  <div *ngIf="vendor.address">
+    <!-- <p>{{ vendor.address.line1 }}</p> -->
+    <p>{{ vendor.address.city }}, {{ vendor.address.state }}</p>
+    <!-- <p>{{ vendor.address.country }}</p> -->
+  </div>
+  </td>
+  </tr>
+</tbody>
+
             </table>
           </div>
         </div>
@@ -249,15 +271,16 @@
             <table class="table align-items-center table-flush">
               <thead>
                 <tr>
-                  <th>Product</th>
+                  <th>Date</th>
                   <th>Photo</th>
                   <th>Product ID</th>
                   <th>Status</th>
                   <th>Amount</th>
                 </tr>
               </thead>
-              <tr>
-                <td>Bisleri</td>
+              <tbody>
+              <tr *ngFor="let order of top4Orders">
+                <td>{{ order.orderDate }}</td>
                 <td>
                   <img
                     src="assets/images/bisleri.png"
@@ -265,69 +288,17 @@
                     alt="product img"
                   />
                 </td>
-                <td>#9405822</td>
+                <td>{{ order.orderNumber }}</td>
                 <td>
                   <span
                     class="btn btn-sm btn-outline-success btn-round btn-block"
-                    >Paid</span
+                    >{{ order.orderStatus }}</span
                   >
                 </td>
-                <td>&#x20B9; 1250.00</td>
+                <td>&#x20B9; {{ order.orderGrandTotal}}</td>
               </tr>
-
-              <tr>
-                <td>Bisleri</td>
-                <td>
-                  <img
-                    src="assets/images/bisleri.png"
-                    class="product-img"
-                    alt="product img"
-                  />
-                </td>
-                <td>#9405822</td>
-                <td>
-                  <span class="btn btn-sm btn-outline-info btn-round btn-block"
-                    >Pending</span
-                  >
-                </td>
-                <td>&#x20B9; 1250.00</td>
-              </tr>
-              <tr>
-                <td>Bisleri</td>
-                <td>
-                  <img
-                    src="assets/images/bisleri.png"
-                    class="product-img"
-                    alt="product img"
-                  />
-                </td>
-                <td>#9405822</td>
-                <td>
-                  <span
-                    class="btn btn-sm btn-outline-danger btn-round btn-block"
-                    >Canceled</span
-                  >
-                </td>
-                <td>&#x20B9; 1250.00</td>
-              </tr>
-              <tr>
-                <td>Bisleri</td>
-                <td>
-                  <img
-                    src="assets/images/bisleri.png"
-                    class="product-img"
-                    alt="product img"
-                  />
-                </td>
-                <td>#9405822</td>
-                <td>
-                  <span
-                    class="btn btn-sm btn-outline-success btn-round btn-block"
-                    >Paid</span
-                  >
-                </td>
-                <td>&#x20B9; 1250.00</td>
-              </tr>
+</tbody>
+             
             </table>
           </div>
         </div>

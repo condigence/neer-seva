@@ -60,7 +60,7 @@ export class AddUserComponent implements OnInit {
 
 
   receiveMessage($event) {
-    this.imageId = $event;
+    this.imageId = $event.id;
     this.addForm.controls.imageId.setValue(this.imageId);
   }
 
