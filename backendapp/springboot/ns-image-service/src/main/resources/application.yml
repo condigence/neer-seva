@@ -14,7 +14,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/ns-image-db?autoReconnect=true&useSSL=false
     username: root
-    password: "@233Breakaleg"
+    password: "ConDyn6!"
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 # Default Eureka settings (can be overridden per-profile)
