@@ -11,14 +11,15 @@
             <button [routerLink]="['/user/add-user']" type="submit" class="btn btn-primary">
               <i class="zmdi zmdi-plus"></i> Add User
             </button>
-            <form class="search-bar pull-right">
+            <form class="search-bar float-end">
               <input class="form-control" type="text" name="search" (input)="Search()" [(ngModel)]="name"
                 autocomplete="off" placeholder="Search By User Name" />
             </form>
           </div>
           <div class="card-body">
             <div class="table-responsive">
-              <table id="example" class="table table-bordered">
+              <div *ngIf="!res || res.length === 0" class="p-3">No users found.</div>
+              <table *ngIf="res && res.length" class="table table-bordered">
                 <thead>
                   <tr>
                     <th>S.N</th>
@@ -31,31 +32,27 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let user of pageOfItems; trackBy: trackUser; let i = index;">
+                  <tr *ngFor="let user of res; let i = index; trackBy: trackUser">
                     <td>{{ i + 1 }}</td>
                     <td>
                       <img [src]="'data:image/jpeg;base64,' + user.pic" class="rounded-circle customer-img"
-                      onerror="this.onerror=null; this.src='assets/images/df_user.png'" alt=""/>
+                        (error)="onImgError($event)" alt="" />
                     </td>
-                    <td>{{ user.name || "N/A" }}</td>
-                    <td>{{ user.contact || "N/A" }}</td>
-                    <td>{{ user.email || "N/A" }}</td>
-                    <td>{{ user.type || "N/A" }}</td>
+                    <td>{{ user.name || 'N/A' }}</td>
+                    <td>{{ user.contact || 'N/A' }}</td>
+                    <td>{{ user.email || 'N/A' }}</td>
+                    <td>{{ user.type || 'N/A' }}</td>
                     <td>
-                      <a (click)="updateUser(user)" class="btn btn-sm btn-primary" style="margin: 5px;">
-                        <i class="zmdi zmdi-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i>
+                      <a (click)="updateUser(user)" class="btn btn-sm btn-primary me-2">
+                        <i class="zmdi zmdi-edit" data-bs-toggle="tooltip" data-placement="top" title="Edit"></i>
                       </a>
-                      <a class="btn btn-sm btn-danger" (click)="deleteTheUser(user)" style="color: white;">
-                        <i class="zmdi zmdi-delete" data-toggle="tooltip" data-placement="top" title="Delete"></i>
+                      <a class="btn btn-sm btn-danger text-white" (click)="deleteTheUser(user)">
+                        <i class="zmdi zmdi-delete" data-bs-toggle="tooltip" data-placement="top" title="Delete"></i>
                       </a>
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <div class="card-footer pb-0 pt-3">
-                <app-pagination [items]="res" (changePage)="onChangePage($event)" style="float: right;">
-                </app-pagination>
-              </div>
             </div>
           </div>
         </div>

@@ -4,9 +4,9 @@
 
 <header class="topbar-nav" *ngIf="currentUser">
   <nav class="navbar navbar-expand fixed-top bg-white">
-    <ul class="navbar-nav mr-auto align-items-center">
+  <ul class="navbar-nav me-auto align-items-center">
       <li class="nav-item">
-        <a class="nav-link toggle-menu" href='javascript:;'>
+        <a class="nav-link toggle-menu" (click)="toggleSidebar()" (keydown.enter)="toggleSidebar()" (keydown.space)="onToggleKey($event)" role="button" tabindex="0" aria-controls="sidebar-wrapper" aria-expanded="false" aria-label="Toggle sidebar">
           <i class="icon-menu menu-icon"></i>
         </a>
       </li>
@@ -16,7 +16,7 @@
     </div>
     <ul class="navbar-nav align-items-center right-nav-link">
       <li class="nav-item dropdown-lg">
-        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="">
+        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-bs-toggle="dropdown" aria-expanded="false" href="">
           <i class="fa fa-bell-o"></i></a>
         <div class="dropdown-menu dropdown-menu-right">
           <ul class="list-group list-group-flush">
@@ -27,7 +27,7 @@
             <li class="list-group-item">
               <a href="">
                 <div class="media">
-                  <i class="zmdi zmdi-notifications-active fa-2x mr-3 text-secondary"></i>
+                  <i class="zmdi zmdi-notifications-active fa-2x me-3 text-secondary"></i>
                   <div class="media-body">
                     <h6 class="mt-0 msg-title">New User added</h6>
                   </div>
@@ -37,7 +37,7 @@
             <li class="list-group-item">
               <a href="">
                 <div class="media">
-                  <i class="zmdi zmdi-notifications-active fa-2x mr-3 text-secondary"></i>
+                  <i class="zmdi zmdi-notifications-active fa-2x me-3 text-secondary"></i>
                   <div class="media-body">
                     <h6 class="mt-0 msg-title">New Orders</h6>
                   </div>
@@ -47,7 +47,7 @@
             <li class="list-group-item">
               <a href="">
                 <div class="media">
-                  <i class="zmdi zmdi-notifications-active fa-2x mr-3 text-secondary"></i>
+                  <i class="zmdi zmdi-notifications-active fa-2x me-3 text-secondary"></i>
                   <div class="media-body">
                     <h6 class="mt-0 msg-title">New Item Added</h6>
                   </div>
@@ -63,8 +63,8 @@
       <li class="nav-item language">
         <a class="nav-link waves-effect"><i class="flag-icon flag-icon-in"></i></a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown" href="#">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown" aria-expanded="false" href="#">
           <div *ngIf="currentUser">
             <span class="user-profile">
               <img [src]="'data:image/jpeg;base64,'+currentUser.pic" class="img-circle"
@@ -72,33 +72,16 @@
             </span>
           </div>
         </a>
-        <ul class="dropdown-menu dropdown-menu-right">
-          <!-- <li class="dropdown-item user-details">
-            <a href="">
-              <div class="media" *ngIf="currentUser">
-                <div class="avatar">
-                  <img
-                    class="align-self-start mr-3"
-                    [src]="'data:image/jpeg;base64,' + currentUser.pic"
-                    alt="user avatar"
-                  />
-                </div>
-
-                <div class="media-body" *ngIf="currentUser">
-                  <h6 class="mt-2 user-title">{{ currentUser.name }}</h6>
-                  <p class="user-subtitle">{{ currentUser.email }}</p>
-                  <p class="user-subtitle">{{ currentUser.contact }}</p>
-                </div>
-              </div>
-            </a>
-          </li> -->
-          <!-- <li class="dropdown-divider"></li> -->
-          <li class="dropdown-item">
-            <a routerLink="profile/my-profile"><i class="icon-user mr-2"></i>Manage Profile</a>
+  <ul class="dropdown-menu dropdown-menu-end">
+          
+          <li>
+            <button class="dropdown-item" type="button" (click)="goToProfile($event)" aria-label="Manage Profile">
+              <i class="icon-user me-2"></i> Manage Profile
+            </button>
           </li>
           <li class="dropdown-divider"></li>
-          <li class="dropdown-item">
-            <a (click)="logout()"><i class="icon-power mr-2"></i> Logout</a>
+          <li>
+            <a class="dropdown-item" (click)="closeOpenDropdowns(); logout()"><i class="icon-power me-2"></i> Logout</a>
           </li>
         </ul>
       </li>
@@ -106,13 +89,14 @@
   </nav>
 </header>
 
-<div id="wrapper" *ngIf="currentUser">
+<!-- Single wrapper contains sidebar + content so the existing app-script toggle and app-style CSS work correctly -->
+<!-- Always render wrapper so routes like /login can be displayed; show header and sidebar only when a user is logged in -->
+<div id="wrapper" [class.no-sidebar]="!currentUser">
   <!--Start sidebar-wrapper-->
-  <div id="sidebar-wrapper" data-simplebar="" data-simplebar-auto-hide="true">
+  <div id="sidebar-wrapper" *ngIf="currentUser" data-simplebar="" data-simplebar-auto-hide="true" aria-hidden="false">
     <div class="brand-logo">
-      <a routerLink="home">
+      <a routerLink="/home">
         <img src="assets/images/logo-new.png" class="logo-icon" alt="logo icon" />
-        <!-- <h5 class="logo-text">Rukada Admin</h5> -->
       </a>
     </div>
     <ul class="sidebar-menu do-nicescrol">
@@ -120,20 +104,20 @@
         <p class="text-center textColor">Admin</p>
       </li>
       <li routerLinkActive="active current">
-        <a routerLink="home"><i class="zmdi zmdi-home text-info"></i> Home</a>
+        <a routerLink="/home"><i class="zmdi zmdi-home text-info"></i> Home</a>
       </li>
       <li routerLinkActive="active current">
         <a href="" class="waves-effect">
           <i class="zmdi zmdi-account text-info"></i>
           <span> User</span>
-          <i class="fa fa-angle-left float-right"></i>
+          <i class="fa fa-angle-left float-end"></i>
         </a>
         <ul class="sidebar-submenu">
           <li routerLinkActive="active current">
-            <a routerLink="user/add-user"><i class="zmdi zmdi-account-add text-info"></i> Add User</a>
+            <a routerLink="/user/add-user"><i class="zmdi zmdi-account-add text-info"></i> Add User</a>
           </li>
           <li routerLinkActive="active current">
-            <a routerLink="user/list-user"><i class="zmdi zmdi-accounts-list-alt text-info"></i> List User</a>
+            <a routerLink="/user/list-user"><i class="zmdi zmdi-accounts-list-alt text-info"></i> List User</a>
           </li>
         </ul>
       </li>
@@ -141,14 +125,14 @@
         <a href="" class="waves-effect">
           <i class="zmdi zmdi-view-list-alt text-info"></i>
           <span> Brands</span>
-          <i class="fa fa-angle-left float-right"></i>
+          <i class="fa fa-angle-left float-end"></i>
         </a>
         <ul class="sidebar-submenu">
           <li routerLinkActive="active current">
-            <a routerLink="brand/add-brand"><i class="zmdi zmdi-plus text-info"></i> Add Brand</a>
+            <a routerLink="/brand/add-brand"><i class="zmdi zmdi-plus text-info"></i> Add Brand</a>
           </li>
           <li routerLinkActive="active current">
-            <a routerLink="brand/list-brand"><i class="zmdi zmdi-view-list text-info"></i> List Brand</a>
+            <a routerLink="/brand/list-brand"><i class="zmdi zmdi-view-list text-info"></i> List Brand</a>
           </li>
         </ul>
       </li>
@@ -156,25 +140,32 @@
         <a href="" class="waves-effect">
           <i class="zmdi zmdi-view-list-alt text-info"></i>
           <span> Items</span>
-          <i class="fa fa-angle-left float-right"></i>
+          <i class="fa fa-angle-left float-end"></i>
         </a>
         <ul class="sidebar-submenu">
           <li routerLinkActive="active current">
-            <a routerLink="item/add-item"><i class="zmdi zmdi-plus text-info"></i> Add Item</a>
+            <a routerLink="/item/add-item"><i class="zmdi zmdi-plus text-info"></i> Add Item</a>
           </li>
           <li routerLinkActive="active current">
-            <a routerLink="item/list-item"><i class="zmdi zmdi-view-list text-info"></i> List Item</a>
+            <a routerLink="/item/list-item"><i class="zmdi zmdi-view-list text-info"></i> List Item</a>
           </li>
         </ul>
       </li>
       <li routerLinkActive="active current">
-        <a routerLink="image-approval"><i class="zmdi zmdi-image text-info"></i> Manage Request</a>
+        <a routerLink="/image-approval"><i class="zmdi zmdi-image text-info"></i> Manage Request</a>
       </li>
 
     </ul>
   </div>
-</div>
-<div id="wrapper">
-  <router-outlet></router-outlet>
+
+  <!-- Page content wrapper (works with #wrapper toggled class in app-script.js) -->
+  <div class="content-wrapper">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Mobile overlay; clicking it will close the sidebar on small screens -->
+  <div id="sidebar-overlay" class="sidebar-overlay" tabindex="0" aria-hidden="true"
+    (click)="closeSidebar()" (keydown.enter)="closeSidebar()" aria-label="Close sidebar overlay"></div>
+
 </div>
 <!-- <app-footer></app-footer> -->

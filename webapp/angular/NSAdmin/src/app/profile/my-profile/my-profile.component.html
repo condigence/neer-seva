@@ -5,15 +5,18 @@
         <h4 class="page-title">My Profile</h4>
       </div>
       <div class="col-sm-3">
-        <div class="btn-group float-sm-right">
-          <button type="button" class="btn btn-outline-primary waves-effect waves-light">
-            <i class="fa fa-cog mr-1"></i> Setting
-          </button>
-          <button type="button"
-            class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split waves-effect waves-light"
-            data-toggle="dropdown">
-            <span class="caret"></span>
-          </button>
+        <!-- Right-aligned settings button (responsive) -->
+        <div class="d-flex justify-content-sm-end">
+          <div class="btn-group">
+            <button type="button" class="btn btn-outline-primary waves-effect waves-light">
+              <i class="fa fa-cog me-1"></i> Setting
+            </button>
+            <button type="button"
+              class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split waves-effect waves-light"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -23,16 +26,14 @@
       <div class="col-lg-4">
         <div class="card profile-card-2">
           <div class="card-img-block">
-            <img class="img-fluid" src="assets/images/bgg.jpg" alt="Card image cap" />
+            <img class="img-fluid" [src]="'data:image/jpeg;base64,' + user.pic" alt="Card image cap" />
           </div>
 
           <div class="card-body myPic">
-            <div>
-              <img [src]="'data:image/jpeg;base64,' + user.pic" alt="profile-image" class="profile" />
+            <div class="text-center text-lg-start mb-3">
+              <img [src]="'data:image/jpeg;base64,' + user.pic" alt="profile-image" class="profile img-fluid rounded-circle" />
             </div>
-            <!-- <img [src]="convertedImage"> -->
-            <!-- <h5 class="card-title">{{user.name}}</h5> -->
-            <!-- <p class="card-text">{{profile.description}}</p> -->
+      
             <div class="icon-block"></div>
           </div>
         </div>
@@ -43,12 +44,12 @@
           <div class="card-body">
             <ul class="nav nav-tabs nav-tabs-primary top-icon nav-justified">
               <li class="nav-item">
-                <a href="" data-target="#profile" data-toggle="pill" class="nav-link active"><i class="icon-user"></i>
+                <a href="" data-bs-target="#profile" data-bs-toggle="pill" class="nav-link active"><i class="icon-user"></i>
                   <span class="hidden-xs">Profile</span></a>
               </li>
 
               <li class="nav-item">
-                <a href="" data-target="#edit" data-toggle="pill" class="nav-link"><i class="icon-note"></i>
+                <a href="" data-bs-target="#edit" data-bs-toggle="pill" class="nav-link"><i class="icon-note"></i>
                   <span class="hidden-xs">Edit</span></a>
               </li>
             </ul>
@@ -56,15 +57,15 @@
               <div class="tab-pane active" id="profile">
                 <div class="form-group row">
                   <label class="col-lg-3 col-form-label form-control-label">Name</label>
-                  <div class="col-lg-9" style="margin-bottom: 15px;">
+                  <div class="col-lg-9 mb-3">
                     <span>{{ user.name }}</span>
                   </div>
                   <label class="col-lg-3 col-form-label form-control-label">Email</label>
-                  <div class="col-lg-9" style="margin-bottom: 15px;">
+                  <div class="col-lg-9 mb-3">
                     <span>{{ user.email }}</span>
                   </div>
                   <label class="col-lg-3 col-form-label form-control-label">Phone</label>
-                  <div class="col-lg-9" style="margin-bottom: 15px;">
+                  <div class="col-lg-9 mb-3">
                     <span>{{ user.contact }}</span>
                   </div>
                 </div>
@@ -97,8 +98,10 @@
                     <label class="col-lg-3 col-form-label form-control-label">Change profile Image</label>
                     <div class="col-lg-9">
                       <app-upload-image  (messageEvent)="receiveMessage($event)"
+                        (fileSelected)="onFileSelected($event)"
                         [receivedParentMessage]="messageToSendP">
                       </app-upload-image>
+                      <div *ngIf="uploadValidationError" class="text-danger small mt-1">{{ uploadValidationError }}</div>
                     </div>
                   </div>
                  
@@ -106,10 +109,14 @@
                   <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-9">
-                      <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-check-square-o"></i> Update
-                      </button>
-                      <a type="button" class="btn btn-info" style="margin-left: 10px;"href="javascript:history.go(-1)">Go Back</a>
+                      <!-- Buttons: stacked full-width on small screens, inline on md+ -->
+                      <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <button type="submit" class="btn btn-primary w-100 w-md-auto"
+                          [disabled]="!editForm.controls['imageId'].value">
+                          <i class="fa fa-check-square-o"></i> Update
+                        </button>
+                        <a role="button" class="btn btn-info ms-md-2 w-100 w-md-auto" href="javascript:history.go(-1)">Go Back</a>
+                      </div>
                     </div>
                   </div>
                 </form>

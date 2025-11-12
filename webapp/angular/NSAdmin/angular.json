@@ -35,14 +35,24 @@
               "src/favicon.ico",
               "src/assets"
             ],
+            "allowedCommonJsDependencies": ["sweetalert2"],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/assets/plugins/simplebar/css/simplebar.css",
+              "src/assets/css/animate.css",
+              "src/assets/css/sidebar-menu.css",
+              "src/assets/css/app-style.css",
               "src/styles.css"
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.slim.min.js",
-              "node_modules/@popperjs/core/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "src/assets/plugins/simplebar/js/simplebar.js",
+              "src/assets/js/waves.js",
+              "src/assets/js/sidebar-menu.js",
+              "src/assets/js/app-script.js",
+              "src/assets/plugins/Chart.js/Chart.min.js",
+              "src/assets/js/index.js"
             ]
           },
           "configurations": {
@@ -51,8 +61,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "800kb",
+                  "maximumError": "2mb"
                 },
                 {
                   "type": "anyComponentStyle",

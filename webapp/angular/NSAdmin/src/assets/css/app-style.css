@@ -14,6 +14,83 @@ html{
   height: 100%;
 }
 
+/* SweetAlert / SweetAlert2 centering overrides
+     Force modal containers to use flex centering and ensure
+     both older SweetAlert (swal-modal/swaw-overlay) and
+     SweetAlert2 (swal2-container/swaw2-popup) are centered.
+     These rules are intentionally specific and use !important
+     to override plugin styles that may apply transforms.
+*/
+.swal2-container,
+.swal-overlay,
+.swal-overlay--show-modal {
+    /* make overlay transparent and use flex centering for responsiveness */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 20000 !important;
+    background-color: transparent !important; /* transparent backdrop requested */
+    padding: 1rem !important; /* keeps popup away from screen edges on small devices */
+    box-sizing: border-box !important;
+}
+
+.swal2-popup,
+.swal-modal {
+    /* responsive popup card */
+    background-color: rgba(255,255,255,0.96) !important;
+    color: inherit !important;
+    width: 100% !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    position: relative !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+    border-radius: 0.5rem !important;
+    padding: 1.25rem !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    max-height: calc(100vh - 2rem) !important;
+    overflow: auto !important;
+}
+
+/* make action buttons wrap and centered on small screens */
+.swal2-actions,
+.swal-button-container {
+    display: flex !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    margin-top: 1rem !important;
+}
+
+/* smaller padding on very small screens */
+@media (max-width: 480px) {
+    .swal2-container,
+    .swal-overlay,
+    .swal-overlay--show-modal {
+        padding: 0.5rem !important;
+    }
+    .swal2-popup,
+    .swal-modal {
+        padding: 0.75rem !important;
+        max-width: calc(100% - 1rem) !important;
+    }
+}
+
+/* ensure old swal buttons are centered too */
+.swal-button,
+.swal-button--cancel,
+.swal-button--confirm {
+    min-width: 100px !important;
+}
+
+
 
 @-ms-viewport {
 	width: device-width
@@ -248,35 +325,72 @@ hr {
 	margin-left: 0px;
 }
 
-#wrapper.toggled .content-wrapper {
-    margin-left: 0;
+/* removed legacy rule for .content-wrapper here — layout offset is handled by the
+   desktop media query (.content-wrapper margin-left: 240px at min-width:768px) */
+
+/* Sidebar overlay for mobile: covers content when sidebar is open on small screens */
+.sidebar-overlay {
+    /* overlay is present but hidden by default (opacity 0) to allow transitions */
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 999; /* under the sidebar (1000) but above content */
+    transition: opacity 180ms ease-in-out;
 }
 
-/* Page Content Wrapper */
+.sidebar-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Page Content Wrapper
+   Default: no left margin so mobile/tablet view is full-width.
+   On desktop (min-width:768px) the content is offset to make room for the sidebar. */
 .content-wrapper {
-    margin-left: 240px;
-	padding-top: 70px;
-	padding-left: 15px;
+    margin-left: 0; /* default for small screens */
+    padding-top: 70px;
+    padding-left: 15px;
     padding-right: 15px;
     padding-bottom: 70px;
     overflow-x: hidden;
-	-webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-  }
-  .content-wrapper1 {
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+.content-wrapper1 {
     margin-left: 0px;
-	padding-top: 0px;
-	padding-left: 15px;
+    padding-top: 0px;
+    padding-left: 15px;
     padding-right: 15px;
     padding-bottom: 70px;
     overflow-x: hidden;
-	-webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-  } 
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+/* Desktop breakpoint: apply left offset to make room for the fixed sidebar */
+@media (min-width: 768px) {
+    .content-wrapper {
+        margin-left: 240px;
+    }
+}
+
+/* When the app is rendering auth pages (no header/sidebar), ensure content takes full width
+   and remove top padding that was reserved for the fixed topbar. This rule targets the
+   wrapper when the Angular template sets the `no-sidebar` class (see app.component.html). */
+#wrapper.no-sidebar .content-wrapper {
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+}
 
  
 
@@ -284,21 +398,47 @@ hr {
 .topbar-nav .navbar{
    padding: 0px 15px;
    z-index: 999;
+
+/* Defensive fix for a selector parsing warning observed during builds.
+   Some build pipelines reported a skipped selector: ".form-floating>~label".
+   That selector is malformed (successive traversals). The original Bootstrap
+   rule should be like ".form-floating > .form-control:focus ~ label". To
+   ensure floating labels still behave correctly across browsers and to
+   remove missing behavior when the optimizer skips a rule, add explicit
+   rules here that implement the expected transform for floating labels.
+*/
+.form-floating > label {
+    transform-origin: 0 0;
+    transition: transform .2s ease, color .2s ease;
+}
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-control-plaintext ~ label,
+.form-floating > .form-select ~ label {
+    transform: translateY(-0.6rem) scale(.85);
+    opacity: .85;
+}
    height: 60px;
    -webkit-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .toggle-menu i {
-   margin-left: 240px;
-   font-size: 14px;
-   font-weight: 600;
-   color: #172b4d;
-   cursor: pointer;
-   -webkit-transition: all 0.3s ease;
-   -moz-transition: all 0.3s ease;
-   -o-transition: all 0.3s ease;
-   transition: all 0.3s ease;
+    margin-left: 0; /* default for small screens */
+    font-size: 14px;
+    font-weight: 600;
+    color: #172b4d;
+    cursor: pointer;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .toggle-menu i {
+        margin-left: 240px;
+    }
 }
 
 .right-nav-link a.nav-link {
@@ -4699,7 +4839,7 @@ table.grid td {
 [class*="icheck-material"] {
   min-height: 22px;
   margin-top: 6px;
-  margin-bottom: 6px
+    margin-bottom: 6px;
   padding-left: 0px; }
   [class*="icheck-material"] > label {
     padding-left: 29px !important;
@@ -4777,7 +4917,7 @@ table.grid td {
       -ms-transform: scale(0);
       opacity: 1;
       transition: opacity 0s, transform 0s; }
-  [class*="icheck-material" > input[type="radio"]:first-child + label::before,
+    [class*="icheck-material"] > input[type="radio"]:first-child + label::before,
   [class*="icheck-material"] > input[type="radio"]:first-child + input[type="hidden"] + label::before {
     border-radius: 50%; }
   [class*="icheck-material"] > input[type="radio"]:first-child:checked + label::before,
@@ -5136,12 +5276,15 @@ table.grid td {
   -o-transform: translateZ(0);
   transform: translateZ(0);
   -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
+    mask-image: radial-gradient(circle, white 100%, black 100%);
+    -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
   text-align: center;
   width: 2.5em;
   height: 2.5em;
   line-height: 2.5em;
   border-radius: 50%;
-  -webkit-mask-image: none;
+    mask-image: none;
+    -webkit-mask-image: none;
 }
 .waves-input-wrapper {
   border-radius: 0.2em;

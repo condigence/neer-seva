@@ -125,7 +125,7 @@ public class UserController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostMapping(value = "/v1/verify/login", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> verifyLogin(@RequestBody UserDTO dto) {
-		logger.info("Entering login with user Details >>>>>>>>  : {}", dto);
+		logger.info("Entering login with user Details >>>>>>>>  : {}", dto.getContact());
 		// HttpHeaders headers = new HttpHeaders();
 
 		// Check If User contact Not Provided
@@ -562,7 +562,7 @@ public class UserController {
 
 	@GetMapping("/v1/users/active/count")
 	public ResponseEntity<Long> countActiveUsers() {
-		logger.info("Counting active users");
+		//logger.info("Counting active users");
 		long activeCount = service.countActiveUsers();
 		return ResponseEntity.ok(activeCount);
 	}

@@ -1,3 +1,89 @@
 .card-title{
-    background: antiquewhite;
+        background: antiquewhite;
+}
+
+/* Login page responsive styles */
+.login-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    box-sizing: border-box;
+    background-color: #f8f9fb;
+}
+
+.card-authentication1{
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 8px;
+}
+
+.card-authentication1 .card-body{
+    padding: 1.25rem;
+}
+
+.card-authentication1 img{
+    max-width: 160px;
+    width: 50%;
+    height: auto;
+}
+
+/* form control tweaks */
+.card-authentication1 .form-control{
+    height: 44px;
+    padding: 0.5rem 0.75rem;
+}
+
+@media (max-width: 576px){
+    .login-wrapper{ padding: 1rem; }
+    .card-authentication1{ max-width: 360px; }
+    .card-authentication1 img{ max-width: 140px; }
+    .card-title{ font-size: 1.05rem; }
+}
+
+@media (min-width: 992px){
+    .login-wrapper{ padding: 3.25rem; }
+}
+
+.card-title.text-uppercase{ font-weight: 600; }
+
+/* background moved from inline HTML into SCSS to make the page responsive */
+.login-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-image: url('../../assets/images/login_bg.jpg');
+}
+
+.card-authentication1{
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 8px;
+}
+
+.card-authentication1 .card-body{
+    padding: 1.25rem;
+}
+
+.card-authentication1 img{
+    max-width: 160px;
+    width: 50%;
+    height: auto;
+}
+
+/* small screen tweaks */
+@media (max-width: 576px){
+    .login-wrapper{ padding: 1rem; }
+    .card-authentication1{ max-width: 360px; }
+    .card-authentication1 img{ max-width: 140px; }
+    .card-title{ font-size: 1.05rem; }
 }

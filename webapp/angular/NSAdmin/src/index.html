@@ -10,19 +10,9 @@
   <!-- <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon"> -->
  
-  <!-- simplebar CSS-->
-  <link href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet"/>
-  <!-- Bootstrap core CSS-->
-  <link href="assets/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Styles are loaded via angular.json "styles" to allow CLI bundling -->
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
-  <!-- animate CSS-->
-  <link href="assets/css/animate.css" rel="stylesheet" type="text/css"/>
-  <!-- Icons CSS-->
-  <link href="assets/css/icons.css" rel="stylesheet" type="text/css"/>
-  <!-- Sidebar CSS-->
-  <link href="assets/css/sidebar-menu.css" rel="stylesheet"/>
-  <!-- Custom Style-->
-  <link href="assets/css/app-style.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="./assets/css/icons.css">
 </head>
 <body>
   <app-root></app-root>
@@ -30,25 +20,10 @@
 
 
 
-   <!-- Bootstrap core JavaScript-->
-   <script src="assets/js/jquery.min.js"></script>
-   <script src="assets/js/popper.min.js"></script>
-   <script src="assets/js/bootstrap.min.js"></script>
+   <!-- Bootstrap & dependencies are provided via angular.json "scripts" (node_modules) -
+     removed local vendor copies to avoid duplicate/conflicting versions -->
 
-   <!-- simplebar js -->
-   <script src="assets/plugins/simplebar/js/simplebar.js"></script>
-   <!-- waves effect js -->
-   <script src="assets/js/waves.js"></script>
-   <!-- sidebar-menu js -->
-   <script src="assets/js/sidebar-menu.js"></script>
-   <!-- Custom scripts -->
-   <script src="assets/js/app-script.js"></script>
-   <!-- Chart js -->
-   <script src="assets/plugins/Chart.js/Chart.min.js"></script>
-   <!--Peity Chart -->
-   <script src="assets/plugins/peity/jquery.peity.min.js"></script>
-   <!-- Index js -->
-   <script src="assets/js/index.js"></script>
+  <!-- App/plugin scripts are included via angular.json "scripts" so they load after vendor libraries (jQuery/Bootstrap) -->
   
 </body>
 </html>

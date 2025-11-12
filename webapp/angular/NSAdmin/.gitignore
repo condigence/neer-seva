@@ -10,11 +10,26 @@ pnpm-lock.yaml
 dist/
 build/
 
+# Temporary files
+tmp/
+temp/
+.cache/
+.sass-cache/
+
+# Coverage and reports
+coverage/
+reports/
+.nyc_output/
+
 # IDEs and editors
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+# JetBrains project files
+*.iml
+.idea/
 
 # Mac
 .DS_Store
@@ -29,8 +44,11 @@ logs/
 # Environment
 .env
 .env.*
+/.env.local
+.env.local
 
 # Angular
+.angular
 /.angular/cache/
 
 # Dependency directories
@@ -41,6 +59,17 @@ jspm_packages/
 
 # Misc
 *.tmp
+
+# Generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# TypeScript build info
+*.tsbuildinfo
 
 # JetBrains
 out/

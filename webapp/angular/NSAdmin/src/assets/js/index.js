@@ -4,9 +4,11 @@ $(function() {
 
 // chart 1
 
-var ctx = document.getElementById("dashboard-chart-1").getContext('2d');
+var el1 = document.getElementById("dashboard-chart-1");
+if (el1 && el1.getContext) {
+  var ctx = el1.getContext('2d');
 
-      var myChart = new Chart(ctx, {
+  var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: [1, 2, 3, 4, 5, 6, 7, 8],
@@ -51,15 +53,18 @@ var ctx = document.getElementById("dashboard-chart-1").getContext('2d');
         displayColors:false,
       }
     }
-      });
+  });
+}
 
 
 
 // chart 2
 
- var ctx = document.getElementById("dashboard-chart-2").getContext('2d');
+var el2 = document.getElementById("dashboard-chart-2");
+if (el2 && el2.getContext) {
+ var ctx = el2.getContext('2d');
 
-      var myChart = new Chart(ctx, {
+   var myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: ["kinley", "Bisleri", "Bailley"],
@@ -92,14 +97,17 @@ var ctx = document.getElementById("dashboard-chart-1").getContext('2d');
         displayColors:false,
       }
         }
-      });
+  });
+}
 
 
 // chart 3
 
-       var ctx = document.getElementById('dashboard-chart-3').getContext('2d');
+var el3 = document.getElementById('dashboard-chart-3');
+if (el3 && el3.getContext) {
+     var ctx = el3.getContext('2d');
 
-	    var gradientStroke1 = ctx.createLinearGradient(0, 0, 0, 300);
+   	var gradientStroke1 = ctx.createLinearGradient(0, 0, 0, 300);
           gradientStroke1.addColorStop(0, 'rgba(37, 117, 252, 0.9)');
           gradientStroke1.addColorStop(1, 'rgba(106, 17, 203, 0.5)');
 
@@ -133,15 +141,32 @@ var ctx = document.getElementById("dashboard-chart-1").getContext('2d');
         displayColors:false,
       }
         }
+  });
+}
+
+
+ // Replace peity donut with Chart.js doughnuts
+  function _createDoughnutFromSpan(spanEl) {
+    try {
+      const txt = spanEl.textContent.trim();
+      const parts = txt.indexOf(',')>-1 ? txt.split(',') : (txt.indexOf('/')>-1 ? txt.split('/') : txt.split(/\s+/));
+      const values = parts.map(p => parseFloat(p) || 0);
+      const canvas = document.createElement('canvas');
+      canvas.width = 120; canvas.height = 120;
+      spanEl.parentNode.replaceChild(canvas, spanEl);
+      const ctx = canvas.getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: values.map((v,i) => ''),
+          datasets: [{ data: values, backgroundColor: ['#5e72e4','#ff2fa0','#2dce89','#f5365c','#fb6340','#11cdef'], borderWidth: 1 }]
+        },
+        options: { cutoutPercentage: 25, legend: { display: false }, tooltips: { displayColors: false } }
       });
+    } catch (e) { console.debug('createDoughnutFromSpan error', e); }
+  }
 
-
- //donut
-
-    $("span.donut").peity("donut",{
-          width: 120,
-          height: 120
-      });
+  document.querySelectorAll('span.donut').forEach(el => _createDoughnutFromSpan(el));
 
 
 

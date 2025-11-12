@@ -121,7 +121,8 @@ public class ImageUtil {
 
 	public String getDateTimeFormatter() {
 		LocalDateTime myDateObj = LocalDateTime.now();
-		DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH:mm:ss");
+		// Use a filename-safe format (no colon characters)
+		DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
 		String formattedDate = myDateObj.format(myFormatObj);
 		return formattedDate;
 	}

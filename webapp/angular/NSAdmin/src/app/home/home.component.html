@@ -9,11 +9,8 @@
             <div class="media align-items-center">
               <div class="media-body">
                 <p class="text-white">Total Orders</p>
-                <h4
-                  class="text-white line-height-5"
-                  *ngFor="let order of totalOrders"
-                >
-                  {{ order.NumberOfOrders }}
+                <h4 class="text-white line-height-5" *ngIf="totalOrders">
+                  {{ totalOrders.NumberOfOrders || totalOrders.numberOfOrders || totalOrders.count || totalOrders }}
                 </h4>
               </div>
               <div class="w-circle-icon rounded-circle border border-white">
@@ -44,11 +41,8 @@
             <div class="media align-items-center">
               <div class="media-body">
                 <p class="text-white">Total Users</p>
-                <h4
-                  class="text-white line-height-5"
-                  *ngFor="let u of userscount"
-                >
-                  {{ u.NumberOfUsers }}
+                <h4 class="text-white line-height-5" *ngIf="userscount">
+                  {{ userscount.NumberOfUsers || userscount.numberOfUsers || userscount.count || userscount }}
                 </h4>
               </div>
               <div class="w-circle-icon rounded-circle border border-white">
@@ -64,11 +58,8 @@
             <div class="media align-items-center">
               <div class="media-body">
                 <p class="text-white">Total Customer</p>
-                <h4
-                  class="text-white line-height-5"
-                  *ngFor="let c of userAsCustomer"
-                >
-                  {{ c.numberOfCustomer }}
+                <h4 class="text-white line-height-5" *ngIf="userAsCustomer">
+                  {{ userAsCustomer.numberOfCustomer || userAsCustomer.numberOfCustomers || userAsCustomer.count || userAsCustomer }}
                 </h4>
               </div>
               <div class="w-circle-icon rounded-circle border border-white">
@@ -91,22 +82,17 @@
                 <a
                   href="javascript:void();"
                   class="dropdown-toggle dropdown-toggle-nocaret"
-                  data-toggle="dropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
                 >
                   <i class="icon-options"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
-                  <a class="dropdown-item" href="javascript:void();">Action</a>
-                  <a class="dropdown-item" href="javascript:void();"
-                    >Another action</a
-                  >
-                  <a class="dropdown-item" href="javascript:void();"
-                    >Something else here</a
-                  >
+                  <a class="dropdown-item" href="javascript:void();" (click)="closeOpenDropdowns()">Action</a>
+                  <a class="dropdown-item" href="javascript:void();" (click)="closeOpenDropdowns()">Another action</a>
+                  <a class="dropdown-item" href="javascript:void();" (click)="closeOpenDropdowns()">Something else here</a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="javascript:void();"
-                    >Separated link</a
-                  >
+                  <a class="dropdown-item" href="javascript:void();" (click)="closeOpenDropdowns()">Separated link</a>
                 </div>
               </div>
             </div>
@@ -125,22 +111,17 @@
                 <a
                   href="javascript:void();"
                   class="dropdown-toggle dropdown-toggle-nocaret"
-                  data-toggle="dropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
                 >
                   <i class="icon-options"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
-                  <a class="dropdown-item" href="javascript:void();">Action</a>
-                  <a class="dropdown-item" href="javascript:void();"
-                    >Another action</a
-                  >
-                  <a class="dropdown-item" href="javascript:void();"
-                    >Something else here</a
-                  >
+                  <a class="dropdown-item" href="javascript:void();" (click)="closeOpenDropdowns()">Action</a>
+                  <a class="dropdown-item" href="javascript:void();" (click)="closeOpenDropdowns()">Another action</a>
+                  <a class="dropdown-item" href="javascript:void();" (click)="closeOpenDropdowns()">Something else here</a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="javascript:void();"
-                    >Separated link</a
-                  >
+                  <a class="dropdown-item" href="javascript:void();" (click)="closeOpenDropdowns()">Separated link</a>
                 </div>
               </div>
             </div>
@@ -164,7 +145,8 @@
                 <a
                   href="javascript:void();"
                   class="dropdown-toggle dropdown-toggle-nocaret"
-                  data-toggle="dropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
                 >
                   <i class="icon-options"></i>
                 </a>
@@ -268,7 +250,8 @@
                 <a
                   href="javascript:void();"
                   class="dropdown-toggle dropdown-toggle-nocaret"
-                  data-toggle="dropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
                 >
                   <i class="icon-options"></i>
                 </a>

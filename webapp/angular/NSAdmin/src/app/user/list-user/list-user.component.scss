@@ -81,3 +81,14 @@ a{
 // img:before {
 //   background-image:url('./assets/images/sorry.jpg');
 // }
+
+/* Customer image sizing for responsive tables */
+.customer-img{
+  width:48px;
+  height:48px;
+  object-fit:cover;
+}
+
+@media (max-width: 576px){
+  .customer-img{ width:36px; height:36px; }
+}

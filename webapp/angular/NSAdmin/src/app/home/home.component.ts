@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 import { UserService } from '../service/user.service';
 import { AddressService } from '../service/address.service';
 
@@ -15,7 +15,8 @@ export class HomeComponent implements OnInit {
   totalOrders: any;
   top4Orders: any;
   fiveUsers: any;
-  constructor(private userService: UserService, private addressService: AddressService) { }
+  constructor(private userService: UserService, private addressService: AddressService, private renderer: Renderer2) { }
+  
 
   ngOnInit() {
     this.userService.getAllUsers()
@@ -57,5 +58,22 @@ export class HomeComponent implements OnInit {
 
 
    
+
+  
+  // Close dropdowns immediately when a dropdown item is clicked
+  public closeOpenDropdowns(): void {
+    try {
+      const openMenus = document.querySelectorAll('.dropdown-menu.show');
+      openMenus.forEach(menu => this.renderer.removeClass(menu, 'show'));
+
+      const openParents = document.querySelectorAll('.dropdown.show');
+      openParents.forEach(parent => this.renderer.removeClass(parent, 'show'));
+
+      const toggles = document.querySelectorAll('.dropdown-toggle[aria-expanded]');
+      toggles.forEach(t => this.renderer.setAttribute(t as HTMLElement, 'aria-expanded', 'false'));
+    } catch (e) {
+      // ignore
+    }
+  }
 
 }
