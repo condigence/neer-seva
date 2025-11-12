@@ -27,11 +27,7 @@
       // replace node with container (preserve id/class if present)
       if (node.parentNode) node.parentNode.replaceChild(container, node);
 
-      new Chart(canvas.getContext('2d'), {
-        type: 'doughnut',
-        data: { labels:['',''], datasets:[{ data:[val, 100-val], backgroundColor:['#11cdef','#e9ecef'], borderWidth:0 }] },
-        options: { cutoutPercentage:70, legend:{display:false}, tooltips:{enabled:false}, responsive:false, maintainAspectRatio:false }
-      });
+      // Chart initialization removed - handled by Angular/ng2-charts or component-level code.
 
       const label = document.createElement('div');
       label.style.position = 'absolute';

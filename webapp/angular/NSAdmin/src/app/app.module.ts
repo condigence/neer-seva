@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 
 import { HomeComponent } from './home/home.component';
 import { FooterComponent } from './footer/footer.component';
+import { Dashboard3Component } from './dashboard3/dashboard3.component';
 
 import { ListItemComponent } from './item/list-item/list-item.component';
 import { AddUserComponent } from './user/add-user/add-user.component';
@@ -74,6 +75,15 @@ import { PaginationComponent } from './pagination/pagination.component';
     AlertComponent,
     NumberDirective,
     PaginationComponent,
+  Dashboard3Component,
+  // Dashboard3 component with ng2-charts
+  // NOTE: requires npm install ng2-charts chart.js
+    
+  // added below
+    
+    
+    
+    
 
   ],
   imports: [
@@ -84,6 +94,7 @@ import { PaginationComponent } from './pagination/pagination.component';
     ReactiveFormsModule,
     CommonModule,
     RouterModule,
+  // NgChartsModule removed (using Chart.js directly)
     
 
   ],
