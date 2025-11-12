@@ -37,24 +37,7 @@
 
 		// Chart.js v2-style options used in this project
 		if (!window.Chart) return;
-		new Chart(canvas.getContext('2d'), {
-			type: 'doughnut',
-			data: {
-				labels: ['', ''],
-				datasets: [{
-					data: [percent, Math.max(0, 100 - percent)],
-					backgroundColor: [color, '#e9ecef'],
-					borderWidth: 0
-				}]
-			},
-			options: {
-				cutoutPercentage: 70,
-				responsive: false,
-				maintainAspectRatio: false,
-				legend: { display: false },
-				tooltips: { enabled: false }
-			}
-		});
+		// Chart initialization removed - handled by Angular/ng2-charts or component-level code.
 
 		// Add center percent text
 		const label = document.createElement('div');

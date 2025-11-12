@@ -98,7 +98,12 @@
             </div>
           </div>
           <div class="card-body">
-            <canvas id="dashboard-chart-1"></canvas>
+            <canvas baseChart
+              [data]="barChartData"
+              [options]="barChartOptions"
+              [type]="barChartType"
+              class="chartjs-render-monitor">
+            </canvas>
           </div>
         </div>
       </div>
@@ -127,7 +132,11 @@
             </div>
           </div>
           <div class="card-body">
-            <canvas id="dashboard-chart-2"></canvas>
+            <canvas baseChart
+              [data]="doughnutChartData"
+              [options]="doughnutChartOptions"
+              [type]="doughnutChartType">
+            </canvas>
           </div>
         </div>
       </div>
