@@ -53,3 +53,5 @@ node_modules/.bin/
 *.tsbuildinfo
 
 # Keep package-lock if you prefer it in repo; remove the above package-lock line if you want it tracked
+webapp/angular/NSAdmin/.angular/cache/17.3.12/neerseva/.tsbuildinfo
+webapp/angular/NSAdmin/.angular/cache/17.3.12/neerseva/.tsbuildinfo

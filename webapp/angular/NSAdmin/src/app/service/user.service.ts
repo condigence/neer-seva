@@ -43,6 +43,7 @@ export class UserService {
     return this.http.post(this.usersAPI, user);
   }
 
+
   // getAllUsersCount() {
   //   return this.http.get(this.usersAPI + '/active/count');
   // }
@@ -56,6 +57,18 @@ export class UserService {
 
   getTop5CustomerCount() {
     return this.http.get(this.usersAPI + 'customers/top/5');
+    
+  getAllUsersCount() {
+    return this.http.get(this.nodeBaseUrl + '/counts');
+  }
+
+  getAllVendorCount() {
+    return this.http.get(this.nodeBaseUrl + '/counts');
+  }
+  
+  getAllCustomerCount() {
+    return this.http.get(this.nodeBaseUrl + '/counts');
+    
   }
 
   getAllOrderCount() {

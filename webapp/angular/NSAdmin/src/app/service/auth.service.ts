@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
@@ -17,11 +17,25 @@ export class AuthenticationService {
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
-  private baseUrl = environment.apiUrl;
+  // Prefer an explicit auth URL if provided in environment; fall back to generic apiUrl
+  private baseUrl = environment.AUTH_API_URL || environment.apiUrl;
   private users_api_Url = environment.USERS_API_URL;
 
   public get currentUserValue(): User {
     return this.currentUserSubject.value;
+  }
+
+  /**
+   * Update the current user stored in localStorage and notify subscribers.
+   */
+  public setCurrentUser(user: User) {
+    if (!user) return;
+    try {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      this.currentUserSubject.next(user);
+    } catch (e) {
+      console.error('setCurrentUser error', e);
+    }
   }
 
 
@@ -44,7 +58,9 @@ export class AuthenticationService {
 
 
   verifyLogin(user: User) {
-    return this.http.post<any>(`${this.baseUrl}/v1/verify/login`, user)
+    const url = `${this.baseUrl}/v1/verify/login`;
+    console.debug('verifyLogin POST URL:', url, 'payload:', user);
+    return this.http.post<any>(url, user)
       .pipe(
         map(u => {
           if (u) {
@@ -53,7 +69,8 @@ export class AuthenticationService {
           return u;
         }),
         catchError(err => {
-          console.error('verifyLogin error', err);
+          // Add more context when logging to help diagnose 404s from environment/path issues
+          console.error('verifyLogin error at', url, err);
           return throwError(() => err);
         })
       );
@@ -87,8 +104,11 @@ export class AuthenticationService {
   }
 
 
-  register(user: User) {
-    return this.http.post(this.users_api_Url, user);
+  /**
+   * Register a new user. Returns the full HttpResponse so callers can inspect status codes (e.g. 201 Created).
+   */
+  register(user: User): Observable<HttpResponse<any>> {
+    return this.http.post<any>(this.users_api_Url, user, { observe: 'response' as 'body' });
   }
 
 

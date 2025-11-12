@@ -10,11 +10,18 @@ eureka:
   instance:
     hostname: localhost
   client:
-    registerWithEureka: true
-    fetchRegistry: true
+    # Disable Eureka client registration and registry fetching when Eureka server isn't available
+    registerWithEureka: false
+    fetchRegistry: false
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka/
-  
+
+app:
+  # Fallback absolute URL to reach the image service when service discovery is not available.
+  # Update this to the real image-service host:port if different.
+  image-service:
+    url: http://localhost:9095
+
   zipkin:
     baseUrl: http://127.0.0.1:9411/
 

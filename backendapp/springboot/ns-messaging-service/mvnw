@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Maven wrapper script (minimal). To fully enable the wrapper, generate the wrapper jar locally by running:
+# mvn -N io.takari:maven:wrapper
+# This script will invoke the local 'mvn' if present otherwise instructs the user to generate the wrapper.
+
+if [ -x "./.mvn/wrapper/maven-wrapper.jar" ]; then
+  java -jar ".mvn/wrapper/maven-wrapper.jar" "$@"
+else
+  if command -v mvn >/dev/null 2>&1; then
+    mvn "$@"
+  else
+    echo "Maven not found and maven-wrapper.jar is missing."
+    echo "Run 'mvn -N io.takari:maven:wrapper' locally to generate the wrapper, or install Maven." >&2
+    exit 1
+  fi
+fi
+

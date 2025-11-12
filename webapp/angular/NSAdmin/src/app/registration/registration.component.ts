@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { AuthenticationService } from "../service/auth.service";
 import { AlertService } from "../service/alert.service";
 import { first } from "rxjs/operators";
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2/dist/sweetalert2.esm.js';
 // import { MyValidationService } from "src/app/service/myValidatorService";
 
 @Component({

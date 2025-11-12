@@ -5,9 +5,7 @@ import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-import { SidebarComponent } from './sidebar/sidebar.component';
 import { HomeComponent } from './home/home.component';
-import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 
 import { ListItemComponent } from './item/list-item/list-item.component';
@@ -52,9 +50,8 @@ import { PaginationComponent } from './pagination/pagination.component';
 @NgModule({
   declarations: [
     AppComponent,
-    SidebarComponent,
     HomeComponent,
-    HeaderComponent,
+    
     FooterComponent,
     AddItemComponent,
     EditItemComponent,

@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BrandService } from '../../service/brand.service';
 import { first } from 'rxjs/operators';
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2/dist/sweetalert2.esm.js';
 
 @Component({
   selector: 'app-edit-brand',

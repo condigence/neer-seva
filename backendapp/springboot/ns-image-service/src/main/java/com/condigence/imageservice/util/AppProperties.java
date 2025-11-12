@@ -1,8 +1,8 @@
 package com.condigence.imageservice.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -11,8 +11,7 @@ import jakarta.annotation.PostConstruct;
 @ConfigurationProperties("app")
 public class AppProperties {
 
-	@Autowired
-	private Environment env;
+    private static final Logger logger = LoggerFactory.getLogger(AppProperties.class);
 
 	private String location;
 	
@@ -24,59 +23,59 @@ public class AppProperties {
 		this.location = location;
 	}
 
-	public String getProperty(String pPropertyKey) {
-        return env.getProperty(pPropertyKey);
-    }
-
 	@Override
 	public String toString() {
-		return "AppProperties [env=" + env + ", location=" + location + "]";
+		return "AppProperties [location=" + location + "]";
 	}
 
 	/**
 	 * Returns a normalized, resolved location path for images.
 	 * Resolution order:
-	 * 1) APP_LOCATION env var
-	 * 2) app.location (bound from properties)
-	 * 3) app.base.path system property
-	 * 4) literal default
-	 * The returned path always uses forward slashes and ends with /neerseva-images
+	 * 1) app.location (bound from properties) - preferred
+	 * 2) APP_LOCATION env var
+	 * 3) app.base.path system property (appended with /neerseva-images)
+	 * 4) null (no fallback hard-coded)
+	 * The returned path always uses forward slashes and has no trailing slash
 	 */
 	public String getResolvedLocation() {
-		String resolved = null;
-		// 1) env var
-		resolved = System.getenv("APP_LOCATION");
-		if (resolved == null || resolved.isBlank()) {
-			// 2) bound property
-			if (this.location != null && !this.location.isBlank()) {
-				resolved = this.location;
-			}
-		}
-		if (resolved == null || resolved.isBlank()) {
-			// 3) system property
-			resolved = System.getProperty("app.base.path");
-		}
-		if (resolved == null || resolved.isBlank()) {
-			// 4) fallback default — keep forward-slash style
-			resolved = "D://gitrepo//neer-seva//backendapp//springboot//ns-image-service/neerseva-images";
+		// 1) prefer bound property from application.yml
+		if (this.location != null && !this.location.isBlank()) {
+			return normalize(this.location);
 		}
 
-		// Normalize separators to forward slash
-		resolved = resolved.replace('\\', '/');
+		// 2) env var
+		String resolved = System.getenv("APP_LOCATION");
+		if (resolved != null && !resolved.isBlank()) {
+			return normalize(resolved);
+		}
 
+		// 3) system property base path
+		String base = System.getProperty("app.base.path");
+		if (base != null && !base.isBlank()) {
+			String candidate = base.replace('\\', '/') + "/neerseva-images";
+			return normalize(candidate);
+		}
+
+		// 4) no hard-coded fallback; return null to indicate not configured
+		return null;
+	}
+
+	private String normalize(String raw) {
+		String resolved = raw.replace('\\', '/');
 		// Remove any trailing slash
 		while (resolved.endsWith("/")) {
 			resolved = resolved.substring(0, resolved.length() - 1);
 		}
-
 		return resolved;
 	}
 
 	@PostConstruct
-	private void init() {
-		// Ensure location is set to something usable for other components that read the raw property
-		if ((this.location == null || this.location.isBlank()) && System.getenv("APP_LOCATION") != null) {
-			this.location = System.getenv("APP_LOCATION");
+	private void postConstruct() {
+		String resolved = getResolvedLocation();
+		if (resolved == null || resolved.isBlank()) {
+			logger.warn("app.location is not configured. Set app.location in application.yml or APP_LOCATION env var or -Dapp.base.path.");
+		} else {
+			logger.info("Resolved app.location={}", resolved);
 		}
 	}
 

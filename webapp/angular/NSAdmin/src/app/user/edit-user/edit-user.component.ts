@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { User } from '../../model/user.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2/dist/sweetalert2.esm.js';
 
 @Component({
   selector: 'app-edit-user',
@@ -69,10 +69,28 @@ export class EditUserComponent implements OnInit {
     });
   }
 
+
   receiveMessage($event) {
     this.imageId = $event.id;
 
-    this.editForm.controls.imageId.setValue(this.imageId);
+  onImgError(event: any) {
+    try { (event.target as HTMLImageElement).src = 'assets/images/df_user.png'; } catch (e) { }
+  }
+
+
+  receiveMessage($event) {
+    // $event now contains the full image response { id, pic, ... }
+    if ($event && typeof $event === 'object') {
+      this.imageId = $event.id;
+      this.editForm.controls.imageId.setValue(this.imageId);
+      if ($event.pic) {
+        // set the pic form control so template preview shows the uploaded image immediately
+        this.editForm.controls.pic.setValue($event.pic);
+      }
+    } else {
+      this.imageId = $event;
+      this.editForm.controls.imageId.setValue(this.imageId);
+    }
   }
 
   get f() {

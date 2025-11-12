@@ -35,7 +35,7 @@ export class UserService {
   }
 
   updateUser(user: User) {
-    return this.http.put(this.baseUrl + '/v1/user', user);
+    return this.http.put(this.baseUrl + '/v1/users', user);
   }
 
   register(user: User) {

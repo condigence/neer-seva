@@ -1,0 +1,3 @@
+# Make GitHub Copilot the code owner for the entire repository.
+# Best practice: reference the GitHub Copilot bot account so code-owner reviews can be requested automatically on PRs.
+* github-copilot[bot]

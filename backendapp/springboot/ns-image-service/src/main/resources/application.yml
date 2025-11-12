@@ -4,6 +4,8 @@ server:
 
 app:
   # Use forward-slash style and the requested absolute path
+  # Use a relative path: prefer -Dapp.base.path if provided, otherwise use the JVM working dir (user.dir)
+  # Resulting value will be something like: <working-dir>/neerseva-images
   location: "${app.base.path:${user.dir}}/neerseva-images"
 
 spring:

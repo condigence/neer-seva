@@ -90,19 +90,19 @@ public class OrderService {
 				OrderDetail orderDetail = new OrderDetail();
 				orderDetail.setOrderItemId(itemDto.getId());
 				orderDetail.setOrderItemQuantity(itemDto.getQuantity());
-				// orderDetail.setOrderItemPrice(itemDto.getPrice());
-				// orderDetail.setOrderSubTotal(orderDetail.getOrderItemQuantity() *
-				// orderDetail.getOrderItemPrice());
-				// TODO:
-				// orderDetail.setOrderTotalamount(orderDetail.getOrderSubTotal() +
-				// orderDetail.getOrderServiceCharge() + orderDetail.getOrderGST() -
-				// orderDetail.getOrderDiscount());
-				// grandTotal = grandTotal + orderDetail.getOrderTotalamount();
+				// set parent relationship
+				//orderDetail.setOrder(order);
+				// add to list
 				orderDetailList.add(orderDetail);
 			}
 			// TODO:
 			order.setOrderGrandTotal(grandTotal);
 			order.setOrderDetail(orderDetailList);
+
+			// ensure bidirectional link: set order on each detail
+//			for (OrderDetail od : order.getOrderDetail()) {
+//				od.setOrder(order);
+//			}
 
 		}
 		order.setOrderDate(java.time.LocalDate.now());
@@ -110,7 +110,8 @@ public class OrderService {
 		order.setOrderStatus("PENDING");
 		order.setOrderDeliveryStatus("CONFIRMED");
 		order.setEta("NOTSET");
-		order = orderRepository.save(order);
+		// persist and flush so DB assigns identity values immediately
+		order = orderRepository.saveAndFlush(order);
 
 		logger.info("Order  saved in db is ************" + order.toString());
 		if (order.getOrderId() != null) {

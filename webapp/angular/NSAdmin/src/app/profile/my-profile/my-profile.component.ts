@@ -4,7 +4,7 @@ import { Router } from "@angular/router";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { first } from "rxjs/operators";
 // import { UserService } from "src/app/service/user.service";
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2/dist/sweetalert2.esm.js';
 import { UserService } from "../../service/user.service";
 import { User } from "../../model/user.model";
 
@@ -20,6 +20,10 @@ export class MyProfileComponent implements OnInit {
   editForm!: FormGroup;
   imageId!: number;
   messageToSendP = "PROFILE";
+  // whether a file has been selected in the child upload component
+  fileChosen: boolean = false;
+  // validation error shown when Update is clicked but chosen file not uploaded
+  uploadValidationError: string | null = null;
 
   constructor(
     private userService: UserService,
@@ -53,6 +57,16 @@ export class MyProfileComponent implements OnInit {
   receiveMessage($event: number) {
     this.imageId = $event;
     this.editForm.controls["imageId"].setValue(this.imageId);
+    // upload completed
+    this.fileChosen = false;
+    this.uploadValidationError = null;
+  }
+
+  onFileSelected(flag: boolean) {
+    this.fileChosen = flag;
+    if (!flag) {
+      this.uploadValidationError = null;
+    }
   }
 
   get f() {
@@ -62,6 +76,11 @@ export class MyProfileComponent implements OnInit {
   onSubmit() {
     console.log(this.editForm.value);
     console.log(this.editForm.valid);
+    // Require an uploaded image before allowing update (per UX requirement)
+    if (!this.editForm.controls['imageId'].value) {
+      this.uploadValidationError = 'Please choose and upload a profile image before updating.';
+      return;
+    }
     this.editForm.controls["id"].setValue(this.user.id);
     this.userService
       .updateUser(this.editForm.value)
