@@ -21,7 +21,7 @@ $(function() {
                 try {
                     const vals = _toNumberArray(el.textContent.trim());
                     const canvas = _replaceWithCanvas(el, 120, 120);
-                    new Chart(canvas.getContext('2d'), { type: 'pie', data: { labels: vals.map(()=>''), datasets: [{ data: vals, backgroundColor: ['#5e72e4','#ff2fa0','#2dce89','#f5365c','#fb6340'] }] }, options: { legend:{display:false}, tooltips:{displayColors:false}}});
+                    // Chart initialization removed - handled by Angular/ng2-charts or component-level code.
                 } catch(e){console.debug('pie->chart error', e)}
             });
 
@@ -30,7 +30,7 @@ $(function() {
                 try {
                     const vals = _toNumberArray(el.textContent.trim());
                     const canvas = _replaceWithCanvas(el, 120, 120);
-                    new Chart(canvas.getContext('2d'), { type: 'doughnut', data: { labels: vals.map(()=>''), datasets: [{ data: vals, backgroundColor: ['#5e72e4','#ff2fa0','#2dce89','#f5365c','#fb6340'] }] }, options: { cutoutPercentage: 25, legend:{display:false}, tooltips:{displayColors:false}}});
+                    // Chart initialization removed - handled by Angular/ng2-charts or component-level code.
                 } catch(e){console.debug('donut->chart error', e)}
             });
 
@@ -39,7 +39,7 @@ $(function() {
                 try {
                     const vals = _toNumberArray(el.textContent.trim());
                     const canvas = _replaceWithCanvas(el, 120, 40);
-                    new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: vals.map((v,i)=>i+1), datasets:[{ data: vals, borderColor: '#11cdef', backgroundColor: 'rgba(17,205,239,0.1)', pointRadius:0, fill:true }] }, options: { legend:{display:false}, tooltips:{displayColors:false}, scales:{xAxes:[{display:false}], yAxes:[{display:false}] } } });
+                    // Chart initialization removed - handled by Angular/ng2-charts or component-level code.
                 } catch(e){console.debug('line->chart error', e)}
             });
 
@@ -48,7 +48,7 @@ $(function() {
                 try {
                     const vals = _toNumberArray(el.textContent.trim());
                     const canvas = _replaceWithCanvas(el, 120, 40);
-                    new Chart(canvas.getContext('2d'), { type: 'bar', data: { labels: vals.map((v,i)=>i+1), datasets:[{ data: vals, backgroundColor: '#11cdef', borderWidth:0 }] }, options:{ legend:{display:false}, tooltips:{displayColors:false}, scales:{xAxes:[{display:false}], yAxes:[{display:false}]} } });
+                    // Chart initialization removed - handled by Angular/ng2-charts or component-level code.
                 } catch(e){console.debug('bar->chart error', e)}
             });
          

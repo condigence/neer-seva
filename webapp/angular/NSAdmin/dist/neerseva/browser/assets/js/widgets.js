@@ -44,36 +44,7 @@ $(function() {
       gradientStroke1.addColorStop(0, '#00b09b');
       gradientStroke1.addColorStop(1, '#96c93d');
 
-      var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [{
-            label: 'Revenue',
-            data: [543, 430, 630, 500, 430, 500, 250],
-            pointBorderWidth: 2,
-            pointHoverBackgroundColor: gradientStroke1,
-            backgroundColor: gradientStroke1,
-            borderColor: 'transparent',
-            borderWidth: 3
-          }]
-        },
-        options: {
-            legend: {
-			  position: 'bottom',
-              display:false
-            },
-            tooltips: {
-			  displayColors:false,	
-              mode: 'nearest',
-              intersect: false,
-              position: 'nearest',
-              xPadding: 10,
-              yPadding: 10,
-              caretPadding: 10
-            }
-         }
-      });
+      // Chart initialization removed - handled by Angular components/ng2-charts
 
 
 
@@ -93,41 +64,7 @@ var ctx = document.getElementById("widget-chart-5").getContext('2d');
       gradientStroke3.addColorStop(0, '#7f00ff');
       gradientStroke3.addColorStop(1, '#e100ff');
 
-      var myChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: ["Completed", "Pending", "Process"],
-          datasets: [{
-            backgroundColor: [
-              gradientStroke1,
-              gradientStroke2,
-              gradientStroke3
-            ],
-
-             hoverBackgroundColor: [
-              gradientStroke1,
-              gradientStroke2,
-              gradientStroke3
-            ],
-
-            data: [50, 50, 50],
-      borderWidth: [0, 0, 0]
-          }]
-        },
-        options: {
-          cutoutPercentage: 25,
-            legend: {
-              position: 'bottom',
-              display: true,
-            labels: {
-                boxWidth:8
-              }
-            },
-			tooltips: {
-			  displayColors:false,
-			},
-        }
-      });
+      // Chart initialization removed - handled by Angular components/ng2-charts
 
 
 

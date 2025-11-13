@@ -19,14 +19,15 @@ public class Order {
 
 	@Id
 	@Column(name = "id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	/** Use database sequence 'order_seq' for id generation. */
+	@SequenceGenerator(name = "order_seq_gen", sequenceName = "order_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq_gen")
 	private Long orderId;
 
 	@Column(name = "order_number")
 	private String orderNumber;
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "cust_order_order_detail", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "order_detail_id"))
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<OrderDetail> orderDetail;
 
 	@Column(name = "order_date")

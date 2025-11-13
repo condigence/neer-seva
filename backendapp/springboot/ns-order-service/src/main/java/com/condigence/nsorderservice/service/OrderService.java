@@ -15,11 +15,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import com.condigence.nsorderservice.exception.BadRequestException;
+import com.condigence.nsorderservice.exception.ResourceNotFoundException;
 
 @Service("OrderService")
 public class OrderService {
@@ -41,6 +46,7 @@ public class OrderService {
 
 	}
 
+	@Transactional
 	public boolean saveOrderDetail(OrderDetailDTO orderdetailDTO) {
 
 
@@ -57,12 +63,12 @@ public class OrderService {
 			long shopId = -1L;
 			if (shopDto == null) {
 				logger.error("Shop information is missing in OrderDetailDTO");
-				return false;
+				throw new BadRequestException("Shop information is missing in request");
 			} else {
 				shopId = shopDto.getId();
 				if (shopId <= 0) {
 					logger.error("Invalid shop id in OrderDetailDTO: {}", shopId);
-					return false;
+					throw new BadRequestException("Invalid shop id: " + shopId);
 				}
 			}
 
@@ -71,15 +77,15 @@ public class OrderService {
 				shopData = restTemplate.getForObject("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/shops/" + shopId, ShopDTO.class); // Working
 			} catch (HttpClientErrorException.NotFound nf) {
 				logger.error("Shop not found for id {}", shopId);
-				return false;
+				throw new ResourceNotFoundException("Shop not found for id " + shopId);
 			} catch (RestClientException rce) {
 				logger.error("Error while fetching shop data for id {}: {}", shopId, rce.getMessage());
-				return false;
+				throw new BadRequestException("Error while fetching shop data: " + rce.getMessage());
 			}
 
 			if (shopData == null) {
 				logger.error("Shop service returned null for id {}", shopId);
-				return false;
+				throw new ResourceNotFoundException("Shop not found for id " + shopId);
 			}
 
 			order.setOrderToVendorId(shopData.getUserId());
@@ -91,18 +97,18 @@ public class OrderService {
 				orderDetail.setOrderItemId(itemDto.getId());
 				orderDetail.setOrderItemQuantity(itemDto.getQuantity());
 				// set parent relationship
-				//orderDetail.setOrder(order);
+				orderDetail.setOrder(order);
 				// add to list
 				orderDetailList.add(orderDetail);
 			}
-			// TODO:
+			// TODO: compute grandTotal from items if price available
 			order.setOrderGrandTotal(grandTotal);
 			order.setOrderDetail(orderDetailList);
 
-			// ensure bidirectional link: set order on each detail
-//			for (OrderDetail od : order.getOrderDetail()) {
-//				od.setOrder(order);
-//			}
+			// ensure bidirectional link: set order on each detail (defensive)
+			for (OrderDetail od : order.getOrderDetail()) {
+				if (od.getOrder() == null) od.setOrder(order);
+			}
 
 		}
 		order.setOrderDate(java.time.LocalDate.now());
@@ -113,14 +119,48 @@ public class OrderService {
 		// persist and flush so DB assigns identity values immediately
 		order = orderRepository.saveAndFlush(order);
 
-		logger.info("Order  saved in db is ************" + order.toString());
-		if (order.getOrderId() != null) {
-			// TODO : Update Stock as well
-			 restTemplate.postForObject("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/update/on/order",orderdetailDTO, Boolean.class); // Working
-			return true;
-		}
-		return false;
-	}
+		// Log saved order minimal info to avoid lazy-loading issues during JSON serialization
+		logger.info("Order saved in db: id={} date={} status={}", order.getOrderId(), order.getOrderDate(), order.getOrderStatus());
+		 if (order.getOrderId() != null) {
+		     // Attempt to update stock. If stock update fails because stock not found,
+		     // remove the created order to avoid inconsistent state and return false.
+		     try {
+		        var response = restTemplate.postForEntity("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/update/on/order", orderdetailDTO, Boolean.class);
+		        if (response.getStatusCode().is2xxSuccessful() && Boolean.TRUE.equals(response.getBody())) {
+		            return true;
+		        } else {
+		            logger.error("Stock service did not confirm update for order {}. status={} body={}", order.getOrderId(), response.getStatusCode(), response.getBody());
+		            // Construct a more specific not-found message with shop and item details
+                    StringBuilder itemDetails = new StringBuilder();
+                    if (orderdetailDTO != null && orderdetailDTO.getItems() != null) {
+                        orderdetailDTO.getItems().forEach(i -> itemDetails.append("[id:").append(i.getId()).append(",qty:").append(i.getQuantity()).append("]"));
+                    }
+                    Long shopId = null;
+                    if (orderdetailDTO != null && orderdetailDTO.getShop() != null) shopId = orderdetailDTO.getShop().getId();
+                    String msg = String.format("Stock not available for order %d; shopId=%s items=%s", order.getOrderId(), shopId, itemDetails.toString());
+                    throw new ResourceNotFoundException(msg);
+                }
+            } catch (HttpClientErrorException.NotFound nf) {
+                 logger.warn("Stock update failed - Not Found for order {}: {}.", order.getOrderId(), nf.getResponseBodyAsString());
+                 throw new ResourceNotFoundException("Stock not found: " + nf.getResponseBodyAsString());
+              } catch (HttpClientErrorException.BadRequest br) {
+                 logger.warn("Stock update returned BadRequest for order {}: {}.", order.getOrderId(), br.getResponseBodyAsString());
+                 throw new BadRequestException("Stock service returned bad request: " + br.getResponseBodyAsString());
+             } catch (HttpClientErrorException hce) {
+                 // other 4xx errors
+                 logger.warn("Stock update returned client error for order {}: {}.", order.getOrderId(), hce.getResponseBodyAsString());
+                 throw new BadRequestException("Stock service client error: " + hce.getResponseBodyAsString());
+             } catch (RestClientException rce) {
+                  logger.error("Stock update failed for order {}: {}", order.getOrderId(), rce.getMessage());
+                  // mark order for manual attention and persist
+                  order.setOrderStatus("STOCK_UPDATE_FAILED");
+                  orderRepository.save(order);
+                  return false;
+              }
+
+          }
+          return false;
+	 }
 
 //	public boolean updateOrder(OrderDTO orderDTO) {
 //		// TODO Auto-generated method stub
@@ -251,6 +291,15 @@ public class OrderService {
 
 	private OrderDTO createOrderDTOObject(Order order, List<ItemDTO> itemList, UserDTO customer, UserDTO vendor) {
 		OrderDTO orderDto = new OrderDTO();
+		if (order == null) {
+			logger.warn("createOrderDTOObject called with null order");
+			return orderDto;
+		}
+
+		// Ensure orderId is propagated
+		orderDto.setOrderId(order.getOrderId());
+
+		// basic timestamps and statuses
 		orderDto.setOrderDate(order.getOrderDate());
 		orderDto.setOrderTime(order.getOrderTime());
 		orderDto.setOrderStatus(order.getOrderStatus());
@@ -258,7 +307,7 @@ public class OrderService {
 		// ETA
 		orderDto.setEta(order.getEta());
 
-		// grand total
+		// grand total (safe conversion)
 		orderDto.setOrderGrandTotal(convertGrandTotal(order.getOrderGrandTotal()));
 
 		// build nested DTOs
@@ -353,16 +402,17 @@ public class OrderService {
 		try {
 			jsonStr = Obj.writeValueAsString(obj);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Failed to serialize object to JSON: {}", e.getMessage());
 		}
 		return jsonStr;
 	}
 
 	public OrderDTO save(OrderDTO dto, Integer id) {
-		Optional<Order> order = orderRepository.findById(Long.valueOf(id));
-		order.get().setOrderDeliveryStatus(dto.getOrderDeliveryStatus());
+		Order order = orderRepository.findById(Long.valueOf(id))
+				.orElseThrow(() -> new IllegalArgumentException("Order not found for id: " + id));
+		order.setOrderDeliveryStatus(dto.getOrderDeliveryStatus());
 
-		Order newOrder = orderRepository.save(order.get());
+		Order newOrder = orderRepository.save(order);
 
 		OrderDTO updatedOrder = new OrderDTO();
 		updatedOrder.setOrderId(newOrder.getOrderId());

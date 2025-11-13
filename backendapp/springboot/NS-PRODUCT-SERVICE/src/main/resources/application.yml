@@ -11,8 +11,8 @@ eureka:
     hostname: localhost
   client:
     # Disable Eureka client registration and registry fetching when Eureka server isn't available
-    registerWithEureka: false
-    fetchRegistry: false
+    registerWithEureka: true
+    fetchRegistry: true
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka/
 
