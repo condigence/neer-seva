@@ -7,6 +7,8 @@ import com.condigence.nsorderservice.entity.Order;
 import com.condigence.nsorderservice.service.OrderService;
 import com.condigence.nsorderservice.util.AppProperties;
 import com.condigence.nsorderservice.util.CustomErrorType;
+import com.condigence.nsorderservice.exception.BadRequestException;
+import com.condigence.nsorderservice.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +42,22 @@ public class OrderController {
 
         logger.info("Entering placeOrder with Order Details >>>>>>>>  : {}", orderdetailDTO);
         HttpHeaders headers = new HttpHeaders();
-        boolean saved = orderService.saveOrderDetail(orderdetailDTO);
-        if (!saved) {
-            // Could be invalid input (400) or not found (404) or server error; return 400 with message
-            return new ResponseEntity<>(new CustomErrorType("Unable to save order. Check shop id and payload."), HttpStatus.BAD_REQUEST);
+        try {
+            boolean saved = orderService.saveOrderDetail(orderdetailDTO);
+            if (!saved) {
+                return new ResponseEntity<>(new CustomErrorType("Unable to save order. Check shop id and payload."), HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(headers, HttpStatus.CREATED);
+        } catch (ResourceNotFoundException rnfe) {
+            logger.warn("placeOrder - resource not found: {}", rnfe.getMessage());
+            return new ResponseEntity<>(new CustomErrorType(rnfe.getMessage()), HttpStatus.NOT_FOUND);
+        } catch (BadRequestException bre) {
+            logger.warn("placeOrder - bad request: {}", bre.getMessage());
+            return new ResponseEntity<>(new CustomErrorType(bre.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            logger.error("placeOrder - unexpected error: {}", e.getMessage());
+            return new ResponseEntity<>(new CustomErrorType("Internal server error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     @GetMapping("/")
@@ -85,13 +97,22 @@ public class OrderController {
     public ResponseEntity<?> placeOrderItems(@RequestBody OrderDetailDTO orderdetailDTO) {
         logger.info("placeOrderItems detail is>>>>>>>>  : {}", orderdetailDTO);
         HttpHeaders headers = new HttpHeaders();
-        boolean orderDetail = false;
-        orderDetail = orderService.saveOrderDetail(orderdetailDTO);
-        if (orderDetail == false) {
-            return new ResponseEntity(new CustomErrorType("Unable to save order. Check shop id and payload."),
-                    HttpStatus.BAD_REQUEST);
+        try {
+            boolean orderDetail = orderService.saveOrderDetail(orderdetailDTO);
+            if (!orderDetail) {
+                return new ResponseEntity(new CustomErrorType("Unable to save order. Check shop id and payload."), HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<String>(headers, HttpStatus.CREATED);
+        } catch (ResourceNotFoundException rnfe) {
+            logger.warn("placeOrderItems - resource not found: {}", rnfe.getMessage());
+            return new ResponseEntity<>(new CustomErrorType(rnfe.getMessage()), HttpStatus.NOT_FOUND);
+        } catch (BadRequestException bre) {
+            logger.warn("placeOrderItems - bad request: {}", bre.getMessage());
+            return new ResponseEntity<>(new CustomErrorType(bre.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            logger.error("placeOrderItems - unexpected error: {}", e.getMessage());
+            return new ResponseEntity<>(new CustomErrorType("Internal server error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<String>(headers, HttpStatus.CREATED);
     }
 
     @GetMapping("/v1/orders")
@@ -122,5 +143,4 @@ public class OrderController {
 //	}
 
 ///////////////////////////////////////////////////////////////////
-
 }

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { ChartConfiguration, ChartOptions, ChartType } from 'chart.js';
+import Chart from 'chart.js/auto';
 import { UserService } from '../service/user.service';
 
 @Component({
@@ -44,6 +45,42 @@ export class Dashboard3Component implements OnInit {
 
   ngOnInit(): void {
     // sample component — data currently static (from original index3.js). Replace with API calls if needed.
+  }
+
+  private barChartInst: any = null;
+  private doughChartInst: any = null;
+  private lineChartInst: any = null;
+
+  ngAfterViewInit(): void {
+    try {
+      const barEl = document.getElementById('dashboard3-bar-chart') as HTMLCanvasElement | null;
+      if (barEl && (barEl as any).getContext) {
+        const ctx = (barEl as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D;
+        this.barChartInst = new Chart(ctx, { type: this.barChartType as any, data: this.barChartData as any, options: this.barChartOptions as any });
+      }
+
+      const doughEl = document.getElementById('dashboard3-doughnut-chart') as HTMLCanvasElement | null;
+      if (doughEl && (doughEl as any).getContext) {
+        const ctx2 = (doughEl as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D;
+        this.doughChartInst = new Chart(ctx2, { type: this.doughnutChartType as any, data: this.doughnutChartData as any, options: this.doughnutChartOptions as any });
+      }
+
+      const lineEl = document.getElementById('dashboard3-line-chart') as HTMLCanvasElement | null;
+      if (lineEl && (lineEl as any).getContext) {
+        const ctx3 = (lineEl as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D;
+        this.lineChartInst = new Chart(ctx3, { type: this.lineChartType as any, data: this.lineChartData as any, options: this.lineChartOptions as any });
+      }
+    } catch (e) {
+      console.error('Dashboard3 chart init error', e);
+    }
+  }
+
+  ngOnDestroy(): void {
+    try {
+      if (this.barChartInst) { this.barChartInst.destroy(); this.barChartInst = null; }
+      if (this.doughChartInst) { this.doughChartInst.destroy(); this.doughChartInst = null; }
+      if (this.lineChartInst) { this.lineChartInst.destroy(); this.lineChartInst = null; }
+    } catch (e) { }
   }
 
 }

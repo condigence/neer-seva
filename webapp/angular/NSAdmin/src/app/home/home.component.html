@@ -98,12 +98,8 @@
             </div>
           </div>
           <div class="card-body">
-            <canvas baseChart
-              [data]="barChartData"
-              [options]="barChartOptions"
-              [type]="barChartType"
-              class="chartjs-render-monitor">
-            </canvas>
+            <!-- Using plain canvas and Chart.js directly -->
+            <canvas id="home-bar-chart" width="400" height="200"></canvas>
           </div>
         </div>
       </div>
@@ -132,11 +128,8 @@
             </div>
           </div>
           <div class="card-body">
-            <canvas baseChart
-              [data]="doughnutChartData"
-              [options]="doughnutChartOptions"
-              [type]="doughnutChartType">
-            </canvas>
+            <!-- Using plain canvas and Chart.js directly -->
+            <canvas id="home-doughnut-chart" width="400" height="200"></canvas>
           </div>
         </div>
       </div>

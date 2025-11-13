@@ -1,4 +1,5 @@
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnInit, Renderer2, AfterViewInit, OnDestroy } from '@angular/core';
+import Chart from 'chart.js/auto';
 import { UserService } from '../service/user.service';
 import { AddressService } from '../service/address.service';
 
@@ -52,6 +53,61 @@ export class HomeComponent implements OnInit {
 
   console.log(this.top4Orders);
     });    
+  }
+
+  // Chart.js instances
+  private barChart: any = null;
+  private doughnutChart: any = null;
+
+  ngAfterViewInit(): void {
+    try {
+      const barEl = document.getElementById('home-bar-chart') as HTMLCanvasElement | null;
+      if (barEl && (barEl as any).getContext) {
+        const ctx = (barEl as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D;
+        this.barChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: [1,2,3,4,5,6,7,8],
+            datasets: [
+              { label: 'New Orders', data: [40,30,60,35,60,25,50,40], backgroundColor: '#11cdef', borderColor: '#11cdef', borderWidth: 1 },
+              { label: 'Pending', data: [50,60,40,70,35,75,30,20], backgroundColor: '#e8e8e8', borderColor: '#e8e8e8', borderWidth: 1 }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: true, position: 'bottom' }, tooltip: { enabled: true } },
+            scales: { x: { stacked: true }, y: { stacked: true } }
+          }
+        });
+      }
+
+      const doughEl = document.getElementById('home-doughnut-chart') as HTMLCanvasElement | null;
+      if (doughEl && (doughEl as any).getContext) {
+        const ctx2 = (doughEl as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D;
+        this.doughnutChart = new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: ['kinley', 'Bisleri', 'Bailley'],
+            datasets: [{ backgroundColor: ['#5e72e4','#ff2fa0','#2dce89'], data: [25,50,25], borderWidth: 1 }]
+          },
+          options: {
+            responsive: true,
+            cutout: '25%',
+            plugins: { legend: { display: true, position: 'right' }, tooltip: { enabled: true } }
+          }
+        });
+      }
+    } catch (e) {
+      // swallow chart init errors to avoid breaking the dashboard
+      console.error('Chart initialization error', e);
+    }
+  }
+
+  ngOnDestroy(): void {
+    try {
+      if (this.barChart) { this.barChart.destroy(); this.barChart = null; }
+      if (this.doughnutChart) { this.doughnutChart.destroy(); this.doughnutChart = null; }
+    } catch (e) { }
   }
 
 

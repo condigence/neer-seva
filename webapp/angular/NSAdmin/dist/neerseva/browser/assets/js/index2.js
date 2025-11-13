@@ -42,36 +42,7 @@ $(function() {
 
      var ctx = document.getElementById('dashboard2-chart-4').getContext('2d');
               
-       var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
-          datasets: [{
-            label: 'Sales Report',
-            data: [15, 8, 12, 5, 12, 8, 16, 25, 15, 10, 20, 10, 0],
-            backgroundColor: 'rgba(45, 206, 137, 0.2)',
-            borderColor: '#2dce89',
-            pointBackgroundColor:'#fff',
-            pointHoverBackgroundColor:'#fff',
-            pointBorderColor :'#2dce89',
-            pointHoverBorderColor :'#2dce89',
-            pointBorderWidth :2,
-            pointRadius :4,
-            pointHoverRadius :4,
-            borderWidth: 3
-          }]
-        }
-        ,
-        options: {
-            legend: {
-        position: false,
-              display: true,
-            },
-      tooltips: {
-        displayColors:false,
-      }
-        }
-      });
+      // Chart initialization removed - handled by Angular components/ng2-charts
 
 
 	  
@@ -86,48 +57,7 @@ $(function() {
       gradientStroke4.addColorStop(0, ' #00b09b');
       gradientStroke4.addColorStop(0.5, '#96c93d');
 
-      var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: [1, 2, 3, 4, 5, 6, 7, 8],
-          datasets: [{
-            label: 'Electronics',
-            data: [40, 30, 60, 35, 60, 25, 50, 40],
-            borderColor: gradientStroke3,
-            backgroundColor: gradientStroke3,
-            hoverBackgroundColor: gradientStroke3,
-            pointRadius: 0,
-            fill: false,
-            borderWidth: 1
-          }, {
-            label: 'Fashion',
-            data: [50, 60, 40, 70, 35, 75, 30, 20],
-            borderColor: gradientStroke4,
-            backgroundColor: gradientStroke4,
-            hoverBackgroundColor: gradientStroke4,
-            pointRadius: 0,
-            fill: false,
-            borderWidth: 1
-          }]
-        },
-		options:{
-		  legend: {
-			  position: 'bottom',
-              display: true,
-			  labels: {
-                boxWidth:8
-              }
-            },
-			tooltips: {
-			  displayColors:false,
-			},	
-		  scales: {
-			  xAxes: [{
-				categoryPercentage: .2
-			  }]
-		     }
-		}
-      });
+      // Chart initialization removed - handled by Angular components/ng2-charts
 	  
 	  
 	  
@@ -139,60 +69,7 @@ $(function() {
       gradientStroke1.addColorStop(0, 'rgba(255, 255, 255, 0.5');
       gradientStroke1.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
 
-      var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [1, 2, 3, 4, 5, 6, 7],
-          datasets: [{
-            label: 'Views',
-            data: [540, 632, 432, 320, 350, 240, 150],
-			
-            backgroundColor: gradientStroke1,
-            borderColor: '#fff',
-            borderWidth: 3,
-			pointBackgroundColor:'#2575fc',
-            pointHoverBackgroundColor:'#fff',
-            pointBorderColor :'#fff',
-            pointHoverBorderColor :'#fff',
-            pointBorderWidth :2,
-            pointRadius :4,
-            pointHoverRadius :4
-			
-          }]
-        },
-        options: {
-            legend: {
-			  position: 'bottom',
-              display:false
-            },
-            tooltips: {
-			  displayColors:false
-            },
-			scales: {
-			  xAxes: [{
-				ticks: {
-                    beginAtZero:true,
-                    fontColor: '#fff'
-                },
-				gridLines: {
-				  display: true ,
-				  color: "rgba(255, 255, 255, 0.3)"
-				},
-			  }],
-			   yAxes: [{
-				ticks: {
-                    beginAtZero:true,
-                    fontColor: '#fff'
-                },
-				gridLines: {
-				  display: true ,
-				  color: "rgba(255, 255, 255, 0.0)"
-				},
-			  }]
-		     }
-
-         }
-      });  
+      // Chart initialization removed - handled by Angular components/ng2-charts
 	  	  
 		  
 // world map
