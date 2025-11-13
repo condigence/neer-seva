@@ -130,28 +130,36 @@ public class OrderService {
 		            return true;
 		        } else {
 		            logger.error("Stock service did not confirm update for order {}. status={} body={}", order.getOrderId(), response.getStatusCode(), response.getBody());
-		            throw new BadRequestException("Stock service did not confirm update for order " + order.getOrderId());
-		        }
-		     } catch (HttpClientErrorException.NotFound nf) {
-		        logger.warn("Stock update failed - Not Found for order {}: {}.", order.getOrderId(), nf.getResponseBodyAsString());
-		        throw new ResourceNotFoundException("Stock not found: " + nf.getResponseBodyAsString());
-		     } catch (HttpClientErrorException.BadRequest br) {
-		        logger.warn("Stock update returned BadRequest for order {}: {}.", order.getOrderId(), br.getResponseBodyAsString());
-		        throw new BadRequestException("Stock service returned bad request: " + br.getResponseBodyAsString());
-		    } catch (HttpClientErrorException hce) {
-		        // other 4xx errors
-		        logger.warn("Stock update returned client error for order {}: {}.", order.getOrderId(), hce.getResponseBodyAsString());
-		        throw new BadRequestException("Stock service client error: " + hce.getResponseBodyAsString());
-		    } catch (RestClientException rce) {
-		         logger.error("Stock update failed for order {}: {}", order.getOrderId(), rce.getMessage());
-		         // mark order for manual attention and persist
-		         order.setOrderStatus("STOCK_UPDATE_FAILED");
-		         orderRepository.save(order);
-		         return false;
-		     }
+		            // Construct a more specific not-found message with shop and item details
+                    StringBuilder itemDetails = new StringBuilder();
+                    if (orderdetailDTO != null && orderdetailDTO.getItems() != null) {
+                        orderdetailDTO.getItems().forEach(i -> itemDetails.append("[id:").append(i.getId()).append(",qty:").append(i.getQuantity()).append("]"));
+                    }
+                    Long shopId = null;
+                    if (orderdetailDTO != null && orderdetailDTO.getShop() != null) shopId = orderdetailDTO.getShop().getId();
+                    String msg = String.format("Stock not available for order %d; shopId=%s items=%s", order.getOrderId(), shopId, itemDetails.toString());
+                    throw new ResourceNotFoundException(msg);
+                }
+            } catch (HttpClientErrorException.NotFound nf) {
+                 logger.warn("Stock update failed - Not Found for order {}: {}.", order.getOrderId(), nf.getResponseBodyAsString());
+                 throw new ResourceNotFoundException("Stock not found: " + nf.getResponseBodyAsString());
+              } catch (HttpClientErrorException.BadRequest br) {
+                 logger.warn("Stock update returned BadRequest for order {}: {}.", order.getOrderId(), br.getResponseBodyAsString());
+                 throw new BadRequestException("Stock service returned bad request: " + br.getResponseBodyAsString());
+             } catch (HttpClientErrorException hce) {
+                 // other 4xx errors
+                 logger.warn("Stock update returned client error for order {}: {}.", order.getOrderId(), hce.getResponseBodyAsString());
+                 throw new BadRequestException("Stock service client error: " + hce.getResponseBodyAsString());
+             } catch (RestClientException rce) {
+                  logger.error("Stock update failed for order {}: {}", order.getOrderId(), rce.getMessage());
+                  // mark order for manual attention and persist
+                  order.setOrderStatus("STOCK_UPDATE_FAILED");
+                  orderRepository.save(order);
+                  return false;
+              }
 
-		 }
-		 return false;
+          }
+          return false;
 	 }
 
 //	public boolean updateOrder(OrderDTO orderDTO) {

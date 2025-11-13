@@ -21,7 +21,7 @@ export class StockService {
 
 
   addStock(stock: any) {
-    return this.http.post(this.baseUrl+'/', stock);
+    return this.http.post(this.baseUrl, stock);
   }
 
   getAllStocks() {
