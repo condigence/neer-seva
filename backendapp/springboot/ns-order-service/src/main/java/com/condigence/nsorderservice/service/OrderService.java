@@ -126,7 +126,7 @@ public class OrderService {
 		     // remove the created order to avoid inconsistent state and return false.
 		     try {
 		        var response = restTemplate.postForEntity("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/update/on/order", orderdetailDTO, Boolean.class);
-		        if (response.getStatusCode().is2xxSuccessful() && Boolean.TRUE.equals(response.getBody())) {
+		        if (response.getStatusCode().is2xxSuccessful()) {
 		            return true;
 		        } else {
 		            logger.error("Stock service did not confirm update for order {}. status={} body={}", order.getOrderId(), response.getStatusCode(), response.getBody());
