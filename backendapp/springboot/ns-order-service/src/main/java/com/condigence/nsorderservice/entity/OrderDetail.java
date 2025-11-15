@@ -13,8 +13,13 @@ public class OrderDetail {
 	
 	@Id
 	@Column(name = "order_detail_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name = "order_detail_seq_gen", sequenceName = "order_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_detail_seq_gen")
 	private Long orderDetailId;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "order_id")
+	private Order order;
 
 	@Column(name = "order_item_id")
 	private Long orderItemId;
@@ -43,6 +48,10 @@ public class OrderDetail {
 
 	public Long getOrderDetailId() {
 		return orderDetailId;
+	}
+
+	public Order getOrder() {
+		return order;
 	}
 
 	public Long getOrderItemId() {
@@ -75,6 +84,10 @@ public class OrderDetail {
 
 	public void setOrderDetailId(Long orderDetailId) {
 		this.orderDetailId = orderDetailId;
+	}
+
+	public void setOrder(Order order) {
+		this.order = order;
 	}
 
 	public void setOrderItemId(Long orderItemId) {

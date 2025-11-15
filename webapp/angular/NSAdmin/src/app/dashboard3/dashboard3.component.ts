@@ -7,6 +7,7 @@ import {
   ElementRef
 } from '@angular/core';
 
+
 import Chart from 'chart.js/auto';
 import { UserService } from '../service/user.service';
 import { ItemService } from '../service/item.service';
@@ -42,6 +43,7 @@ export class Dashboard3Component implements OnInit, AfterViewInit, OnDestroy {
     this.loadDashboardData();
   }
 
+
   ngAfterViewInit(): void {
     this.viewReady = true;
 
@@ -52,6 +54,7 @@ export class Dashboard3Component implements OnInit, AfterViewInit, OnDestroy {
       this.createDoughnutChart(best.labels, best.data);
 
       this.tempData = null;
+
     }
   }
 

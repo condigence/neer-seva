@@ -70,15 +70,11 @@ export class EditUserComponent implements OnInit {
   }
 
 
-  receiveMessage($event) {
-    this.imageId = $event.id;
-
   onImgError(event: any) {
     try { (event.target as HTMLImageElement).src = 'assets/images/df_user.png'; } catch (e) { }
   }
 
-
-  receiveMessage($event) {
+  receiveMessage($event: any) {
     // $event now contains the full image response { id, pic, ... }
     if ($event && typeof $event === 'object') {
       this.imageId = $event.id;

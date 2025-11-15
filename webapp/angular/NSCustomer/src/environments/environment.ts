@@ -8,7 +8,8 @@ export const environment = {
   USER_API_URL: 'http://localhost:9092/neerseva/api/v1/',
   STOCK_API_URL: 'http://localhost:9093/neerseva/api/v1/',
   ORDER_API_URL: 'http://localhost:9094/neerseva/api/v1/',
-  apiUrl: 'http://localhost:9095/neerseva/api/v1/'
+  apiUrl: 'http://localhost:9095/neerseva/api/v1/',
+  IMAGES_API_URL: 'http://localhost:9095/neerseva/api/v1/images/'
 
 };
 

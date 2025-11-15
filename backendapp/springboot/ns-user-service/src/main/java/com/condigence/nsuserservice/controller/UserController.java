@@ -274,6 +274,10 @@ public class UserController {
 
         // Step 1: Fetch all users (you already have a service method for this)
         List<User> users = service.getAll();
+        // Step 3: Handle case when no users found
+        if (users.isEmpty()) {
+            return new ResponseEntity<>(new CustomErrorType("No Users Found! Please Register"), HttpStatus.NOT_FOUND);
+        }
 
         // Step 2: Sort by type (descending) and limit to top 5
         List<User> top5Customers = users.stream()
@@ -286,11 +290,6 @@ public class UserController {
                 )// 🕒 newest first
                 .limit(5)
                 .collect(Collectors.toList());
-
-        // Step 3: Handle case when no users found
-        if (top5Customers.isEmpty()) {
-            return new ResponseEntity<>(new CustomErrorType("No Users Found! Please Register"), HttpStatus.NOT_FOUND);
-        }
 
         // Step 4: Convert Users → DTOs (like your existing code)
         List<UserDTO> dtos = new ArrayList<>();
