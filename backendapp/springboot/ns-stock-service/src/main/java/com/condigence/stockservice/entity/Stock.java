@@ -15,16 +15,16 @@ public class Stock {
 	}
 
 	@Id
-	@Column(name = "id")
+	// explicitly declare column as auto-incrementing BIGINT; this helps Hibernate's DDL and documents intent
+	@Column(name = "id", nullable = false, columnDefinition = "BIGINT AUTO_INCREMENT")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long stockId;
 
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long stockId;
-
-	@Column(name = "itemId")
+	@Column(name = "item_id")
 
 	private long itemId;
 
-	@Column(name = "shopId")
+	@Column(name = "shop_id")
 
 	private long shopId;
 
@@ -38,19 +38,19 @@ public class Stock {
 //	@JoinTable(name = "stock_item", joinColumns = @JoinColumn(name = "stockId"), inverseJoinColumns = @JoinColumn(name = "itemId"))
 //	private List<Item> stockItem;
 
-	@Column(name = "dateCreated")
+	@Column(name = "date_created")
 
 	private Date stockDateCreated;
 
-	@Column(name = "createdByUser")
+	@Column(name = "created_by_user")
 
 	private long stockCreatedByUser;
 
-	@Column(name = "isAvailable")
+	@Column(name = "is_available")
 
 	private String stockIsAvailable;
 
-	@Column(name = "isDeleted")
+	@Column(name = "is_deleted")
 
 	private String stockIsDeleted;
 
@@ -70,7 +70,7 @@ public class Stock {
 		this.shopId = shopId;
 	}
 
-	public long getStockId() {
+	public Long getStockId() {
 		return stockId;
 	}
 
@@ -90,7 +90,7 @@ public class Stock {
 		return stockIsDeleted;
 	}
 
-	public void setStockId(long stockId) {
+	public void setStockId(Long stockId) {
 		this.stockId = stockId;
 	}
 

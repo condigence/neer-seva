@@ -4664,10 +4664,10 @@ table.grid td {
 /* CheckBoxes & Radios */
 
 [class*="icheck-material"] {
-  min-height: 22px;
-  margin-top: 6px;
-  margin-bottom: 6px
-  padding-left: 0px; }
+    min-height: 22px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding-left: 0px; }
   [class*="icheck-material"] > label {
     padding-left: 29px !important;
     min-height: 22px;
@@ -4744,7 +4744,7 @@ table.grid td {
       -ms-transform: scale(0);
       opacity: 1;
       transition: opacity 0s, transform 0s; }
-  [class*="icheck-material" > input[type="radio"]:first-child + label::before,
+    [class*="icheck-material"] > input[type="radio"]:first-child + label::before,
   [class*="icheck-material"] > input[type="radio"]:first-child + input[type="hidden"] + label::before {
     border-radius: 50%; }
   [class*="icheck-material"] > input[type="radio"]:first-child:checked + label::before,
