@@ -48,6 +48,9 @@ public class StockController {
 	@Autowired
 	private com.condigence.stockservice.client.ImageClient imageClient;
 
+
+
+
 	//////////// Shops //////////////////
 
 	@GetMapping("/shops/{id}")
@@ -462,6 +465,33 @@ public class StockController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		return ResponseEntity.ok((long) stock.getStockQuantity());
+	}
+
+	@GetMapping("/all")
+	public ResponseEntity<?> getAllStock() {
+		List<Stock> stocks = stockService.getAllStocks();
+		List<ItemDTO> dtos = new ArrayList<>();
+		for (Stock stock : stocks) {
+			ItemDTO itemDTO = new ItemDTO();
+			ItemDTO item = getItemById(stock.getItemId());
+			// prepare Items to display
+			itemDTO.setId(item.getId());
+			itemDTO.setName(item.getName());
+			itemDTO.setDispPrice(item.getDispPrice());
+			itemDTO.setCapacity(item.getCapacity());
+			itemDTO.setDiscount(item.getDiscount());
+			itemDTO.setMrp(item.getMrp());
+			itemDTO.setPrice(item.getPrice());
+			itemDTO.setCode(item.getCode());
+            itemDTO.setStockId(stock.getStockId());
+
+			if (item.getImageId() != null) {
+				byte[] pic = imageClient.fetchImagePic(item.getImageId());
+				if (pic != null) itemDTO.setPic(pic);
+			}
+			dtos.add(itemDTO);
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(dtos);
 	}
 
 }

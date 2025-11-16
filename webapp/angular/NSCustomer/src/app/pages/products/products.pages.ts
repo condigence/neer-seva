@@ -45,6 +45,9 @@ import { UserService } from 'src/app/services/user.service';
  [searchedText]="searchText"
  [sortingBy]="sortOption"
  ></productslist-dir>
+        <div *ngIf="shopErrorMessage" class="mt-3 alert alert-warning">
+          {{ shopErrorMessage }}
+        </div>
  </div>
  
  <div class="col-md-5">
@@ -65,6 +68,7 @@ export class ProductsPage implements OnInit {
   items: ItemView[] = [];
   searchText: string = '';
   vendors:any;
+  shopErrorMessage: string = '';
 
 /////
 message: string;
@@ -108,22 +112,98 @@ messageToSendP: string = '';
   }
 
   getDefaultStock(): void {
-    this.itemService.getAllItemsWithImage().subscribe(data => {
-      this.items = data;
-    });
+    this.itemService.getAllItemsWithImage().subscribe(
+      (data: any) => {
+        this.shopErrorMessage = '';
+        // API may return different shapes. Try common variants.
+        if (Array.isArray(data)) {
+          this.items = data as ItemView[];
+          return;
+        }
+
+        if (data && data.Items && Array.isArray(data.Items)) {
+          this.items = data.Items;
+          return;
+        }
+
+        if (data && data.items && Array.isArray(data.items)) {
+          this.items = data.items;
+          return;
+        }
+
+        if (data && data.data && Array.isArray(data.data)) {
+          this.items = data.data;
+          return;
+        }
+
+        // fallback
+        const vals = data && typeof data === 'object' ? Object.values(data).filter(v => Array.isArray(v))[0] : null;
+        if (Array.isArray(vals)) {
+          this.items = vals as ItemView[];
+          return;
+        }
+
+        console.warn('getDefaultStock: unexpected response shape', data);
+        this.items = [];
+      },
+      (err) => {
+        console.error('Failed to load default stock', err);
+        this.items = [];
+        // if backend returned a structured error with errorMessage, show friendly message
+        try {
+          const backendMsg = err && err.error && err.error.errorMessage ? err.error.errorMessage : null;
+          if (backendMsg && backendMsg.indexOf('Items Not Found') !== -1) {
+            this.shopErrorMessage = 'Empty Stock for this Shop. Please contact Admin.';
+          } else if (backendMsg) {
+            this.shopErrorMessage = backendMsg;
+          } else {
+            this.shopErrorMessage = 'Failed to load stock. Please try again later.';
+          }
+        } catch (e) {
+          this.shopErrorMessage = 'Failed to load stock. Please try again later.';
+        }
+      }
+    );
   }
 
   receiveMessage($event) {
     this.shopId = $event;
    localStorage.setItem('selectedShop', this.shopId);
-   this.itemService.getStockItemsByShopId(+this.shopId).subscribe(data => {
-    this.items = data;
-    console.log(this.items);
-  },
-  error => {
-    console.log(error);
-   // this.items = [];
-  });
+   this.shopErrorMessage = '';
+   this.itemService.getStockItemsByShopId(+this.shopId).subscribe(
+     (data: any) => {
+       // clear any previous error
+       this.shopErrorMessage = '';
+       if (Array.isArray(data)) {
+         this.items = data as ItemView[];
+       } else if (data && data.items && Array.isArray(data.items)) {
+         this.items = data.items;
+       } else if (data && data.Items && Array.isArray(data.Items)) {
+         this.items = data.Items;
+       } else {
+         // if API returned empty or unknown, normalize to empty array
+         this.items = Array.isArray(data) ? data : [];
+       }
+       console.log(this.items);
+     },
+     (err) => {
+       console.log('Error loading stock for shop', this.shopId, err);
+       this.items = [];
+       // if backend returned structured error, check for Items Not Found
+       try {
+         const backendMsg = err && err.error && err.error.errorMessage ? err.error.errorMessage : null;
+         if (backendMsg && backendMsg.indexOf('Items Not Found') !== -1) {
+           this.shopErrorMessage = 'Empty Stock for this Shop. Please contact Admin.';
+         } else if (backendMsg) {
+           this.shopErrorMessage = backendMsg;
+         } else {
+           this.shopErrorMessage = 'Failed to load stock for this shop.';
+         }
+       } catch (e) {
+         this.shopErrorMessage = 'Failed to load stock for this shop.';
+       }
+     }
+   );
 
   }
 }

@@ -5,5 +5,6 @@ export class ItemView {
   price: number;  
   imageId: number;
   pic: any;
-  itemQuantity: number;
+  stockId: number;
+
 }
