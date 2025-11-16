@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -17,6 +16,7 @@ import com.condigence.nsuserservice.dto.UserDTO;
 import com.condigence.nsuserservice.entity.Address;
 import com.condigence.nsuserservice.entity.User;
 import com.condigence.nsuserservice.service.UserService;
+import com.condigence.nsuserservice.service.ImageService;
 import com.condigence.nsuserservice.util.AppProperties;
 import com.condigence.nsuserservice.util.CustomErrorType;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -44,8 +44,8 @@ public class UserController {
 	@Autowired
 	UserService service;
 
-//	@Autowired
-//	ImageService imageService;
+	@Autowired
+	ImageService imageService; // Added dedicated ImageService
 
 	@Autowired
 	public void setApp(AppProperties app) {
@@ -126,12 +126,17 @@ public class UserController {
 	@PostMapping(value = "/v1/verify/login", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> verifyLogin(@RequestBody UserDTO dto) {
 		logger.info("Entering login with user Details >>>>>>>>  : {}", dto.getContact());
-		// HttpHeaders headers = new HttpHeaders();
 
-        if(dto.getType().equalsIgnoreCase("CUSTOMER")){
-            return new ResponseEntity(quickRegisterMode(dto), HttpStatus.OK);
-        }else{
-            // Check If User contact Not Provided
+        // Use quick-register only when type is explicitly CUSTOMER
+        if (dto.getType() != null && dto.getType().equalsIgnoreCase("CUSTOMER")) {
+            // Ensure contact is provided for quick register flow as well
+            if (dto.getContact() == null || dto.getContact().trim().isEmpty()) {
+                return new ResponseEntity(new CustomErrorType("Please provide contact!"), HttpStatus.BAD_REQUEST);
+            }
+            User user = quickRegisterMode(dto);
+            return new ResponseEntity(user, HttpStatus.OK);
+        } else {
+            // Normal flow: Check If User contact Not Provided
             if (dto.getContact() == null || dto.getContact().trim().isEmpty()) {
                 return new ResponseEntity(new CustomErrorType("Please provide contact!"), HttpStatus.NOT_FOUND);
             }
@@ -149,7 +154,16 @@ public class UserController {
 	}
 
     private User quickRegisterMode(UserDTO dto) {
-       return  service.saveCustomer(dto);
+       // If user exists for contact, return existing; otherwise create a new CUSTOMER user
+       Optional<User> existing = service.findByContact(dto.getContact());
+       if (existing.isPresent()) {
+           logger.info("Quick register: existing user found for contact {}", dto.getContact());
+           return existing.get();
+       }
+       if (dto.getType() == null || dto.getType().trim().isEmpty()) {
+           dto.setType("CUSTOMER");
+       }
+       return service.saveCustomer(dto);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -198,7 +212,7 @@ public class UserController {
 
 				if (u.getImageId() != null) {
 					dto.setImageId(u.getImageId());
-					byte[] pic = fetchImagePic(u.getImageId());
+					byte[] pic = imageService.getImage(u.getImageId()); // Use ImageService
 					if (pic != null) dto.setPic(pic);
 				}
 
@@ -269,7 +283,7 @@ public class UserController {
 			if (user.getImageId() != null) {
 				dto.setImageId(user.getImageId());
 				logger.debug("Fetching image for user id {} imageId {}", user.getId(), user.getImageId());
-				byte[] pic = fetchImagePic(user.getImageId());
+				byte[] pic = imageService.getImage(user.getImageId()); // Use ImageService
 				if (pic != null) dto.setPic(pic);
 			}
 			dtos.add(dto);
@@ -314,7 +328,7 @@ public class UserController {
 
             if (user.getImageId() != null) {
                 dto.setImageId(user.getImageId());
-                byte[] pic = fetchImagePic(user.getImageId());
+                byte[] pic = imageService.getImage(user.getImageId()); // Use ImageService
                 if (pic != null) dto.setPic(pic);
             }
             dtos.add(dto);
@@ -349,7 +363,7 @@ public class UserController {
 
             if (user.getImageId() != null) {
                 dto.setImageId(user.getImageId());
-                byte[] pic = fetchImagePic(user.getImageId());
+                byte[] pic = imageService.getImage(user.getImageId()); // Use ImageService
                 if (pic != null) dto.setPic(pic);
             }
 
@@ -370,10 +384,9 @@ public class UserController {
 			dto.setId(user.get().getId());
 			dto.setName(user.get().getName());
 			dto.setEmail(user.get().getEmail());
-			dto.setEmail(user.get().getEmail());
 			dto.setContact(user.get().getContact());
 			dto.setType(user.get().getType());
-			if (user.get().getIsActive().equalsIgnoreCase("Y")) {
+			if (user.get().getIsActive() != null && user.get().getIsActive().equalsIgnoreCase("Y")) {
 				dto.setActive(true);
 			}
 			dto.setDescription(user.get().getDescription());
@@ -381,7 +394,7 @@ public class UserController {
 			if (user.get().getImageId() != null) {
 				dto.setImageId(user.get().getImageId());
 				logger.debug("Fetching image for user id {} imageId {}", user.get().getId(), user.get().getImageId());
-				byte[] pic = fetchImagePic(user.get().getImageId());
+				byte[] pic = imageService.getImage(user.get().getImageId()); // Use ImageService
 				if (pic != null) dto.setPic(pic);
 			}
 			return ResponseEntity.status(HttpStatus.OK).body(dto);
@@ -592,75 +605,5 @@ public class UserController {
 		return ResponseEntity.ok(result);
 	}
 
-	// Simple in-memory cache: imageId -> pic (byte[])
-	private final ConcurrentHashMap<Long, CachedImage> imageCache = new ConcurrentHashMap<>();
-
-	// TTL for cache entries (milliseconds)
-	private final long IMAGE_CACHE_TTL_MS = TimeUnit.MINUTES.toMillis(5);
-
-	private static class CachedImage {
-		final byte[] pic;
-		final long ts;
-		CachedImage(byte[] pic, long ts) { this.pic = pic; this.ts = ts; }
-	}
-
-	// Circuit-breaker-protected fetch method. If it fails, fallback to imageFallback.
-	@CircuitBreaker(name = "imageService", fallbackMethod = "imageFallback")
-	private byte[] fetchImagePicWithCircuit(Long imageId) {
-		// First, check cache
-		if (imageId == null) return null;
-		CachedImage ci = imageCache.get(imageId);
-		if (ci != null && (System.currentTimeMillis() - ci.ts) < IMAGE_CACHE_TTL_MS) {
-			return ci.pic;
-		}
-		// Not cached or stale: fetch from remote
-		ImageDTO imageDTO = restTemplate.getForObject("http://NS-IMAGE-SERVICE/neerseva/api/v1/images/" + imageId+"/data", ImageDTO.class);
-		if (imageDTO == null || imageDTO.getPic() == null) {
-			logger.warn("Image service returned null or empty pic for imageId {}", imageId);
-			throw new RestClientException("Image empty for id " + imageId);
-		}
-		byte[] pic = imageDTO.getPic();
-		imageCache.put(imageId, new CachedImage(pic, System.currentTimeMillis()));
-		return pic;
-	}
-
-	// Fallback when circuit breaker trips or fetch throws
-	@SuppressWarnings("unused")
-	private byte[] imageFallback(Long imageId, Throwable t) {
-		logger.warn("Image service unavailable or failed for imageId {}: {}. Using fallback image.", imageId, t == null ? "unknown" : t.getMessage());
-		// Try cache one last time (even if stale)
-		CachedImage ci = imageCache.get(imageId);
-		if (ci != null) return ci.pic;
-		// Use configured fallback image if present (assume base64 encoded)
-		if (app != null && app.getFallbackImage() != null && !app.getFallbackImage().trim().isEmpty()) {
-			try {
-				return Base64.getDecoder().decode(app.getFallbackImage());
-			} catch (IllegalArgumentException ex) {
-				logger.warn("Configured fallbackImage is not valid base64: {}", ex.getMessage());
-				return null;
-			}
-		}
-		// else return null so controller omits pic
-		return null;
-	}
-
-	// Keep a simple safe wrapper for old code to call: it uses the circuit-protected method and handles exceptions
-	private byte[] fetchImagePic(Long imageId) {
-		try {
-			return fetchImagePicWithCircuit(imageId);
-		} catch (Exception ex) {
-			logger.warn("fetchImagePic encountered an error for imageId {}: {}", imageId, ex.getMessage());
-			// fallback: try reading fallback from app
-			if (app != null && app.getFallbackImage() != null && !app.getFallbackImage().trim().isEmpty()) {
-				try {
-					return Base64.getDecoder().decode(app.getFallbackImage());
-				} catch (IllegalArgumentException e) {
-					logger.warn("Configured fallbackImage is not valid base64: {}", e.getMessage());
-					return null;
-				}
-			}
-			return null;
-		}
-	}
 
 }
