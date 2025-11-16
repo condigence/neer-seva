@@ -4,6 +4,7 @@ import { Item } from '../model/item.model';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Brand } from '../model/brand.model';
 import { environment } from 'src/environments/environment';
+import { Stock } from '../model/stock.model';
 
 
 const httpOptions = {
@@ -28,7 +29,8 @@ export class ItemService {
 
 
   getAllItemsWithImage() {
-    return this.http.get<Item[]>(this.baseUrl+'items');
+    return this.http.get<Item[]>(this.stockUrl+'stocks/all');
+    //http://localhost:9093/neerseva/api/v1/stocks/all
   }
 
   getItemById(id: any) {

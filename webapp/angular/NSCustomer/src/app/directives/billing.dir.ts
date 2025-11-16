@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { AuthenticationService } from '../services/auth.service';
 import { OrderService } from '../services/order.service';
 import { HttpClient } from '@angular/common/http';
+import { AddressService } from '../services/address.service';
 
 @Component({
   selector: 'billing-dir',
@@ -69,6 +70,7 @@ export class BillingDir {
     public cart: CartService,
     private orderService: OrderService,
     private http: HttpClient,
+    private addressService: AddressService,
     public router: Router
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
@@ -92,6 +94,78 @@ export class BillingDir {
     });
     
     this.billingForm = this.fb.group(temp);
+
+    // If billing info is not present but user is logged in, try to auto-populate
+    // from the user's default address and profile info.
+    if ((!billingInfo || Object.keys(billingInfo).length === 0) && this.currentUser) {
+      try {
+        // Fill name/email/mobile from currentUser if available
+        const name = this.currentUser.name || '';
+        const nameParts = name.split(' ');
+        const firstName = nameParts.length > 0 ? nameParts[0] : '';
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+        const patch: any = {};
+        if (this.billingForm.controls['firstName']) {
+          patch['firstName'] = firstName;
+        }
+        if (this.billingForm.controls['lastName']) {
+          patch['lastName'] = lastName;
+        }
+        if (this.billingForm.controls['email']) {
+          patch['email'] = this.currentUser.email || '';
+        }
+        if (this.billingForm.controls['mobile']) {
+          patch['mobile'] = this.currentUser.contact || '';
+        }
+
+        // Attempt to fetch default address and merge into patch
+        const custId = this.currentUser.id;
+        if (custId) {
+          this.addressService.getDefaultAddressByUserId(custId).subscribe(
+            (addr: any) => {
+              if (addr) {
+                if (this.billingForm.controls['addressOne']) {
+                  patch['addressOne'] = addr.line1 || addr.lineOne || '';
+                }
+                if (this.billingForm.controls['addressTwo']) {
+                  patch['addressTwo'] = addr.line2 || addr.lineTwo || '';
+                }
+                if (this.billingForm.controls['city']) {
+                  patch['city'] = addr.city || '';
+                }
+                if (this.billingForm.controls['state']) {
+                  patch['state'] = addr.state || '';
+                }
+                if (this.billingForm.controls['zip']) {
+                  patch['zip'] = addr.pin || addr.zip || '';
+                }
+                // apply the patch values
+                this.billingForm.patchValue(patch);
+                // persist into storage so checkout flow sees it
+                this.storage.set({ customerInfo: this.billingForm.value });
+              } else {
+                // no address found, still apply basic profile patch
+                this.billingForm.patchValue(patch);
+                this.storage.set({ customerInfo: this.billingForm.value });
+              }
+            },
+            (err) => {
+              console.error('Failed to load default address for user', custId, err);
+              // apply whatever we have from profile
+              this.billingForm.patchValue(patch);
+              this.storage.set({ customerInfo: this.billingForm.value });
+            }
+          );
+        } else {
+          // no customer id, just patch with profile info
+          this.billingForm.patchValue(patch);
+          this.storage.set({ customerInfo: this.billingForm.value });
+        }
+      } catch (e) {
+        console.error('Error while auto-populating billing form', e);
+      }
+    }
   }
 
   clearCart() {

@@ -29,7 +29,16 @@ public class ItemDTO {
 	private Long brandId;
 	private Long imageId;
 	private Date dateCreated;
-	private Long quantityInStock;
+
+    public Long getStockId() {
+        return stockId;
+    }
+
+    public void setStockId(Long stockId) {
+        this.stockId = stockId;
+    }
+
+    private Long stockId;
 
 	public byte[] getPic() {
 		return pic;
