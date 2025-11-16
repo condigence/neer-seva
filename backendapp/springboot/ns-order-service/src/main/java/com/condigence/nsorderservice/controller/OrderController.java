@@ -8,6 +8,8 @@ import com.condigence.nsorderservice.service.OrderService;
 import com.condigence.nsorderservice.util.CustomErrorType;
 import com.condigence.nsorderservice.exception.BadRequestException;
 import com.condigence.nsorderservice.exception.ResourceNotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +44,8 @@ public class OrderController {
             return new ResponseEntity<>(headers, HttpStatus.CREATED);
         } catch (ResourceNotFoundException rnfe) {
             logger.warn("placeOrder - resource not found: {}", rnfe.getMessage());
-            return new ResponseEntity<>(new CustomErrorType(rnfe.getMessage()), HttpStatus.NOT_FOUND);
+            String userMsg = extractMessageFromResourceNotFound(rnfe.getMessage());
+            return new ResponseEntity<>(new CustomErrorType(userMsg), HttpStatus.NOT_FOUND);
         } catch (BadRequestException bre) {
             logger.warn("placeOrder - bad request: {}", bre.getMessage());
             return new ResponseEntity<>(new CustomErrorType(bre.getMessage()), HttpStatus.BAD_REQUEST);
@@ -94,7 +97,8 @@ public class OrderController {
             return new ResponseEntity<>(headers, HttpStatus.CREATED);
         } catch (ResourceNotFoundException rnfe) {
             logger.warn("placeOrderItems - resource not found: {}", rnfe.getMessage());
-            return new ResponseEntity<>(new CustomErrorType(rnfe.getMessage()), HttpStatus.NOT_FOUND);
+            String userMsg = extractMessageFromResourceNotFound(rnfe.getMessage());
+            return new ResponseEntity<>(new CustomErrorType(userMsg), HttpStatus.NOT_FOUND);
         } catch (BadRequestException bre) {
             logger.warn("placeOrderItems - bad request: {}", bre.getMessage());
             return new ResponseEntity<>(new CustomErrorType(bre.getMessage()), HttpStatus.BAD_REQUEST);
@@ -134,4 +138,29 @@ public class OrderController {
 //	}
 
 ///////////////////////////////////////////////////////////////////
+    // Try to extract inner JSON error.message from exception message if present
+    private String extractMessageFromResourceNotFound(String fullMessage) {
+        if (fullMessage == null) return "Resource not found";
+        int jsonStart = fullMessage.indexOf('{');
+        if (jsonStart >= 0) {
+            String json = fullMessage.substring(jsonStart);
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                @SuppressWarnings("unchecked")
+                java.util.Map<String, Object> m = mapper.readValue(json, java.util.Map.class);
+                if (m == null) return fullMessage;
+                Object em = m.get("errorMessage");
+                if (em == null) em = m.get("message");
+                if (em == null) em = m.get("error");
+                if (em != null) return em.toString();
+                // fallback: return the original JSON string
+                return json;
+            } catch (Exception ex) {
+                logger.debug("extractMessageFromResourceNotFound: failed to parse JSON from message: {}", ex.getMessage());
+                return fullMessage;
+            }
+        }
+        // No JSON found, return as-is
+        return fullMessage;
+    }
 }
