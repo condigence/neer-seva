@@ -14,6 +14,7 @@ export class Item {
   price: number;  
   itemDispPrice: number;  
   itemMrp: number;  
+  stockId: number;
 }
 
 
