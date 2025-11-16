@@ -128,21 +128,31 @@ public class UserController {
 		logger.info("Entering login with user Details >>>>>>>>  : {}", dto.getContact());
 		// HttpHeaders headers = new HttpHeaders();
 
-		// Check If User contact Not Provided
-		if (dto.getContact() == null || dto.getContact().trim().isEmpty()) {
-			return new ResponseEntity(new CustomErrorType("Please provide contact!"), HttpStatus.NOT_FOUND);
-		}
-		// Verify Contact
-		Optional<User> user = service.findByContact(dto.getContact());
-		if (user.isPresent()) {
-			return new ResponseEntity(user.get(), HttpStatus.OK);
-		} else {
-			logger.info("User Not Found for contact {}", dto.getContact());
-			return new ResponseEntity(new CustomErrorType("Contact Not Found! Please Register"), HttpStatus.NOT_FOUND);
-		}
+        if(dto.getType().equalsIgnoreCase("CUSTOMER")){
+            return new ResponseEntity(quickRegisterMode(dto), HttpStatus.OK);
+        }else{
+            // Check If User contact Not Provided
+            if (dto.getContact() == null || dto.getContact().trim().isEmpty()) {
+                return new ResponseEntity(new CustomErrorType("Please provide contact!"), HttpStatus.NOT_FOUND);
+            }
+            // Verify Contact
+            Optional<User> user = service.findByContact(dto.getContact());
+            if (user.isPresent()) {
+                return new ResponseEntity(user.get(), HttpStatus.OK);
+            } else {
+                logger.info("User Not Found for contact {}", dto.getContact());
+                return new ResponseEntity(new CustomErrorType("Contact Not Found! Please Register"), HttpStatus.NOT_FOUND);
+            }
+        }
+
+
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+    private User quickRegisterMode(UserDTO dto) {
+       return  service.saveCustomer(dto);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostMapping(value = "/v1/verify/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> verifyRegistration(@RequestBody UserDTO dto) {
 		logger.info("Entering Verify User with user Details >>>>>>>>  : {}", dto);

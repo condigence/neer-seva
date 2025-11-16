@@ -35,7 +35,8 @@ export class LoginComponent implements OnInit {
 
     ngOnInit() {
         this.loginForm = this.formBuilder.group({
-            contact: ['', Validators.required]
+            contact: ['', Validators.required],
+            type: 'CUSTOMER'
            //, Validators.pattern(/^[6-9]\d{9}$/)
         });
 

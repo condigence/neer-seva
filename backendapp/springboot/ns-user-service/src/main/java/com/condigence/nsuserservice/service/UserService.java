@@ -51,6 +51,16 @@ public class UserService {
 		return repository.save(user);
 	}
 
+    public User saveCustomer(UserDTO dto) {
+        User user = new User();
+        user.setType(dto.getType());
+        user.setContact(dto.getContact());
+        user.setIsActive("N");
+        user.setIsDeleted("N");
+        user.setOtp("1234"); // By Default 1234 for Now
+        return repository.save(user);
+    }
+
 	public User update(User user) {
 		return repository.save(user);
 	}
