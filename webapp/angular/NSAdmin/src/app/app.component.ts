@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     // Initialize synchronously from the AuthenticationService current value instead of reading localStorage directly
-    this.currentUser = this.authenticationService.currentUserValue;
+    // this.currentUser = this.authenticationService.currentUserValue;
     // Close any open dropdowns after successful navigation to keep the UI tidy
     this.router.events.subscribe(evt => {
       if (evt instanceof NavigationEnd) {
@@ -155,7 +155,7 @@ export class AppComponent implements OnInit {
             cu.pic = this.user.pic;
           }
           this.authenticationService.setCurrentUser(cu as any);
-          this.currentUser = cu;
+          // this.currentUser = cu;
         } catch (e) {
           console.error('Error updating currentUser pic:', e);
         }
