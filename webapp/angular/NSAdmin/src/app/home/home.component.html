@@ -10,7 +10,7 @@
               <div class="media-body">
                 <p class="text-white">Total Orders</p>
                 <h4 class="text-white line-height-5" *ngIf="totalOrders">
-                  {{ totalOrders.NumberOfOrders || totalOrders.numberOfOrders || totalOrders.count || totalOrders }}
+                  {{ totalOrders.NumberOfOrders || totalOrders.numberOfOrders || totalOrders.count || totalOrders.length }}
                 </h4>
               </div>
               <div class="w-circle-icon rounded-circle border border-white">
@@ -25,8 +25,10 @@
           <div class="card-body">
             <div class="media align-items-center">
               <div class="media-body">
-                <p class="text-white">Total Revenue</p>
-                <h4 class="text-white line-height-5">&#x20B9;10,000,00</h4>
+                <p class="text-white mb-2">Total Revenue</p>
+      <h4 class="text-white mb-0">
+        ₹ {{ totalRevenue | number:'1.0-0' }}
+      </h4>
               </div>
               <div class="w-circle-icon rounded-circle border border-white">
                 <i class="fa fa-money text-white"></i>
@@ -42,7 +44,7 @@
               <div class="media-body">
                 <p class="text-white">Total Users</p>
                 <h4 class="text-white line-height-5" *ngIf="userscount">
-                  {{ userscount.NumberOfUsers || userscount.numberOfUsers || userscount.count || userscount }}
+                  {{ userscount.NumberOfUsers || userscount.numberOfUsers || userscount.count || userscount.length }}
                 </h4>
               </div>
               <div class="w-circle-icon rounded-circle border border-white">
@@ -59,7 +61,7 @@
               <div class="media-body">
                 <p class="text-white">Total Customer</p>
                 <h4 class="text-white line-height-5" *ngIf="userAsCustomer">
-                  {{ userAsCustomer.numberOfCustomer || userAsCustomer.numberOfCustomers || userAsCustomer.count || userAsCustomer }}
+                  {{ userAsCustomer.numberOfCustomer || userAsCustomer.numberOfCustomers || userAsCustomer.count || userAsCustomer.length }}
                 </h4>
               </div>
               <div class="w-circle-icon rounded-circle border border-white">
