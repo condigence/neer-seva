@@ -154,12 +154,16 @@
 <!-- Success Modal -->
 <div class="custom-modal-overlay" *ngIf="showSuccessModal" (click)="closeSuccessModal()">
     <div class="custom-modal success-modal" (click)="$event.stopPropagation()">
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" [style.width.%]="progressBarWidth"></div>
+        </div>
         <div class="modal-header-custom modal-header-success">
             <i class="zmdi zmdi-thumb-up"></i>
             <h4>Profile Updated!</h4>
         </div>
         <div class="modal-body-custom">
             <p>Your profile has been successfully updated.</p>
+            <p class="auto-close-text">This will close in {{remainingSeconds}} second{{remainingSeconds !== 1 ? 's' : ''}}</p>
         </div>
         <div class="modal-footer-custom">
             <button class="btn-custom btn-success-ok" (click)="closeSuccessModal()">

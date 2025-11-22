@@ -5,8 +5,8 @@ import { BillingDir } from './directives/billing.dir';
 import { BillingCartDir } from './directives/billingcart.dir';
 import { CheckOutDir } from './directives/checkout.dir';
 import { ListAddressDir, DeleteAddressModalContent } from './directives/address/list/listaddressdir.component';
-import { AddAddressDir, UnsavedChangesModalContent } from './directives/address/add/address.component';
-import { EditAddressDir, UpdateSuccessModalContent } from './directives/address/edit/addressdir';
+import { AddAddressDir } from './directives/address/add/address.component';
+import { EditAddressDir, UpdateSuccessModalContent, UnsavedChangesModalContent } from './directives/address/edit/addressdir';
 // import { AddressDir } from './directives/address/addresses/addressdir.component';
 // import { EditAddressDir } from './directives/address/editAddressdir/addressdir';
 // import { AddAddressDir } from './directives/address/addAddress/address.component';
@@ -21,7 +21,7 @@ export const dirConfig = [
     ListAddressDir,
     DeleteAddressModalContent,
     AddAddressDir,
-    UnsavedChangesModalContent,
     EditAddressDir,
-    UpdateSuccessModalContent
+    UpdateSuccessModalContent,
+    UnsavedChangesModalContent
 ];

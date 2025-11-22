@@ -34,8 +34,12 @@ export class MyProfileComponent implements OnInit, DoCheck, CanComponentDeactiva
   public hasUnsavedChanges: boolean = false;
   public showCancelModal: boolean = false;
   public showSuccessModal: boolean = false;
+  public progressBarWidth: number = 100;
+  public remainingSeconds: number = 3;
   private pendingNavigation: any = null;
   private resolveNavigationPromise: (value: boolean) => void = null;
+  private progressInterval: any;
+  private countdownInterval: any;
 
   constructor(
     private userService: UserService,
@@ -199,18 +203,57 @@ export class MyProfileComponent implements OnInit, DoCheck, CanComponentDeactiva
             
             // Show success modal instead of navigating
             this.showSuccessModal = true;
+            this.startProgressBar();
             
             // Switch back to profile tab
             this.goBackToProfile();
           });
         },
         error => {
-          alert(error);
+          console.error('Profile update error:', error);
         });
   }
 
+  startProgressBar() {
+    // Reset values
+    this.progressBarWidth = 100;
+    this.remainingSeconds = 3;
+    
+    // Clear any existing intervals
+    if (this.progressInterval) clearInterval(this.progressInterval);
+    if (this.countdownInterval) clearInterval(this.countdownInterval);
+    
+    // Update progress bar every 30ms (100 updates over 3 seconds)
+    const totalDuration = 3000; // 3 seconds
+    const updateInterval = 30; // Update every 30ms
+    const decrementAmount = 100 / (totalDuration / updateInterval);
+    
+    this.progressInterval = setInterval(() => {
+      this.progressBarWidth -= decrementAmount;
+      if (this.progressBarWidth <= 0) {
+        this.progressBarWidth = 0;
+        clearInterval(this.progressInterval);
+        this.closeSuccessModal();
+      }
+    }, updateInterval);
+    
+    // Update countdown every second
+    this.countdownInterval = setInterval(() => {
+      this.remainingSeconds--;
+      if (this.remainingSeconds <= 0) {
+        clearInterval(this.countdownInterval);
+      }
+    }, 1000);
+  }
+
   closeSuccessModal() {
-    this.showSuccessModal = false;
+    if (this.showSuccessModal) {
+      // Clear intervals
+      if (this.progressInterval) clearInterval(this.progressInterval);
+      if (this.countdownInterval) clearInterval(this.countdownInterval);
+      
+      this.showSuccessModal = false;
+    }
   }
 
   onCancel() {

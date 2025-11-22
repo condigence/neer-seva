@@ -31,7 +31,7 @@ const appRoutes: Routes = [
   { path: 'orders', component: OrderComponent, canActivate: [AuthGuard] },
   { path: 'upload-image', component: UploadImageComponent, canActivate: [AuthGuard]},
   { path: 'address/edit-address', component: EditAddressDir, canActivate: [AuthGuard], canDeactivate: [UnsavedChangesGuard] },
-  { path: 'address/add-address', component: AddAddressDir, canActivate: [AuthGuard], canDeactivate: [UnsavedChangesGuard] },
+  { path: 'address/add-address', component: AddAddressDir, canActivate: [AuthGuard] },
 
   {
     path: '',

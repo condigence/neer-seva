@@ -236,6 +236,29 @@ body {
     box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
   }
 
+  /* Progress Bar Styles */
+  .progress-bar-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    transition: width 30ms linear;
+    box-shadow: 0 0 10px rgba(17, 153, 142, 0.5);
+  }
+
+  .auto-close-text {
+    font-size: 0.9rem !important;
+    color: #888 !important;
+    margin-top: 15px !important;
+    font-weight: 500;
+  }
+
   /* Responsive */
   @media (max-width: 576px) {
     .custom-modal {

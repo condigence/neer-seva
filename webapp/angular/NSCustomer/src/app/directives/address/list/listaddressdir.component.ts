@@ -4,6 +4,7 @@ import { Address } from 'src/app/model/address.model';
 import { Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/auth.service';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'list-address-dir',
@@ -17,11 +18,14 @@ export class ListAddressDir {
   public cancelClicked: boolean = false;
   address;
   makedefault = [];
+  deletingAddressId: string | null = null;
+  
   constructor(
     private addressService: AddressService,
     private router: Router,
     private authenticationService: AuthenticationService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private toastr: ToastrService
   ) {
 
   }
@@ -88,11 +92,29 @@ export class ListAddressDir {
     
     modalRef.result.then((result) => {
       if (result === 'confirm') {
+        // Show loading state
+        this.deletingAddressId = address.id;
+        
         this.addressService.deleteAddress(address.id)
-          .subscribe(data => {
-            // Remove address from local array without reloading
-            this.address = this.address.filter(addr => addr.id !== address.id);
-          });
+          .subscribe(
+            data => {
+              // Hide loading state
+              this.deletingAddressId = null;
+              
+              // Remove address from local array without reloading
+              this.address = this.address.filter(addr => addr.id !== address.id);
+              
+              // Show success toast
+              this.toastr.success('Address deleted successfully!', 'Success');
+            },
+            error => {
+              // Hide loading state
+              this.deletingAddressId = null;
+              
+              console.error('Error deleting address:', error);
+              this.toastr.error('Failed to delete address. Please try again.', 'Error');
+            }
+          );
       }
     }, (reason) => {
       // Modal dismissed
@@ -135,7 +157,7 @@ export class ListAddressDir {
   selector: 'delete-address-modal-content',
   template: `
     <div class="modal-header border-0 pb-0">
-      <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+      <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()" [disabled]="isDeleting">
         <i class="zmdi zmdi-close"></i>
       </button>
     </div>
@@ -146,11 +168,17 @@ export class ListAddressDir {
       <h5 class="mb-3">Delete Address?</h5>
       <p class="text-muted mb-4">Are you sure you want to delete this address? This action cannot be undone.</p>
       <div class="d-flex gap-2 justify-content-center">
-        <button type="button" class="btn btn-secondary px-4" (click)="activeModal.dismiss()">
+        <button type="button" class="btn btn-secondary px-4" (click)="activeModal.dismiss()" [disabled]="isDeleting">
           <i class="zmdi zmdi-close mr-1"></i>Cancel
         </button>
-        <button type="button" class="btn btn-danger px-4" (click)="confirm()">
-          <i class="zmdi zmdi-delete mr-1"></i>Delete
+        <button type="button" class="btn btn-danger px-4" (click)="confirm()" [disabled]="isDeleting">
+          <span *ngIf="!isDeleting">
+            <i class="zmdi zmdi-delete mr-1"></i>Delete
+          </span>
+          <span *ngIf="isDeleting">
+            <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+            Deleting...
+          </span>
         </button>
       </div>
     </div>
@@ -192,10 +220,12 @@ export class ListAddressDir {
 })
 export class DeleteAddressModalContent {
   address: Address;
+  isDeleting: boolean = false;
 
   constructor(public activeModal: NgbActiveModal) {}
 
   confirm() {
+    this.isDeleting = true;
     this.activeModal.close('confirm');
   }
 }
