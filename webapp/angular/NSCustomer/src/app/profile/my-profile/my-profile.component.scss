@@ -32,9 +32,305 @@ body {
     background-color: #428bca;
     padding : 5px 15px;
   }
-  
-  
-  
-  
-  
+  .nav-item {
+    cursor: pointer;
+  }
+
+  /* Beautiful Tab Styling */
+  .nav-tabs {
+    border-bottom: 2px solid #e0e0e0;
+  }
+
+  .nav-tabs .nav-link {
+    border: none;
+    color: #666;
+    font-weight: 500;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+    position: relative;
+    background: transparent;
+    margin-right: 8px;
+  }
+
+  .nav-tabs .nav-link:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .nav-tabs .nav-link.active {
+    color: #667eea;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 8px 8px 0 0;
+    font-weight: 600;
+  }
+
+  .nav-tabs .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 3px 3px 0 0;
+  }
+
+  .nav-tabs .nav-link i {
+    margin-right: 8px;
+    font-size: 18px;
+    vertical-align: middle;
+  }
+
+  /* Custom Modal Styles */
+  .custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .custom-modal {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    max-width: 450px;
+    width: 90%;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .modal-header-custom {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 30px;
+    text-align: center;
+    color: white;
+  }
+
+  .modal-header-custom i {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    display: block;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+
+  .modal-header-custom h4 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-body-custom {
+    padding: 30px;
+    text-align: center;
+  }
+
+  .modal-body-custom p {
+    font-size: 1.1rem;
+    color: #555;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .modal-footer-custom {
+    padding: 20px 30px 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .btn-custom {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-custom i {
+    font-size: 1.2rem;
+  }
+
+  .btn-cancel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .btn-cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-confirm {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+  }
+
+  .btn-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+  }
+
+  .btn-custom:active {
+    transform: translateY(0);
+  }
+
+  /* Success Modal Styles */
+  .modal-header-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+  }
+
+  .btn-success-ok {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .btn-success-ok:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .custom-modal {
+      width: 95%;
+    }
+
+    .modal-footer-custom {
+      flex-direction: column;
+    }
+
+    .btn-custom {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Profile Card Styles */
+  .profile-card-2 {
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .profile-card-2 .card-header-gradient {
+    height: 120px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+  }
+
+  .profile-card-2 .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-img-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin-top: -75px;
+  }
+
+  .image-loader {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #667eea;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .profile-card-2 .profile-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 5px solid white;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+  }
+
+  .profile-card-2 .profile-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+  }
+
+  .profile-card-2 .card-title {
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #333;
+  }
+
+  /* Equal height for both cards */
+  .equal-height-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .equal-height-row > [class*='col-'] {
+    display: flex;
+  }
+
+  .equal-height-row > [class*='col-'] > .card {
+    width: 100%;
+    height: 100%;
+  }
   

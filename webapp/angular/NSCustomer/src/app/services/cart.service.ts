@@ -4,7 +4,7 @@ import { AddressService } from './address.service';
 @Injectable()
 
 export class CartService {
-  public allItems: any = [];
+  private _allItems: any = [];
   public cartData: any = [];
   // public cartItemsList: any  = {};
   public cartItemsList: any = [];
@@ -12,6 +12,19 @@ export class CartService {
   public cartItemsStorageName = 'mycart';
 
   address;
+
+  // Getter and setter for allItems to trigger cart refresh
+  get allItems(): any {
+    return this._allItems;
+  }
+  
+  set allItems(value: any) {
+    this._allItems = value;
+    // Refresh cart items when allItems is set
+    if (value && value.length > 0) {
+      this.listCartItems();
+    }
+  }
 
   constructor(
     private addressService: AddressService,
@@ -110,6 +123,9 @@ export class CartService {
   }
 
   emptyCart() {
+    this.cartData = {};
+    this.cartItemsList = [];
+    this.cartTotal = 0;
     this.storage.set({
       mycart: {}
     });

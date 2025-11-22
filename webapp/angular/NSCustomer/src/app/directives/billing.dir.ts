@@ -151,7 +151,6 @@ export class BillingDir {
               }
             },
             (err) => {
-              console.error('Failed to load default address for user', custId, err);
               // apply whatever we have from profile
               this.billingForm.patchValue(patch);
               this.storage.set({ customerInfo: this.billingForm.value });
@@ -184,7 +183,6 @@ export class BillingDir {
     //  console.log(this.currentUser);
       if (this.billingForm.valid) {
 
-        console.log(this.billingForm.value);
        
         this.storage.set({
           customerInfo: this.billingForm.value

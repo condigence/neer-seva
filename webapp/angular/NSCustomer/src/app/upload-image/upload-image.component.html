@@ -6,17 +6,43 @@
      
     </div>
   </div>
-  <div class="col-sm-3"> 
-      <img [src]="imgURL" height="100" *ngIf="imgURL">
+  <div class="col-sm-3" style="position: relative;"> 
+      <div *ngIf="imgURL" style="position: relative; display: inline-block;">
+        <img [src]="imgURL" height="100">
+        <button 
+          type="button" 
+          class="btn btn-danger btn-sm" 
+          (click)="onRemoveImage()" 
+          style="position: absolute; top: -5px; right: -5px; border-radius: 50%; width: 25px; height: 25px; padding: 0; line-height: 1; font-size: 16px;"
+          title="Remove image">
+          &times;
+        </button>
+      </div>
   </div>
 
-  <div class="col-sm-3" style="left:80px;"> <input type="button" (click)="onUpload()" value="upload" class="btn btn-success btn-xs">
+  <div class="col-sm-3" style="left:80px;"> 
+    <input type="button" (click)="onUpload()" value="upload" 
+           class="btn btn-success btn-xs" 
+           [disabled]="!isFileSelected || isUploading"
+           [class.btn-secondary]="!isFileSelected">
   </div>
   <div class="col-sm-3">
-    <div *ngIf='dispalyPreview'>
-      <span>Preview:</span>
-  {{imageId}}
-      <img height="100" [src]="convertedImage">
+    <!-- Uploading Loader -->
+    <div *ngIf='isUploading' class="upload-loader">
+      <div class="mini-spinner"></div>
+      <span class="upload-text">Uploading...</span>
+    </div>
+    
+    <!-- Preview after upload -->
+    <div *ngIf='dispalyPreview && !isUploading' class="preview-section">
+      <span class="preview-label">Preview:</span>
+      <!-- <span class="image-id">ID: {{imageId}}</span> -->
+      <div class="preview-image-wrapper">
+        <img height="100" [src]="convertedImage" (load)="onImageLoad()" (error)="onImageError()" [hidden]="imageLoading">
+        <div *ngIf="imageLoading" class="image-loader">
+          <div class="mini-spinner"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -26,6 +26,7 @@ import { OrderService } from './services/order.service';
 import { OrderComponent } from './directives/orders/order.component';
 import { UserService } from './services/user.service';
 import { UploadImageComponent } from './upload-image/upload-image.component';
+import { ToastComponent } from './toast/toast.component';
 
 
 //import { OwlCarouselDemoComponent } from './components/owl-carousel-demo/owl-carousel-demo.component';
@@ -56,7 +57,8 @@ import { ModalModule, ModalService } from './modal';
     FilterPipe,
     UploadImageComponent,
     OrderComponent,
-    SortPipe
+    SortPipe,
+    ToastComponent
   ],
   providers: [
     ProductsModel,
