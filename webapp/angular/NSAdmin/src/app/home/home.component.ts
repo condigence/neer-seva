@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit {
   totalOrders: any;
   top4Orders: any;
   fiveUsers: any;
+  totalRevenue: any | number = 12500; // Example total revenue
   constructor(private userService: UserService, private addressService: AddressService, private renderer: Renderer2) { }
   
 
