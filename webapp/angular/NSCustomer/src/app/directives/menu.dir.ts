@@ -43,8 +43,12 @@ import { User } from '../model/user.model';
           <a class="nav-link" routerLinkActive="active" (click)="logout()" routerLink='/checkout'>Logout</a>
       </li>
   </ul>
-  <div *ngIf="currentUser">
-      <h6 class="mt-2 user-title">Hello {{currentUser.name}}</h6>
+  <div *ngIf="currentUser" class="user-greeting-container">
+      <div class="user-greeting">
+          <span class="greeting-text">Hello,</span>
+          <span class="user-name">{{currentUser.name}}</span>
+          <span class="greeting-wave">👋</span>
+      </div>
   </div>
   <ul class="navbar-nav align-items-center right-nav-link">
       <li class="dropdown-divider"></li>
@@ -74,6 +78,88 @@ import { User } from '../model/user.model';
     .logo{
       height: 60px;
       width: auto;
+    }
+
+    .user-greeting-container {
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .user-greeting {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 10px 20px;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .user-greeting:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .greeting-text {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
+
+    .user-name {
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .greeting-wave {
+      font-size: 1.2rem;
+      animation: wave 2s ease-in-out infinite;
+      transform-origin: 70% 70%;
+    }
+
+    @keyframes wave {
+      0%, 100% {
+        transform: rotate(0deg);
+      }
+      10%, 30% {
+        transform: rotate(14deg);
+      }
+      20% {
+        transform: rotate(-8deg);
+      }
+      40% {
+        transform: rotate(-4deg);
+      }
+      50% {
+        transform: rotate(10deg);
+      }
+      60% {
+        transform: rotate(0deg);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .user-greeting {
+        padding: 8px 15px;
+      }
+
+      .greeting-text {
+        font-size: 0.8rem;
+      }
+
+      .user-name {
+        font-size: 0.9rem;
+      }
+
+      .greeting-wave {
+        font-size: 1rem;
+      }
     }
   `]
 })

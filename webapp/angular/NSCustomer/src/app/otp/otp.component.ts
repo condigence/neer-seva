@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AuthenticationService } from '../services/auth.service';
 import { AlertService } from '../services/alert.service';
+import { ToastService } from '../services/toast.service';
 @Component({
   selector: 'app-otp',
   templateUrl: './otp.component.html',
@@ -17,13 +19,16 @@ export class OTPComponent implements OnInit {
   returnUrl: string;
   userExist: false;
   error: string;
+  showErrorModal: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private authenticationService: AuthenticationService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private modalService: NgbModal,
+    private toastService: ToastService
   ) {
     // redirect to home if already logged in
     if (this.authenticationService.currentUserValue) {
@@ -65,18 +70,21 @@ export class OTPComponent implements OnInit {
       .pipe(first())
       .subscribe(
         data => {
-          // console.log(this.returnUrl);
-          this.router.navigate(['/']);
-       //  document.location.href = '/';
-
+          console.log('OTP verified successfully');
+          // Navigate to home with login flag
+          this.router.navigate(['/products'], { queryParams: { justLoggedIn: 'true' } });
         },
         error => {
           console.log(error);
-          this.alertService.error(error);
           this.loading = false;
           this.error = error;
+          this.showErrorModal = true;
         });
 
 
+  }
+
+  closeErrorModal() {
+    this.showErrorModal = false;
   }
 }

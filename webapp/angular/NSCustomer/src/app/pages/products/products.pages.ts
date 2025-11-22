@@ -3,6 +3,9 @@ import { ProductsModel } from '../../model/products.model';
 import { ItemService } from 'src/app/services/item.service';
 import { ItemView } from 'src/app/model/item.view.';
 import { UserService } from 'src/app/services/user.service';
+import { CartService } from 'src/app/services/cart.service';
+import { ToastService } from 'src/app/services/toast.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 @Component({
@@ -39,15 +42,42 @@ import { UserService } from 'src/app/services/user.service';
  </div>
  <div class="row">
  <div class="col-md-7">
- <productslist-dir
- (refresh)="ref($event)"
- [allProductList]="items"
- [searchedText]="searchText"
- [sortingBy]="sortOption"
- ></productslist-dir>
-        <div *ngIf="shopErrorMessage" class="mt-3 alert alert-warning">
-          {{ shopErrorMessage }}
-        </div>
+   <!-- Loader -->
+   <div *ngIf="isLoading" class="loader-container">
+     <div class="loader-spinner">
+       <div class="spinner-circle"></div>
+       <div class="spinner-circle"></div>
+       <div class="spinner-circle"></div>
+     </div>
+     <p class="loading-text">Loading products...</p>
+   </div>
+
+   <!-- Products List -->
+   <div *ngIf="!isLoading">
+     <productslist-dir
+       (refresh)="ref($event)"
+       [allProductList]="items"
+       [searchedText]="searchText"
+       [sortingBy]="sortOption"
+     ></productslist-dir>
+     
+     <!-- No Items Found Message -->
+     <div *ngIf="filteredItemsCount === 0 && !isLoading && !shopErrorMessage" class="no-items-container">
+       <div class="no-items-content">
+         <i class="zmdi zmdi-shopping-basket" style="font-size: 4rem; color: #ccc;"></i>
+         <h4>No Products Found</h4>
+         <p *ngIf="searchText">No products match your search "<strong>{{searchText}}</strong>"</p>
+         <p *ngIf="!searchText">No products available at the moment.</p>
+         <button *ngIf="searchText" class="btn btn-primary btn-sm mt-2" (click)="searchText = ''">
+           Clear Search
+         </button>
+       </div>
+     </div>
+     
+     <div *ngIf="shopErrorMessage" class="mt-3 alert alert-warning">
+       {{ shopErrorMessage }}
+     </div>
+   </div>
  </div>
  
  <div class="col-md-5">
@@ -57,6 +87,19 @@ import { UserService } from 'src/app/services/user.service';
  </div>
  </div>
  </div>
+
+<!-- Login Success Modal -->
+<div class="modal fade show" *ngIf="showLoginSuccessModal" style="display: block; background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center p-4">
+        <i class="zmdi zmdi-check-circle zmdi-hc-3x text-success mb-3"></i>
+        <h4 class="text-success">Welcome!</h4>
+        <p class="mb-0">You are successfully logged in</p>
+      </div>
+    </div>
+  </div>
+</div>
 
   `
 })
@@ -69,6 +112,22 @@ export class ProductsPage implements OnInit {
   searchText: string = '';
   vendors:any;
   shopErrorMessage: string = '';
+  isLoading: boolean = false;
+  showLoginSuccessModal: boolean = false;
+
+  // Computed property to get filtered items count
+  get filteredItemsCount(): number {
+    if (!this.items || this.items.length === 0) {
+      return 0;
+    }
+    if (!this.searchText) {
+      return this.items.length;
+    }
+    // Filter items based on search text
+    return this.items.filter(item => 
+      item.name?.toLowerCase().includes(this.searchText.toLowerCase())
+    ).length;
+  }
 
 /////
 message: string;
@@ -81,12 +140,40 @@ messageToSendP: string = '';
   constructor(
     public product: ProductsModel,
     public itemService: ItemService,
-    public userService: UserService
+    public userService: UserService,
+    private cartService: CartService,
+    private toastService: ToastService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
 
   }
 
-  ngOnInit() {
+  ngOnInit() {    
+    // Check if user just logged in
+    this.route.queryParams.subscribe(params => {
+      if (params['justLoggedIn'] === 'true') {
+        console.log('justLoggedIn detected, showing modal');
+        
+        // Clear the query param immediately so it doesn't show on refresh
+        this.router.navigate([], {
+          queryParams: {},
+          replaceUrl: true
+        });
+        
+        // Show success modal
+        setTimeout(() => {
+          this.showLoginSuccessModal = true;
+          // Auto-hide after 2 seconds
+          setTimeout(() => {
+            this.showLoginSuccessModal = false;
+          }, 2000);
+        }, 300);
+      } else {
+        console.log('No justLoggedIn param found');
+      }
+    });
+    
     this.ref();
     this.getDefaultStock();
    // let defaultVendorId = this.getVendorIdByName("NeerSeva");
@@ -112,43 +199,38 @@ messageToSendP: string = '';
   }
 
   getDefaultStock(): void {
+    this.isLoading = true;
     this.itemService.getAllItemsWithImage().subscribe(
       (data: any) => {
+        console.log('getDefaultStock response', data);
         this.shopErrorMessage = '';
         // API may return different shapes. Try common variants.
         if (Array.isArray(data)) {
           this.items = data as ItemView[];
-          return;
-        }
-
-        if (data && data.Items && Array.isArray(data.Items)) {
+        } else if (data && data.Items && Array.isArray(data.Items)) {
           this.items = data.Items;
-          return;
-        }
-
-        if (data && data.items && Array.isArray(data.items)) {
+        } else if (data && data.items && Array.isArray(data.items)) {
           this.items = data.items;
-          return;
-        }
-
-        if (data && data.data && Array.isArray(data.data)) {
+        } else if (data && data.data && Array.isArray(data.data)) {
           this.items = data.data;
-          return;
+        } else {
+          // fallback
+          const vals = data && typeof data === 'object' ? Object.values(data).filter(v => Array.isArray(v))[0] : null;
+          if (Array.isArray(vals)) {
+            this.items = vals as ItemView[];
+          } else {
+            console.warn('getDefaultStock: unexpected response shape', data);
+            this.items = [];
+          }
         }
-
-        // fallback
-        const vals = data && typeof data === 'object' ? Object.values(data).filter(v => Array.isArray(v))[0] : null;
-        if (Array.isArray(vals)) {
-          this.items = vals as ItemView[];
-          return;
-        }
-
-        console.warn('getDefaultStock: unexpected response shape', data);
-        this.items = [];
+        // Set items in cart service to refresh cart display
+        this.cartService.allItems = this.items;
+        this.isLoading = false;
       },
       (err) => {
         console.error('Failed to load default stock', err);
         this.items = [];
+        this.isLoading = false;
         // if backend returned a structured error with errorMessage, show friendly message
         try {
           const backendMsg = err && err.error && err.error.errorMessage ? err.error.errorMessage : null;
@@ -170,6 +252,7 @@ messageToSendP: string = '';
     this.shopId = $event;
    localStorage.setItem('selectedShop', this.shopId);
    this.shopErrorMessage = '';
+   this.isLoading = true;
    this.itemService.getStockItemsByShopId(+this.shopId).subscribe(
      (data: any) => {
        // clear any previous error
@@ -184,11 +267,15 @@ messageToSendP: string = '';
          // if API returned empty or unknown, normalize to empty array
          this.items = Array.isArray(data) ? data : [];
        }
+       // Set items in cart service to refresh cart display
+       this.cartService.allItems = this.items;
+       this.isLoading = false;
        console.log(this.items);
      },
      (err) => {
        console.log('Error loading stock for shop', this.shopId, err);
        this.items = [];
+       this.isLoading = false;
        // if backend returned structured error, check for Items Not Found
        try {
          const backendMsg = err && err.error && err.error.errorMessage ? err.error.errorMessage : null;
