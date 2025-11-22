@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ToastrModule } from 'ngx-toastr';
 import { AppComponent } from './app.component';
 
 import { HelloComponent } from './hello.component';
@@ -26,7 +27,6 @@ import { OrderService } from './services/order.service';
 import { OrderComponent } from './directives/orders/order.component';
 import { UserService } from './services/user.service';
 import { UploadImageComponent } from './upload-image/upload-image.component';
-import { ToastComponent } from './toast/toast.component';
 
 
 //import { OwlCarouselDemoComponent } from './components/owl-carousel-demo/owl-carousel-demo.component';
@@ -38,12 +38,21 @@ import { ModalModule, ModalService } from './modal';
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
     CarouselModule,
     ModalModule,
     NgbModule,
+    ToastrModule.forRoot({
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+      timeOut: 5000,
+      progressBar: true,
+      progressAnimation: 'increasing',
+      closeButton: true
+    }),
     RouterConfig],
 
   declarations: [
@@ -57,8 +66,7 @@ import { ModalModule, ModalService } from './modal';
     FilterPipe,
     UploadImageComponent,
     OrderComponent,
-    SortPipe,
-    ToastComponent
+    SortPipe
   ],
   providers: [
     ProductsModel,

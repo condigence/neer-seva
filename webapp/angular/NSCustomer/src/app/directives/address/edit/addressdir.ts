@@ -5,7 +5,7 @@ import { AddressService } from 'src/app/services/address.service';
 import { first } from 'rxjs/operators';
 import { CanComponentDeactivate } from 'src/app/guards/unsaved-changes.guard';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UnsavedChangesModalContent } from '../add/address.component';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -38,13 +38,14 @@ export class EditAddressDir implements DoCheck, CanComponentDeactivate {
     private formBuilder: FormBuilder,
     private router: Router,
     private addressService: AddressService,
-    private modalService: NgbModal) {}
+    private modalService: NgbModal,
+    private toastr: ToastrService) {}
 
    ngOnInit() {
     const id = localStorage.getItem('editAddressId');
     console.log(id);
     if (!id) {
-      alert('Invalid action.');
+      this.toastr.error('Invalid action. No address ID found.', 'Error');
       this.router.navigate(['address/list']);
       return;
     }
@@ -173,7 +174,8 @@ export class EditAddressDir implements DoCheck, CanComponentDeactivate {
             this.showSuccessModal();
           },
           error => {
-            alert('Error updating address: ' + error);
+            console.error('Error updating address:', error);
+            this.toastr.error('Failed to update address. Please try again.', 'Error');
           });
     } else {
       console.log('Form is invalid');
@@ -241,6 +243,36 @@ export class UpdateSuccessModalContent {
   constructor(public activeModal: NgbActiveModal) {}
 }
 
-
-
+// Unsaved Changes Modal Component
+@Component({
+  selector: 'unsaved-changes-modal',
+  template: `
+    <div class="modal-header bg-warning text-white">
+      <h4 class="modal-title">
+        <i class="zmdi zmdi-alert-triangle mr-2"></i>Unsaved Changes
+      </h4>
+      <button type="button" class="close text-white" aria-label="Close" (click)="activeModal.dismiss('cancel')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body text-center p-4">
+      <div class="mb-3">
+        <i class="zmdi zmdi-edit zmdi-hc-3x text-warning mb-3"></i>
+      </div>
+      <h5 class="mb-3">You have unsaved changes</h5>
+      <p class="text-muted">Would you like to save your address before leaving this page?</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-danger" (click)="activeModal.close('leave')">
+        <i class="zmdi zmdi-close mr-1"></i>Leave Without Saving
+      </button>
+      <button type="button" class="btn btn-primary" (click)="activeModal.dismiss('cancel')">
+        <i class="zmdi zmdi-edit mr-1"></i>Keep Editing
+      </button>
+    </div>
+  `
+})
+export class UnsavedChangesModalContent {
+  constructor(public activeModal: NgbActiveModal) {}
+}
 

@@ -1,2 +1,56 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap/dist/css/bootstrap.css";
+
+/* Custom ngx-toastr styling */
+.toast-container .ngx-toastr {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 18px 20px !important;
+  opacity: 1 !important;
+}
+
+.toast-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+  border-left: 4px solid #38ef7d !important;
+}
+
+.toast-error {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%) !important;
+  border-left: 4px solid #ff6b6b !important;
+}
+
+.toast-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-left: 4px solid #667eea !important;
+}
+
+.toast-warning {
+  background: linear-gradient(135deg, #ffa502 0%, #ff6348 100%) !important;
+  border-left: 4px solid #ffa502 !important;
+}
+
+.toast-container .ngx-toastr .toast-title {
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  margin-bottom: 5px !important;
+}
+
+.toast-container .ngx-toastr .toast-message {
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+}
+
+.toast-container .toast-close-button {
+  color: white !important;
+  opacity: 0.8 !important;
+  font-size: 20px !important;
+  font-weight: 300 !important;
+}
+
+.toast-container .toast-close-button:hover {
+  opacity: 1 !important;
+}
+
+.toast-progress {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}

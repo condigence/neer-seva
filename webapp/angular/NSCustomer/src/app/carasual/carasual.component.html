@@ -1,13 +1,27 @@
-<ngb-carousel >
-    
-    <ng-template ngbSlide *ngFor="let i of outlets" >
-      <div class="picsum-img-wrapper vendor-profile" (click)="getShopItemsByShopId(i)">
-        <img [src]="'data:image/jpeg;base64,'+i.pic" alt="profile-image" 
-class="align-self-start mr-3 vendor-profile">
-      </div>
-      <div class="carousel-caption">
-        <h3><p class="card-title">{{i.name}}</p></h3>
-      
+<div class="carousel-wrapper">
+  <ngb-carousel [showNavigationArrows]="true" [showNavigationIndicators]="true" [interval]="5000">
+    <ng-template ngbSlide *ngFor="let i of outlets">
+      <div class="vendor-slide" (click)="getShopItemsByShopId(i)">
+        <div class="vendor-card">
+          <div class="vendor-image-wrapper">
+            <img [src]="'data:image/jpeg;base64,'+i.pic" alt="{{i.name}}" class="vendor-image">
+            <div class="image-overlay">
+              <div class="overlay-content">
+                <i class="zmdi zmdi-eye"></i>
+                <span>View Shop</span>
+              </div>
+            </div>
+          </div>
+          <div class="vendor-info">
+            <h3 class="vendor-name">{{i.name}}</h3>
+            <p class="vendor-description" *ngIf="i.description">{{i.description}}</p>
+            <div class="vendor-badge">
+              <i class="zmdi zmdi-store"></i>
+              <span>Click to explore</span>
+            </div>
+          </div>
+        </div>
       </div>
     </ng-template>
   </ngb-carousel>
+</div>
