@@ -70,9 +70,15 @@ export class OTPComponent implements OnInit {
       .pipe(first())
       .subscribe(
         data => {
-          console.log('OTP verified successfully');
-          // Navigate to home with login flag
-          this.router.navigate(['/products'], { queryParams: { justLoggedIn: 'true' } });
+          console.log('OTP verified successfully', data);
+          // Check if user is_active to determine redirect
+          if (data && data.active === true) {
+            // Active user - redirect to products page
+            this.router.navigate(['/products'], { queryParams: { justLoggedIn: 'true' } });
+          } else {
+            // Inactive user - redirect to edit profile page in edit mode
+            this.router.navigate(['/profile/my-profile'], { queryParams: { editMode: 'true' } });
+          }
         },
         error => {
           console.log(error);

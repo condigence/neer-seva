@@ -4,5 +4,6 @@ export class User {
     contact: number;
      email: string;
      imageId:any;
+     is_active: boolean;
 }
 
