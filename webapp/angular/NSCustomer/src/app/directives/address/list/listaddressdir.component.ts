@@ -150,6 +150,10 @@ export class ListAddressDir {
     }
   }
 
+  proceedToCheckout() {
+    this.router.navigate(['/billing']);
+  }
+
 }
 
 // Delete Confirmation Modal Component

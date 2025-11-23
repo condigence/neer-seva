@@ -9,9 +9,14 @@
         <h4 class="mb-0">
           <i class="zmdi zmdi-home mr-2"></i>My Addresses
         </h4>
-        <button class="btn btn-light btn-sm" [routerLink]="['/address/add-address']">
-          <i class="zmdi zmdi-plus mr-1"></i>Add New Address
-        </button>
+        <div>
+          <button class="btn btn-success btn-sm mr-2" (click)="proceedToCheckout()" *ngIf="address && address.length > 0">
+            <i class="zmdi zmdi-shopping-cart-plus mr-1"></i>Proceed to Checkout
+          </button>
+          <button class="btn btn-light btn-sm" [routerLink]="['/address/add-address']">
+            <i class="zmdi zmdi-plus mr-1"></i>Add New Address
+          </button>
+        </div>
       </div>
     </div>
 
