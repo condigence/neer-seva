@@ -3,6 +3,7 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -12,7 +13,7 @@ import { environment } from 'src/environments/environment';
 })
 export class UploadImageComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient, private toastr: ToastrService) { }
   title = 'ImageUploadApp';
   public selectedFile;
   public event1;
@@ -67,6 +68,12 @@ export class UploadImageComponent implements OnInit {
     this.dispalyPreview = false;
     this.isUploading = false;
     this.imageLoading = false;
+    this.imageId = null;
+    this.childMessage = null;
+    
+    // Emit null to parent to clear the imageId in the form
+    this.messageEvent.emit(null);
+    
     // Reset the file input
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
@@ -105,8 +112,21 @@ export class UploadImageComponent implements OnInit {
           this.dispalyPreview = true;
         },
         err => {
-          console.log('Error Occured duringng saving: ' + err);
+          console.log('Error Occured during saving: ' + err);
           this.isUploading = false;
+          
+          // Check if error is related to file size
+          if (err.status === 413 || err.status === 400 || err.error?.message?.toLowerCase().includes('size') || err.error?.message?.toLowerCase().includes('large')) {
+            this.toastr.error('Try uploading a small size image', 'Upload Failed', {
+              timeOut: 5000,
+              progressBar: true
+            });
+          } else {
+            this.toastr.error('Failed to upload image. Please try again.', 'Upload Failed', {
+              timeOut: 5000,
+              progressBar: true
+            });
+          }
         }
       );
   }
