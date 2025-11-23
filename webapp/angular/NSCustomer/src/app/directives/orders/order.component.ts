@@ -8,6 +8,7 @@ import { first } from 'rxjs/operators';
 import { ProfileService } from 'src/app/services/profile.service';
 import { OrderService } from '../../services/order.service';
 import { ModalService } from '../../modal';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-my-order',
@@ -19,11 +20,14 @@ export class OrderComponent implements OnInit {
   orders: any[] = [];
   order: any;
   currentUser: any;
+  isLoading: boolean = false;
+  hasError: boolean = false;
 
   constructor(
     private orderService: OrderService,
     private modalService: ModalService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) { this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
   //console.log(this.currentUser);
  // this.getMyOrders();
@@ -37,9 +41,12 @@ export class OrderComponent implements OnInit {
 
 
   getMyOrders(): void {
+    this.isLoading = true;
+    this.hasError = false;
     let currentUser = localStorage.getItem('currentUser');
     this.orderService.getOrderByUserById(JSON.parse(currentUser).id).subscribe(
       data => {
+        this.isLoading = false;
         console.log('raw orders response:', data);
         if (Array.isArray(data)) {
           this.orders = data;
@@ -54,10 +61,24 @@ export class OrderComponent implements OnInit {
           this.orders = data ? [data] : [];
         }
         console.log('normalized orders:', this.orders);
+        
+        // Show message if no orders found
+        if (this.orders.length === 0) {
+          this.toastr.info('No orders found. Start shopping to place your first order!', 'No Orders', {
+            timeOut: 5000,
+            progressBar: true
+          });
+        }
       },
       err => {
+        this.isLoading = false;
+        this.hasError = true;
         console.error('Failed to load orders', err);
         this.orders = [];
+        this.toastr.error('Failed to load orders. Please try again later.', 'Error', {
+          timeOut: 5000,
+          progressBar: true
+        });
       }
     );
   }

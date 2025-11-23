@@ -1,6 +1,7 @@
 .carousel-wrapper {
   margin: 20px 0;
   padding: 0 20px;
+  background: transparent;
   
   ::ng-deep {
     .carousel {
@@ -86,7 +87,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .vendor-card {

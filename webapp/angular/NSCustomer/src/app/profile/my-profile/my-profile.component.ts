@@ -129,6 +129,11 @@ export class MyProfileComponent implements OnInit, DoCheck, CanComponentDeactiva
   receiveMessage($event) {
     this.imageId = $event;
     this.editForm.controls['imageId'].setValue(this.imageId);
+    
+    // If image is removed (null), reset imageId to initial value only
+    if ($event === null && this.initialFormValues) {
+      this.editForm.controls['imageId'].setValue(this.initialFormValues.imageId || '');
+    }
   }
 
   onEdit(){
@@ -278,6 +283,15 @@ export class MyProfileComponent implements OnInit, DoCheck, CanComponentDeactiva
   confirmDiscard() {
     this.showCancelModal = false;
     this.pendingNavigation = null;
+    
+    // Reset form to initial values
+    if (this.editForm && this.initialFormValues) {
+      this.editForm.patchValue(this.initialFormValues);
+      this.editForm.markAsPristine();
+    }
+    
+    // Clear unsaved changes flag
+    this.hasUnsavedChanges = false;
     
     // Resolve navigation promise if it exists (for route guard)
     if (this.resolveNavigationPromise) {
