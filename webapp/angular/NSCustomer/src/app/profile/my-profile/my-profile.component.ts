@@ -1,6 +1,6 @@
 import { Component, OnInit, DoCheck, HostListener, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { ProfileService } from 'src/app/services/profile.service';
@@ -44,12 +44,21 @@ export class MyProfileComponent implements OnInit, DoCheck, CanComponentDeactiva
   constructor(
     private userService: UserService,
     private router: Router,
+    private route: ActivatedRoute,
     private formBuilder: FormBuilder,
     private authenticationService: AuthenticationService
   ) { }
 
   ngOnInit() {
     this.getProfileView();
+    
+    // Check if editMode query parameter is present
+    this.route.queryParams.subscribe(params => {
+      if (params['editMode'] === 'true') {
+        // Wait for user data to load, then switch to edit mode
+        setTimeout(() => this.onEdit(), 500);
+      }
+    });
   }
 
   // Lifecycle hook: compute unsaved-changes state by comparing actual values

@@ -336,6 +336,26 @@ body {
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
   }
 
+  .default-profile-icon {
+    font-size: 150px;
+    color: #667eea;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: white;
+    border: 5px solid white;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .default-profile-icon:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+  }
+
   .profile-card-2 .card-title {
     font-weight: 600;
     font-size: 1.5rem;

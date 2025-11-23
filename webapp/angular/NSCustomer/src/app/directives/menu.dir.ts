@@ -55,8 +55,11 @@ import { User } from '../model/user.model';
       <li class="dropdown-item user-details">
           <a>
               <div class="media" *ngIf="currentUser">
-                  <div class="avatar"><img class="align-self-start mr-3" [src]="'data:image/jpeg;base64,'+currentUser.pic"
-                          alt="user avatar"></div>
+                  <div class="avatar">
+                      <img *ngIf="currentUser.pic" class="align-self-start mr-3" [src]="'data:image/jpeg;base64,'+currentUser.pic"
+                          alt="user avatar">
+                      <i *ngIf="!currentUser.pic" class="zmdi zmdi-account-circle default-user-icon"></i>
+                  </div>
                   <div class="media-body">
                       
                   </div>
@@ -144,6 +147,12 @@ import { User } from '../model/user.model';
     }
 
     /* Responsive */
+    .default-user-icon {
+      font-size: 40px;
+      color: #667eea;
+      margin-right: 12px;
+    }
+
     @media (max-width: 768px) {
       .user-greeting {
         padding: 8px 15px;
