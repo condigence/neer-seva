@@ -2,13 +2,14 @@ import { Component, OnInit, Renderer2, AfterViewInit, OnDestroy } from '@angular
 import Chart from 'chart.js/auto';
 import { UserService } from '../service/user.service';
 import { AddressService } from '../service/address.service';
+import { OrderService } from '../service/order.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   
   userscount: any;
   userAsCustomer: any;
@@ -17,10 +18,11 @@ export class HomeComponent implements OnInit {
   top4Orders: any;
   fiveUsers: any;
   totalRevenue: any | number = 12500; // Example total revenue
-  constructor(private userService: UserService, private addressService: AddressService, private renderer: Renderer2) { }
+  constructor(private userService: UserService, private orderService: OrderService, private addressService: AddressService, private renderer: Renderer2) { }
   
 
   ngOnInit() {
+
     this.userService.getAllUsers()
     .subscribe(data => {
       this.userscount = data;  
@@ -47,7 +49,7 @@ export class HomeComponent implements OnInit {
     
     
 
-    this.userService.getAllOrderCount()
+    this.orderService.getAllOrders()
     .subscribe(data => {
       this.totalOrders = data;  
     this.top4Orders = [...this.totalOrders].reverse().slice(0, 4);

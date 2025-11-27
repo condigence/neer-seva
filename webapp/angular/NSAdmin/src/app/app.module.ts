@@ -33,6 +33,8 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ItemService } from './service/item.service';
 import { BrandService } from './service/brand.service';
+import { OrderService } from './service/order.service';
+import { AddressService } from './service/address.service';
 import { UploadImageComponent } from './upload-image/upload-image.component';
 import { AlertComponent } from './_directives';
 import { AuthGuard } from './_guards';
@@ -114,6 +116,8 @@ import { PaginationComponent } from './pagination/pagination.component';
     CustomerService,
     ItemService,
     BrandService,
+    OrderService,
+    AddressService,
 
 
 
