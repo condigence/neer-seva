@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ToastrModule } from 'ngx-toastr';
 import { AppComponent } from './app.component';
 
 import { HelloComponent } from './hello.component';
@@ -37,12 +38,21 @@ import { ModalModule, ModalService } from './modal';
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
     CarouselModule,
     ModalModule,
     NgbModule,
+    ToastrModule.forRoot({
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+      timeOut: 5000,
+      progressBar: true,
+      progressAnimation: 'increasing',
+      closeButton: true
+    }),
     RouterConfig],
 
   declarations: [

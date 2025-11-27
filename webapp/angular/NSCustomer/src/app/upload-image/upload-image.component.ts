@@ -3,6 +3,7 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -12,7 +13,7 @@ import { environment } from 'src/environments/environment';
 })
 export class UploadImageComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient, private toastr: ToastrService) { }
   title = 'ImageUploadApp';
   public selectedFile;
   public event1;
@@ -24,10 +25,16 @@ export class UploadImageComponent implements OnInit {
   childMessage: any;
   imageModuleName: string;
   dispalyPreview: boolean;
+  isFileSelected: boolean = false;
+  isUploading: boolean = false;
+  imageLoading: boolean = false;
 
 
   ngOnInit() {
     this.dispalyPreview = false;
+    this.isFileSelected = false;
+    this.isUploading = false;
+    this.imageLoading = false;
   }
 
   @Input() receivedParentMessage: string;
@@ -36,18 +43,52 @@ export class UploadImageComponent implements OnInit {
   public onFileChanged(event) {
     this.imageModuleName=this.receivedParentMessage;
     this.selectedFile = event.target.files[0];
-    // Below part is used to display the selected image
-    let reader = new FileReader();
-    reader.readAsDataURL(event.target.files[0]);
-    reader.onload = (event2) => {
-      this.imgURL = reader.result;
-    };
+    
+    // Check if a file is selected
+    if (this.selectedFile) {
+      this.isFileSelected = true;
+      // Below part is used to display the selected image
+      let reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]);
+      reader.onload = (event2) => {
+        this.imgURL = reader.result;
+      };
+    } else {
+      this.isFileSelected = false;
+    }
   }
 
 
+  // Remove selected image
+  onRemoveImage() {
+    this.selectedFile = null;
+    this.imgURL = null;
+    this.isFileSelected = false;
+    this.convertedImage = null;
+    this.dispalyPreview = false;
+    this.isUploading = false;
+    this.imageLoading = false;
+    this.imageId = null;
+    this.childMessage = null;
+    
+    // Emit null to parent to clear the imageId in the form
+    this.messageEvent.emit(null);
+    
+    // Reset the file input
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
   // This part is for uploading
   onUpload() {
-    this.dispalyPreview = true;
+    if (!this.isFileSelected) {
+      return; // Safety check
+    }
+    
+    this.isUploading = true;
+    this.dispalyPreview = false;
     const uploadData = new FormData();
     uploadData.append('moduleName',  this.imageModuleName);
     uploadData.append('myFile', this.selectedFile, this.selectedFile.name);
@@ -58,15 +99,46 @@ export class UploadImageComponent implements OnInit {
           this.receivedImageData = res;
           this.base64Data = this.receivedImageData.pic;
           this.convertedImage = 'data:image/jpeg;base64,' + this.base64Data;
-          console.log(this.base64Data);
-          console.log(this.convertedImage);
+        
           this.imageId = this.receivedImageData.id;
           // set childMessage so the template can display image id or any message
           this.childMessage = this.imageId;
           //Emit Data
           this.messageEvent.emit(this.imageId);
+          // Reset file selection after successful upload
+          this.isFileSelected = false;
+          this.isUploading = false;
+          this.imageLoading = true; // Show loader until image loads
+          this.dispalyPreview = true;
         },
-        err => console.log('Error Occured duringng saving: ' + err)
+        err => {
+          console.log('Error Occured during saving: ' + err);
+          this.isUploading = false;
+          
+          // Check if error is related to file size
+          if (err.status === 413 || err.status === 400 || err.error?.message?.toLowerCase().includes('size') || err.error?.message?.toLowerCase().includes('large')) {
+            this.toastr.error('Try uploading a small size image', 'Upload Failed', {
+              timeOut: 5000,
+              progressBar: true
+            });
+          } else {
+            this.toastr.error('Failed to upload image. Please try again.', 'Upload Failed', {
+              timeOut: 5000,
+              progressBar: true
+            });
+          }
+        }
       );
+  }
+
+  // Image load event handler
+  onImageLoad() {
+    this.imageLoading = false;
+  }
+
+  // Image error event handler
+  onImageError() {
+    this.imageLoading = false;
+    console.error('Error loading preview image');
   }
 }

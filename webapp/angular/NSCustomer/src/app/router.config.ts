@@ -6,6 +6,7 @@ import { BillingPage } from './pages/billing/billing.pages';
 import { LoginComponent } from './login/login.component';
 import { OTPComponent } from './otp/otp.component';
 import { AuthGuard } from './_guards';
+import { UnsavedChangesGuard } from './guards/unsaved-changes.guard';
 import { ListAddressDir } from './directives/address/list/listaddressdir.component';
 import { MyProfileComponent } from './profile/my-profile/my-profile.component';
 import { OrderComponent } from './directives/orders/order.component';
@@ -26,10 +27,10 @@ const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'otp', component: OTPComponent },
   { path: 'address/list', component: ListAddressDir, canActivate: [AuthGuard] },
-  { path: 'profile/my-profile', component: MyProfileComponent, canActivate: [AuthGuard] },
+  { path: 'profile/my-profile', component: MyProfileComponent, canActivate: [AuthGuard], canDeactivate: [UnsavedChangesGuard] },
   { path: 'orders', component: OrderComponent, canActivate: [AuthGuard] },
   { path: 'upload-image', component: UploadImageComponent, canActivate: [AuthGuard]},
-  { path: 'address/edit-address', component: EditAddressDir, canActivate: [AuthGuard] },
+  { path: 'address/edit-address', component: EditAddressDir, canActivate: [AuthGuard], canDeactivate: [UnsavedChangesGuard] },
   { path: 'address/add-address', component: AddAddressDir, canActivate: [AuthGuard] },
 
   {

@@ -117,11 +117,44 @@ public class UserService {
 		return addressRepository.findById(id);
 	}
 
-	public Address updateAddress(Address address) {
-		return addressRepository.save(address);
+	public Address updateAddress(AddressDTO dto) {
+        Address address = populateAddress(dto);
+		return updateAddress(address);
 	}
 
-	public void deleteAddressById(long id) {
+    public Address updateAddress(Address address) {
+        return addressRepository.save(address);
+    }
+
+    private Address populateAddress(AddressDTO dto) {
+        Address address = getAddressesById(dto.getId()).get();
+        if (dto.getId() != null) {
+            address.setId(dto.getId()); // allow updating existing by id
+        }
+        address.setType(dto.getType());
+        address.setLine1(dto.getLine1());
+        address.setLine2(dto.getLine2());
+        address.setLine3(dto.getLine3());
+        address.setLine4(dto.getLine4());
+        address.setPin(dto.getPin());
+        address.setCity(dto.getCity());
+        address.setState(dto.getState());
+        address.setCountry(dto.getCountry());
+        address.setUserId(dto.getUserId());
+
+        // Default flag mapping (normalize true/Y => Y else N)
+        String def = dto.getIsDefault();
+        if (def == null) {
+            address.setIsDefault("N");
+        } else if (def.equalsIgnoreCase("true") || def.equalsIgnoreCase("Y")) {
+            address.setIsDefault("Y");
+        } else {
+            address.setIsDefault("N");
+        }
+        return address;
+    }
+
+    public void deleteAddressById(long id) {
 		addressRepository.deleteById(id);
 	}
 

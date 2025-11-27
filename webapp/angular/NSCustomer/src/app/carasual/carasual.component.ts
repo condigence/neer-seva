@@ -32,14 +32,11 @@ export class CarasualComponent implements OnInit {
   }
   getAllOutlets() {
     this.userService.getAllOutlets().subscribe(data => {
-      this.outlets = data;
-      console.log(this.outlets);
-      console.log(this.outlets.name);
+      this.outlets = data;    
     });
   }
 
   getShopItemsByShopId(shop: any): void {
-    console.log("clicked" + shop.id);
     this.messageEvent.emit(shop.id);
   }
 

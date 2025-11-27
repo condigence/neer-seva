@@ -108,10 +108,10 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/v1/orders")
-    public ResponseEntity<List<Order>> getAll() {
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getAll() {
         List<Order> orders = orderService.getAllOrders();
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(orders.size());
     }
 
     @GetMapping("/to/vendor/{id}")

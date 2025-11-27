@@ -10,16 +10,21 @@
 
         </div>
 
-        <div class="row">
+        <div class="row equal-height-row">
             <div class="col-lg-4">
                 <div class="card profile-card-2">
-                    <div class="card-img-block">
-                        <img class="img-fluid" style="width:25%" [src]="'data:image/jpeg;base64,'+user.pic" alt="Card image cap">
-                    </div>
-                    <div class="card-body pt-5">
-                        <img [src]="'data:image/jpeg;base64,'+user.pic" alt="profile-image" class="profile">
-                        <img [src]="convertedImage">
-                        <h5 class="card-title">{{user.name}}</h5>
+                    <div class="card-header-gradient"></div>
+                    <div class="card-body text-center pt-5">
+                        <div class="profile-img-wrapper">
+                            <div class="image-loader" *ngIf="!imageLoaded && user.pic"></div>
+                            <img *ngIf="user.pic" [src]="'data:image/jpeg;base64,'+user.pic" 
+                                 alt="profile-image" 
+                                 class="profile-img"
+                                 (load)="onImageLoad()"
+                                 [style.display]="imageLoaded ? 'block' : 'none'">
+                            <i *ngIf="!user.pic" class="zmdi zmdi-account-circle default-profile-icon"></i>
+                        </div>
+                        <h5 class="card-title mt-3">{{user.name}}</h5>
                         <!-- <p class="card-text">{{user.description}}</p> -->
                         <div class="icon-block">
                         </div>
@@ -32,17 +37,17 @@
                     <div class="card-body">
                         <ul class="nav nav-tabs nav-tabs-primary top-icon nav-justified">
                             <li class="nav-item">
-                                <a data-target="#profile" data-toggle="pill" class="nav-link active"><i
+                                <a class="nav-link" [class.active]="activeTab === 'profile'" (click)="onProfileTabClick($event)"><i
                                         class="icon-user"></i> <span class="hidden-xs">Profile</span></a>
                             </li>
 
-                            <li class="nav-item" (click)="onEdit()">
-                                <a data-target="#edit" data-toggle="pill" class="nav-link"><i class="icon-note"></i>
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeTab === 'edit'" (click)="onEdit()"><i class="icon-note"></i>
                                     <span class="hidden-xs">Edit</span></a>
                             </li>
                         </ul>
                         <div class="tab-content p-3">
-                            <div class="tab-pane active" id="profile">
+                            <div class="tab-pane" [class.active]="activeTab === 'profile'" [hidden]="activeTab !== 'profile'" id="profile">
 
                                 <div class="form-group row">
 
@@ -64,13 +69,12 @@
                                 </div>
                             </div>
                          
-                            <div class="tab-pane" id="edit">
-                                    <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+                            <div class="tab-pane" [class.active]="activeTab === 'edit'" [hidden]="activeTab !== 'edit'" id="edit">
+                                    <form *ngIf="editForm" [formGroup]="editForm" (ngSubmit)="onSubmit()">
                                         <div class="form-group row">
                                             <label class="col-lg-3 col-form-label form-control-label">Name</label>
                                             <div class="col-lg-9">
-                                                <input class="form-control" formControlName="name" type="text"
-                                                    value="{{user.name}}">
+                                                <input class="form-control" formControlName="name" type="text">
                                                 <!-- <input   formControlName="id" type="text"  hidden> -->
     
                                             </div>
@@ -78,15 +82,13 @@
                                         <div class="form-group row">
                                             <label class="col-lg-3 col-form-label form-control-label">Email</label>
                                             <div class="col-lg-9">
-                                                <input class="form-control" formControlName="email" type="email"
-                                                    value="{{user.email}}">
+                                                <input class="form-control" formControlName="email" type="email">
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <label class="col-lg-3 col-form-label form-control-label">Phone</label>
                                             <div class="col-lg-9">
-                                                <input class="form-control" type="text" formControlName="contact" readonly
-                                                    value="{{user.contact}}">
+                                                <input class="form-control" type="text" formControlName="contact" readonly>
                                             </div>
                                         </div>
     
@@ -106,12 +108,14 @@
                                         <div class="form-group row">
                                             <label class="col-lg-3 col-form-label form-control-label"></label>
                                             <div class="col-lg-9">
-                                                <button type="submit" class="btn btn-success"><i
+                                                <button type="submit" class="btn btn-success" [disabled]="!hasUnsavedChanges"><i
                                                         class="zmdi zmdi-upload"></i> Save Changes</button>
-    
-    
+                                                <button type="button" class="btn btn-outline-secondary ml-2" (click)="onCancel()">
+                                                    <i class="zmdi zmdi-close-circle"></i> Cancel
+                                                </button>
                                             </div>
                                         </div>
+                                        
                                     </form>
                                 </div>
 
@@ -126,3 +130,46 @@
     <!-- End container-fluid-->
 </div>
 <!--End content-wrapper-->
+
+<!-- Custom Confirmation Modal -->
+<div class="custom-modal-overlay" *ngIf="showCancelModal" (click)="cancelDiscard()">
+    <div class="custom-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header-custom">
+            <i class="zmdi zmdi-alert-triangle"></i>
+            <h4>Unsaved Changes</h4>
+        </div>
+        <div class="modal-body-custom">
+            <p>You have unsaved changes. Are you sure you want to discard them?</p>
+        </div>
+        <div class="modal-footer-custom">
+            <button class="btn-custom btn-cancel" (click)="cancelDiscard()">
+                <i class="zmdi zmdi-close"></i> Keep Editing
+            </button>
+            <button class="btn-custom btn-confirm" (click)="confirmDiscard()">
+                <i class="zmdi zmdi-check"></i> Discard Changes
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="custom-modal-overlay" *ngIf="showSuccessModal" (click)="closeSuccessModal()">
+    <div class="custom-modal success-modal" (click)="$event.stopPropagation()">
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" [style.width.%]="progressBarWidth"></div>
+        </div>
+        <div class="modal-header-custom modal-header-success">
+            <i class="zmdi zmdi-thumb-up"></i>
+            <h4>Profile Updated!</h4>
+        </div>
+        <div class="modal-body-custom">
+            <p>Your profile has been successfully updated.</p>
+            <p class="auto-close-text">This will close in {{remainingSeconds}} second{{remainingSeconds !== 1 ? 's' : ''}}</p>
+        </div>
+        <div class="modal-footer-custom">
+            <button class="btn-custom btn-success-ok" (click)="closeSuccessModal()">
+                <i class="zmdi zmdi-check-all"></i> OK
+            </button>
+        </div>
+    </div>
+</div>
