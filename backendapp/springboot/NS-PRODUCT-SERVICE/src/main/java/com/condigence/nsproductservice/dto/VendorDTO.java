@@ -2,87 +2,27 @@ package com.condigence.nsproductservice.dto;
 
 import java.util.List;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class VendorDTO {
 
-	
-	private Long vendorId;
-	
-	private String name;
-	
-	private String contact;
-	
-	private String email;
-	
-	public String getEmail() {
-		return email;
-	}
+    private Long vendorId;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    private String name;
 
-	private Long imageId;
-	
-	List<ShopDTO> shopList;
+    private String contact;
 
-	public List<ShopDTO> getShopList() {
-		return shopList;
-	}
+    private String email;
 
-	public void setShopList(List<ShopDTO> shopList) {
-		this.shopList = shopList;
-	}
+    private Long imageId;
 
-	public Long getImageId() {
-		return imageId;
-	}
+    private byte[] pic;
 
-	public byte[] getPic() {
-		return pic;
-	}
+    List<ShopDTO> shopList;
 
-	public void setImageId(Long imageId) {
-		this.imageId = imageId;
-	}
-
-	public void setPic(byte[] pic) {
-		this.pic = pic;
-	}
-
-	private byte[] pic;
-
-	public String getContact() {
-		return contact;
-	}
-
-	public void setContact(String contact) {
-		this.contact = contact;
-	}
-
-	public Long getVendorId() {
-		return vendorId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public List<AddressDTO> getAddressList() {
-		return addressList;
-	}
-
-	public void setVendorId(Long vendorId) {
-		this.vendorId = vendorId;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setAddressList(List<AddressDTO> addressList) {
-		this.addressList = addressList;
-	}
-
-	List<AddressDTO> addressList;
+    List<AddressDTO> addressList;
 
 }

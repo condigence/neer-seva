@@ -1,29 +1,26 @@
 package com.condigence.nsproductservice.dto;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class BrandDTO {
 
-	private Long id;
+    private Long id;
 
-	private String name;
-	
-	private Long imageId;
+    private String name;
 
-	private byte[] pic;
+    private Long imageId;
 
-	public Long getCreatedByUser() {
-		return createdByUser;
-	}
+    private byte[] pic;
 
-	public void setCreatedByUser(Long createdByUser) {
-		this.createdByUser = createdByUser;
-	}
+    private Long createdByUser;
 
-	private Long createdByUser;
+    private String createdDate;
 
     @JsonSetter("imageId")
     public void setImageIdObject(Object imageId) {
@@ -48,44 +45,5 @@ public class BrandDTO {
             if (id instanceof String) { try { this.createdByUser = Long.parseLong((String) id); return; } catch (NumberFormatException ignored) {} }
         }
     }
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Long getImageId() {
-		return imageId;
-	}
-
-	public void setImageId(Long imageId) {
-		this.imageId = imageId;
-	}
-
-	public byte[] getPic() {
-		return pic;
-	}
-
-	public void setPic(byte[] pic) {
-		this.pic = pic;
-	}
-
-	@Override
-	public String toString() {
-		return "BrandDTO [id=" + id + ", name=" + name + ", imageId=" + imageId + ", pic=" + Arrays.toString(pic) + "]";
-	}
-
-	
 
 }
