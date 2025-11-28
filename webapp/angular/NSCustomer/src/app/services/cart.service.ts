@@ -5,7 +5,7 @@ import { AddressService } from './address.service';
 
 export class CartService {
   private _allItems: any = [];
-  public cartData: any = [];
+  public cartData: any = {};
   // public cartItemsList: any  = {};
   public cartItemsList: any = [];
   public cartTotal: any = 0;
@@ -23,6 +23,16 @@ export class CartService {
     // Refresh cart items when allItems is set
     if (value && value.length > 0) {
       this.listCartItems();
+      // Save snapshot after recalculating cart with product data
+      if (this.cartItemsList && this.cartItemsList.length > 0) {
+        try {
+          this.storage.set({
+            cartItems: { items: this.cartItemsList, total: this.cartTotal }
+          });
+        } catch (e) {
+          console.error('allItems setter - error saving snapshot:', e);
+        }
+      }
     }
   }
 
@@ -39,6 +49,19 @@ export class CartService {
       this.cartData = {};
     } else {
       this.cartData = temp;
+    }
+    // Try to restore a previously stored cart items snapshot so UI shows immediately
+    // even if product catalog (allItems) is not yet loaded.
+    try {
+      const snapshot: any = this.storage.get('cartItems');
+      if (snapshot && snapshot.items && snapshot.items.length > 0) {
+        this.cartItemsList = snapshot.items;
+        this.cartTotal = snapshot.total || 0;
+      } else {
+        console.log('loadCart - no valid snapshot to restore');
+      }
+    } catch (e) {
+      console.error('loadCart - error restoring snapshot:', e);
     }
   }
 
@@ -62,11 +85,41 @@ export class CartService {
     this.storage.set({
       'mycart': this.cartData
     });
+    // Recompute the full cart view from available product data
     this.listCartItems();
+    // Persist a lightweight snapshot of the cart (id/name/qty/price and total)
+    // so the UI can show cart contents immediately after a browser refresh
+    // Only save snapshot if cartItemsList has actual items (i.e., allItems was loaded)
+    try {
+      if (this.cartItemsList && this.cartItemsList.length > 0) {
+        this.storage.set({
+          cartItems: { items: this.cartItemsList, total: this.cartTotal }
+        });
+      } else {
+        console.log('storeItems - skipping snapshot save, cartItemsList is empty (allItems not loaded yet)');
+      }
+    } catch (e) {
+      console.error('storeItems - error saving snapshot:', e);
+    }
   }
 
 
   listCartItems() {
+    console.log('listCartItems called - allItems:', this.allItems?.length, 'cartData keys:', Object.keys(this.cartData).length, 'current cartItemsList:', this.cartItemsList.length);
+    
+    // Don't clear cart display if allItems hasn't loaded yet and we have cart data
+    if (!this.allItems || this.allItems.length === 0) {
+      if (Object.keys(this.cartData).length > 0) {
+        // Cart has items but product catalog hasn't loaded yet
+        // Keep existing cartItemsList from snapshot if available
+        return;
+      } else {
+        this.cartItemsList = [];
+        this.cartTotal = 0;
+        return;
+      }
+    }
+
     let tempCart = [];
     let getActualItems = Object.keys(this.cartData);
     let cartDataItems = this.cartData;
