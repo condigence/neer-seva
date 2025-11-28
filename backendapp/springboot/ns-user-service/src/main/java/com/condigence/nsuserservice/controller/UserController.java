@@ -487,8 +487,15 @@ public class UserController {
 		HttpHeaders headers = new HttpHeaders();
 		Address address = service.saveAddress(dto);
 		return new ResponseEntity<Address>(address, HttpStatus.CREATED);
-
 	}
+
+    @PutMapping(value = "/v1/addresses/by/{id:\\d+}")
+    public ResponseEntity<?> updateUserAddress(@RequestBody AddressDTO dto) {
+        logger.info("Entering updateUserAddress with Details >>>>>>>>  : {}", dto);
+        HttpHeaders headers = new HttpHeaders();
+        Address address = service.updateAddress(dto);
+        return new ResponseEntity<Address>(address, HttpStatus.OK);
+    }
 
 	@GetMapping("/v1/addresses/by/user/{id:\\d+}")
 	public ResponseEntity<?> getAllUserAddressesById(@PathVariable("id") long id) {

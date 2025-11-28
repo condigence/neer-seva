@@ -13,6 +13,7 @@ import { UserService } from '../service/user.service';
 import { ItemService } from '../service/item.service';
 import { forkJoin, Subject, of } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
+import { OrderService } from '../service/order.service';
 
 @Component({
   selector: 'app-dashboard3',
@@ -35,6 +36,7 @@ export class Dashboard3Component implements OnInit, AfterViewInit, OnDestroy {
   private tempData: any = null;
 
   constructor(
+    private orderService: OrderService,
     private userService: UserService,
     private itemService: ItemService
   ) {}
@@ -65,8 +67,10 @@ export class Dashboard3Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadDashboardData(): void {
+    console.log('Loading dashboard orders'+this.orderService.getAllOrders());
+    console.log('Loading dashboard items'+this.itemService.getAllItems());
     forkJoin({
-      orders: this.userService.getAllOrderCount().pipe(catchError(() => of([]))),
+      orders: this.orderService.getAllOrders().pipe(catchError(() => of([]))),
       items: this.itemService.getAllItems().pipe(catchError(() => of([])))
     })
       .pipe(takeUntil(this.destroy$))
@@ -156,6 +160,11 @@ export class Dashboard3Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private createBarChart(labels: string[], newOrders: number[], pending: number[]) {
+    if (!this.barCanvas?.nativeElement) {
+      console.warn('Bar canvas not ready');
+      return;
+    }
+    
     const ctx = this.barCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
@@ -180,6 +189,11 @@ export class Dashboard3Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private createLineChart(labels: string[], sales: number[]) {
+    if (!this.lineCanvas?.nativeElement) {
+      console.warn('Line canvas not ready');
+      return;
+    }
+    
     const ctx = this.lineCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
@@ -210,6 +224,11 @@ export class Dashboard3Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private createDoughnutChart(labels: string[], data: number[]) {
+    if (!this.doughnutCanvas?.nativeElement) {
+      console.warn('Doughnut canvas not ready');
+      return;
+    }
+    
     const ctx = this.doughnutCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 

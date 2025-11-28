@@ -58,9 +58,7 @@ export class UserService {
   getTop5CustomerCount() {
     return this.http.get(this.usersAPI + 'customers/top/5');
   }
-  getAllOrderCount() {
-    return this.http.get(this.ordersAPI + 'v1/orders');
-  }
+
   
 
 }
