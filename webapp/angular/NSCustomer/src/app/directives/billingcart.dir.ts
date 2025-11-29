@@ -43,7 +43,6 @@ import { CartService } from '../services/cart.service';
       overflow: hidden;
       animation: slideIn 0.5s ease-out;
       position: sticky;
-      top: 100px;
     }
 
     @keyframes slideIn {

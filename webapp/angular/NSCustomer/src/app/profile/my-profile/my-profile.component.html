@@ -54,12 +54,12 @@
                                     <label class="col-lg-3 col-form-label form-control-label">Name</label>
                                     <div class="col-lg-9" style="margin-bottom: 15px;">
 
-                                        <span>{{user.name}}</span>
+                                        <span>{{user.name || 'N/A'}}</span>
                                     </div>
                                     <label class="col-lg-3 col-form-label form-control-label">Email</label>
                                     <div class="col-lg-9" style="margin-bottom: 15px;">
 
-                                        <span>{{user.email}}</span>
+                                        <span>{{user.email || 'N/A'}}</span>
                                     </div>
                                     <label class="col-lg-3 col-form-label form-control-label">Phone</label>
                                     <div class="col-lg-9" style="margin-bottom: 15px;">
@@ -108,9 +108,9 @@
                                         <div class="form-group row">
                                             <label class="col-lg-3 col-form-label form-control-label"></label>
                                             <div class="col-lg-9">
-                                                <button type="submit" class="btn btn-success" [disabled]="!hasUnsavedChanges"><i
-                                                        class="zmdi zmdi-upload"></i> Save Changes</button>
-                                                <button type="button" class="btn btn-outline-secondary ml-2" (click)="onCancel()">
+                                                <button type="submit" class="btn-save-changes" [disabled]="!hasUnsavedChanges"><i
+                                                        class="zmdi zmdi-check-circle"></i> Save Changes</button>
+                                                <button type="button" class="btn-cancel-changes ml-2" (click)="onCancel()">
                                                     <i class="zmdi zmdi-close-circle"></i> Cancel
                                                 </button>
                                             </div>
