@@ -10,15 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "*")
 public class HomeController {
-
-
 	@GetMapping("/")
 	public ResponseEntity<?> welcome() {
-
 		return ResponseEntity.status(HttpStatus.OK).body("Welcome!");
-
 	}
-
-
-
 }

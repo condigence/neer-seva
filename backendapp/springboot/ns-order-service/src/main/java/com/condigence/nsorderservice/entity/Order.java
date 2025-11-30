@@ -57,6 +57,9 @@ public class Order {
 	@Column(name = "order_grand_total")
 	private Long orderGrandTotal;
 
+    @Column(name = "order_sub_total")
+    private Long orderSubTotal;
+
 	@Column(name = "order_status")
 	private String orderStatus;
 

@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "shop")
 @Data
@@ -37,5 +39,11 @@ public class Shop {
 
 	@Column(name = "branch")
 	private String shopBranch;
+
+    @Column(name = "gstin")
+    private String gstin;
+
+    @Column(name = "date_created")
+    private Date shopDateCreated;
 
 }
