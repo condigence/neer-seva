@@ -1,56 +1,29 @@
 package com.condigence.nsorderservice.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderDetailDTO {
 
-	
+	private Long orderDetailId;
+	private Long orderItemId;
+	private Integer orderItemQuantity;
+	private Integer orderItemPrice;
+	private Integer orderTotalamount;
+	private Integer orderDiscount;
+	private Integer orderSubTotal;
+	private Integer orderServiceCharge;
+	private Integer orderGST;
+
 	private VendorDTO vendor;
-
-	public ShopDTO getShop() {
-		return shop;
-	}
-
-	public void setShop(ShopDTO shop) {
-		this.shop = shop;
-	}
-
 	private ShopDTO shop;
-
-	
 	private CustomerDTO customer;
-
-	
 	private List<ItemDTO> items;
-
-
-	public VendorDTO getVendor() {
-		return vendor;
-	}
-
-
-	public List<ItemDTO> getItems() {
-		return items;
-	}
-
-
-	public void setVendor(VendorDTO vendor) {
-		this.vendor = vendor;
-	}
-
-
-	public void setItems(List<ItemDTO> items) {
-		this.items = items;
-	}
-
-
-	public CustomerDTO getCustomer() {
-		return customer;
-	}
-
-
-	public void setCustomer(CustomerDTO customer) {
-		this.customer = customer;
-	}
 
 }
