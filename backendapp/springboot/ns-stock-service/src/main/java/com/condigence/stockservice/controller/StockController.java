@@ -409,43 +409,51 @@ public class StockController {
     }
 
     @GetMapping("/items/by/shop/{id}")
-    public ResponseEntity<?> getStocksItemByShopId(@PathVariable("id") Long id) {
+    public ResponseEntity<List<StockDTO>> getStocksItemByShopId(@PathVariable("id") Long id) {
 
-        // Get All the stocks/s by shop id.
+        // Return list of StockDTOs for a given shop id. Only include stocks with positive quantity.
+        List<StockDTO> dtos = new ArrayList<>();
         List<Stock> stocks = stockService.getStockByShopId(id);
-        // get items by Shop id
-        //prepare list and send Item dto
-        List<ItemDTO> itemDtos = new ArrayList<>();
-        if (stocks.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Items Not Found! Please Contact Admin"));
+        if (stocks == null || stocks.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(dtos);
         }
 
         for (Stock stock : stocks) {
-            if (stock.getStockQuantity() > 0) {
+            if (stock == null) continue;
+            if (stock.getStockQuantity() <= 0) {
+                logger.debug("Skipping item {} for shop {} because quantity is {}", stock.getItemId(), stock.getShopId(), stock.getStockQuantity());
+                continue;
+            }
+
+            StockDTO dto = new StockDTO();
+            dto.setId(stock.getStockId());
+            dto.setQuantity(stock.getStockQuantity());
+            dto.setShopId(stock.getShopId());
+
+            ItemDTO item = getItemById(stock.getItemId());
+            if (item != null) {
                 ItemDTO itemDTO = new ItemDTO();
-                ItemDTO item = getItemById(stock.getItemId());
-                // prepare Items to display
                 itemDTO.setId(item.getId());
                 itemDTO.setName(item.getName());
                 itemDTO.setCode(item.getCode());
                 itemDTO.setMrp(item.getMrp());
                 itemDTO.setPrice(item.getPrice());
-                itemDTO.setBrandId(item.getBrandId());
                 itemDTO.setDispPrice(item.getDispPrice());
-
-
+                itemDTO.setCapacity(item.getCapacity());
+                itemDTO.setDiscount(item.getDiscount());
+                itemDTO.setBrandId(item.getBrandId());
+                itemDTO.setImageId(item.getImageId());
+                // fetch and set image bytes if present (best-effort)
                 if (item.getImageId() != null) {
                     setPicIfPresent(itemDTO, item.getImageId());
                 }
-
-                itemDtos.add(itemDTO);
-            } else {
-                logger.warn("Stock is Empty, Please contact admin!");
+                dto.setItem(itemDTO);
             }
 
+            dtos.add(dto);
         }
-        System.out.println(itemDtos);
-        return ResponseEntity.status(HttpStatus.OK).body(itemDtos);
+
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping(value = "/quantity/by/shops/{shopId}/items/{itemId}")
