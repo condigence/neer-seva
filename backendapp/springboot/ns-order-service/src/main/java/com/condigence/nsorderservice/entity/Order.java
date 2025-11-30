@@ -2,6 +2,7 @@ package com.condigence.nsorderservice.entity;
 
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -28,7 +29,8 @@ public class Order {
 	private String orderNumber;
 	
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<OrderDetail> orderDetail;
+    @JsonManagedReference
+    private List<OrderDetail> orderDetail;
 
 	@Column(name = "order_date")
 	private LocalDate orderDate;
