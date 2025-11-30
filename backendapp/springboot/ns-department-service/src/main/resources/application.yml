@@ -1,9 +1,0 @@
-server:
-  port: 9091
-  
-  
-spring:
-  application:
-    name: NS-DEPARTMENT-SERVICE
-  zipkin:
-    baseUrl: http://127.0.0.1:9411/
