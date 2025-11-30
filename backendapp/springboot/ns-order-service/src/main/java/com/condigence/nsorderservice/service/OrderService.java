@@ -15,14 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 import com.condigence.nsorderservice.exception.BadRequestException;
 import com.condigence.nsorderservice.exception.ResourceNotFoundException;
 
@@ -31,24 +29,23 @@ public class OrderService {
 
 	public static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
-	@Autowired
-	RestTemplate restTemplate;
+	private final RestTemplate restTemplate;
+
+	private final OrderRepository orderRepository;
 
 	@Autowired
-	private OrderRepository orderRepository;
+	public OrderService(RestTemplate restTemplate, OrderRepository orderRepository) {
+		this.restTemplate = restTemplate;
+		this.orderRepository = orderRepository;
+	}
 
 
 	public List<Order> getAllOrders() {
-
-		List<Order> orders = new ArrayList<>();
-		orders = (List<Order>) orderRepository.findAll();
-		return orders;
-
+		return orderRepository.findAll();
 	}
 
 	@Transactional
 	public boolean saveOrderDetail(OrderDetailDTO orderdetailDTO) {
-
 
 
 		Order order = new Order();
@@ -60,19 +57,19 @@ public class OrderService {
 
 			// Validate shop is present and has a valid id
 			ShopDTO shopDto = orderdetailDTO.getShop();
-			long shopId = -1L;
+			Long shopId;
 			if (shopDto == null) {
 				logger.error("Shop information is missing in OrderDetailDTO");
 				throw new BadRequestException("Shop information is missing in request");
 			} else {
 				shopId = shopDto.getId();
-				if (shopId <= 0) {
+				if (shopId == null || shopId <= 0) {
 					logger.error("Invalid shop id in OrderDetailDTO: {}", shopId);
 					throw new BadRequestException("Invalid shop id: " + shopId);
 				}
 			}
 
-			ShopDTO shopData = null;
+			ShopDTO shopData;
 			try {
 				shopData = restTemplate.getForObject("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/shops/" + shopId, ShopDTO.class); // Working
 			} catch (HttpClientErrorException.NotFound nf) {
@@ -131,35 +128,35 @@ public class OrderService {
 		        } else {
 		            logger.error("Stock service did not confirm update for order {}. status={} body={}", order.getOrderId(), response.getStatusCode(), response.getBody());
 		            // Construct a more specific not-found message with shop and item details
-                    StringBuilder itemDetails = new StringBuilder();
-                    if (orderdetailDTO != null && orderdetailDTO.getItems() != null) {
-                        orderdetailDTO.getItems().forEach(i -> itemDetails.append("[id:").append(i.getId()).append(",qty:").append(i.getQuantity()).append("]"));
-                    }
-                    Long shopId = null;
-                    if (orderdetailDTO != null && orderdetailDTO.getShop() != null) shopId = orderdetailDTO.getShop().getId();
-                    String msg = String.format("Stock not available for order %d; shopId=%s items=%s", order.getOrderId(), shopId, itemDetails.toString());
-                    throw new ResourceNotFoundException(msg);
-                }
-            } catch (HttpClientErrorException.NotFound nf) {
-                 logger.warn("Stock update failed - Not Found for order {}: {}.", order.getOrderId(), nf.getResponseBodyAsString());
-                 throw new ResourceNotFoundException("Stock not found: " + nf.getResponseBodyAsString());
-              } catch (HttpClientErrorException.BadRequest br) {
-                 logger.warn("Stock update returned BadRequest for order {}: {}.", order.getOrderId(), br.getResponseBodyAsString());
-                 throw new BadRequestException("Stock service returned bad request: " + br.getResponseBodyAsString());
-             } catch (HttpClientErrorException hce) {
-                 // other 4xx errors
-                 logger.warn("Stock update returned client error for order {}: {}.", order.getOrderId(), hce.getResponseBodyAsString());
-                 throw new BadRequestException("Stock service client error: " + hce.getResponseBodyAsString());
-             } catch (RestClientException rce) {
-                  logger.error("Stock update failed for order {}: {}", order.getOrderId(), rce.getMessage());
-                  // mark order for manual attention and persist
-                  order.setOrderStatus("STOCK_UPDATE_FAILED");
-                  orderRepository.save(order);
-                  return false;
-              }
+		                    StringBuilder itemDetails = new StringBuilder();
+		                    if (orderdetailDTO != null && orderdetailDTO.getItems() != null) {
+		                        orderdetailDTO.getItems().forEach(i -> itemDetails.append("[id:").append(i.getId()).append(",qty:").append(i.getQuantity()).append("]"));
+		                    }
+		                    Long shopId = null;
+		                    if (orderdetailDTO != null && orderdetailDTO.getShop() != null) shopId = orderdetailDTO.getShop().getId();
+		                    String msg = String.format("Stock not available for order %d; shopId=%s items=%s", order.getOrderId(), shopId, itemDetails);
+		                    throw new ResourceNotFoundException(msg);
+		                }
+		            } catch (HttpClientErrorException.NotFound nf) {
+		                 logger.warn("Stock update failed - Not Found for order {}: {}.", order.getOrderId(), nf.getResponseBodyAsString());
+		                 throw new ResourceNotFoundException("Stock not found: " + nf.getResponseBodyAsString());
+		              } catch (HttpClientErrorException.BadRequest br) {
+		                 logger.warn("Stock update returned BadRequest for order {}: {}.", order.getOrderId(), br.getResponseBodyAsString());
+		                 throw new BadRequestException("Stock service returned bad request: " + br.getResponseBodyAsString());
+		             } catch (HttpClientErrorException hce) {
+		                 // other 4xx errors
+		                 logger.warn("Stock update returned client error for order {}: {}.", order.getOrderId(), hce.getResponseBodyAsString());
+		                 throw new BadRequestException("Stock service client error: " + hce.getResponseBodyAsString());
+		             } catch (RestClientException rce) {
+		                  logger.error("Stock update failed for order {}: {}", order.getOrderId(), rce.getMessage());
+		                  // mark order for manual attention and persist
+		                  order.setOrderStatus("STOCK_UPDATE_FAILED");
+		                  orderRepository.save(order);
+		                  return false;
+		              }
 
-          }
-          return false;
+		          }
+		          return false;
 	 }
 
 //	public boolean updateOrder(OrderDTO orderDTO) {

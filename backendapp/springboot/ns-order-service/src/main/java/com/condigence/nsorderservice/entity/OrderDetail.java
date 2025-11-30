@@ -3,15 +3,22 @@ package com.condigence.nsorderservice.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 @Entity
 @Table(name = "order_detail")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"order"})
 public class OrderDetail {
 
-	public OrderDetail() {
-		super();
-	}
-
-	
+	@EqualsAndHashCode.Include
 	@Id
 	@Column(name = "order_detail_id")
 	@SequenceGenerator(name = "order_detail_seq_gen", sequenceName = "order_seq", allocationSize = 1)
@@ -47,87 +54,5 @@ public class OrderDetail {
 
 	@Column(name = "order_GST")
 	private Integer orderGST;
-
-	public Long getOrderDetailId() {
-		return orderDetailId;
-	}
-
-	public Order getOrder() {
-		return order;
-	}
-
-	public Long getOrderItemId() {
-		return orderItemId;
-	}
-
-	public Integer getOrderItemQuantity() {
-		return orderItemQuantity;
-	}
-
-	public Integer getOrderTotalamount() {
-		return orderTotalamount;
-	}
-
-	public Integer getOrderDiscount() {
-		return orderDiscount;
-	}
-
-	public Integer getOrderSubTotal() {
-		return orderSubTotal;
-	}
-
-	public Integer getOrderServiceCharge() {
-		return orderServiceCharge;
-	}
-
-	public Integer getOrderGST() {
-		return orderGST;
-	}
-
-	public void setOrderDetailId(Long orderDetailId) {
-		this.orderDetailId = orderDetailId;
-	}
-
-	public void setOrder(Order order) {
-		this.order = order;
-	}
-
-	public void setOrderItemId(Long orderItemId) {
-		this.orderItemId = orderItemId;
-	}
-
-	public void setOrderItemQuantity(Integer orderItemQuantity) {
-		this.orderItemQuantity = orderItemQuantity;
-	}
-
-	public void setOrderTotalamount(Integer orderTotalamount) {
-		this.orderTotalamount = orderTotalamount;
-	}
-
-	public void setOrderDiscount(Integer orderDiscount) {
-		this.orderDiscount = orderDiscount;
-	}
-
-	public void setOrderSubTotal(Integer orderSubTotal) {
-		this.orderSubTotal = orderSubTotal;
-	}
-
-	public void setOrderServiceCharge(Integer orderServiceCharge) {
-		this.orderServiceCharge = orderServiceCharge;
-	}
-
-	public void setOrderGST(Integer orderGST) {
-		this.orderGST = orderGST;
-	}
-
-	public Integer getOrderItemPrice() {
-		return orderItemPrice;
-	}
-
-	public void setOrderItemPrice(Integer orderItemPrice) {
-		this.orderItemPrice = orderItemPrice;
-	}
-
-	
 
 }
