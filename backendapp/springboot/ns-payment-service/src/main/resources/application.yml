@@ -11,10 +11,10 @@ eureka:
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka/
 
-  
-spring:
-  application:
-    name: NS-PAYMENT-SERVICE
+razorpay:
+  key: rzp_test_YourKeyHere
+  secret: YourSecretHere
+
   
 zipkin:
   baseUrl: http://127.0.0.1:9411/

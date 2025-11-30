@@ -28,7 +28,6 @@ public class Stock {
 	private long shopId;
 
 	@Column(name = "quantity")
-
 	private int stockQuantity;
 
 	@Column(name = "date_created")
@@ -46,5 +45,13 @@ public class Stock {
 	@Column(name = "is_deleted")
 
 	private String stockIsDeleted;
+
+    @Column(name = "price")
+    private int price;
+
+    @Column(name = "mrp")
+    private int mrp;
+
+
 
 }
