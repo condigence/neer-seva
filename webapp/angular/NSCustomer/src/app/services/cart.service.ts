@@ -66,16 +66,21 @@ export class CartService {
   }
 
   addToCart(id, qty, replace) {
-
     if (this.cartData[id] === undefined) {
       this.cartData[id] = 0;
     }
     if (replace === '') {
-      this.cartData[id] = this.cartData[id] + qty;
+      // relative change (delta)
+      this.cartData[id] = (this.cartData[id] || 0) + (Number(qty) || 0);
     } else {
-      this.cartData[id] = parseInt(qty);
+      // absolute replace
+      let next = parseInt(qty, 10);
+      if (isNaN(next) || next < 1) {
+        next = 1;
+      }
+      this.cartData[id] = next;
     }
-    if (this.cartData[id] === 0) {
+    if (this.cartData[id] <= 0) {
       delete this.cartData[id];
     }
     this.storeItems();
@@ -120,26 +125,32 @@ export class CartService {
       }
     }
 
-    let tempCart = [];
-    let getActualItems = Object.keys(this.cartData);
-    let cartDataItems = this.cartData;
+    const tempCart: any[] = [];
+    const getActualItems = Object.keys(this.cartData);
+    const cartDataItems = this.cartData;
 
     let tempTotal = 0;
-    var onlyChoosenItems = (this.allItems).filter(function (item) {
-      if (getActualItems.indexOf('' + item.id) !== -1) {
+    (this.allItems as any[]).forEach((catalogItem: any) => {
+      // Expect top-level id (used in addToCart), and nested product data under `item`
+      const key = '' + catalogItem.id;
+      if (getActualItems.indexOf(key) === -1) return;
 
+      const qty = Number(cartDataItems[catalogItem.id]) || 0;
+      const product = catalogItem.item ? catalogItem.item : catalogItem;
+      const unitPrice = Number(product.price) || 0;
+      const lineTotal = unitPrice * qty;
 
-        tempCart.push({
-          id: item.id,
-          name: item.name,
-          qty: cartDataItems[item.id],
-          mrp: item.mrp,
-          price: item.price * cartDataItems[item.id],
-        });
-        tempTotal += item.price * cartDataItems[item.id];
-      }
+      tempCart.push({
+        id: catalogItem.id,
+        name: product.name || catalogItem.name,
+        qty: qty,
+        mrp: product.mrp || product.itemMrp || product.dispPrice || product.itemDispPrice || 0,
+        price: lineTotal,
+        unitPrice: unitPrice,
+        image: product.pic || product.image || null
+      });
+      tempTotal += lineTotal;
     });
-
 
     this.cartItemsList = tempCart;
     this.cartTotal = tempTotal;

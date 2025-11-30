@@ -55,12 +55,6 @@ public class Item {
 	@Column(name = "dateCreated")
 	private Date dateCreated;
 
-	@Column(name = "quantity")
-	private Integer quantity;
-
-    @Column(name = "stockId")
-    private Long stockId;
-
     @Column(name = "unit")
     private String unit;
 
