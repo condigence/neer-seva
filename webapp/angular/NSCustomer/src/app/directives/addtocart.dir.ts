@@ -15,53 +15,56 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
       <div class="header-actions">
         <button type="button" class="btn-total-items">
           <i class="zmdi zmdi-receipt mr-1"></i>
-          <span class="items-count">{{cart.cartItemsList.length}}</span>
+          <span class="items-count">{{itemsCount()}}</span>
           <span class="items-label">Items</span>
         </button>
         <button type="button" class="btn-empty-cart" 
                 (click)="openEmptyCartModal(emptyCartModal)" 
-                [disabled]="!cart.cartItemsList || cart.cartItemsList.length === 0">
+                [disabled]="!hasItems()">
           <i class="zmdi zmdi-delete mr-1"></i>Clear
         </button>
       </div>
     </div>
     
     <div class="cart-body">
-      <div class="empty-cart-state" *ngIf="!cart.cartItemsList || cart.cartItemsList.length === 0">
+      <div class="empty-cart-state" *ngIf="!hasItems()">
         <i class="zmdi zmdi-shopping-cart-plus zmdi-hc-5x text-muted mb-3"></i>
         <h5 class="text-muted">Your cart is empty</h5>
         <p class="text-muted">Add some products to get started!</p>
       </div>
       
-      <div class="cart-items" *ngIf="cart.cartItemsList && cart.cartItemsList.length > 0">
+      <div class="cart-items" *ngIf="hasItems()">
         <div class="cart-item" *ngFor="let item of cart.cartItemsList">
+          <div class="item-thumb" *ngIf="item.image">
+            <img [src]="'data:image/jpeg;base64,' + item.image" alt="{{item.name}}" />
+          </div>
           <div class="item-info">
             <h6 class="item-name">{{item.name}}</h6>
-            <p class="item-price">&#x20B9;{{item.price/item.qty}} each</p>
+            <p class="item-price">&#x20B9;{{unitPrice(item) | number:'1.2-2'}} each</p>
           </div>
           <div class="item-controls">
             <div class="qty-controls">
               <button class="qty-btn qty-minus" type="button" (click)="changeQty(item.id,-1,'')">
                 <i class="zmdi zmdi-minus"></i>
               </button>
-              <input type="text" class="qty-input" value="{{item.qty}}"
+              <input type="text" class="qty-input" [value]="item.qty"
                      #qtyRef (keyup)="changeQty(item.id,qtyRef.value,'replace')">
               <button class="qty-btn qty-plus" type="button" (click)="changeQty(item.id,1,'')">
                 <i class="zmdi zmdi-plus"></i>
               </button>
             </div>
             <div class="item-total">
-              &#x20B9;{{item.price}}
+              &#x20B9;{{item.price | number:'1.2-2'}}
             </div>
           </div>
         </div>
       </div>
     </div>
     
-    <div class="cart-footer" *ngIf="cart.cartItemsList && cart.cartTotal">
+    <div class="cart-footer" *ngIf="hasItems()">
       <div class="total-section">
         <span class="total-label">Total Amount</span>
-        <span class="total-amount">&#x20B9;{{cart.cartTotal}}</span>
+        <span class="total-amount">&#x20B9;{{(cart.cartTotal || 0) | number:'1.2-2'}}</span>
       </div>
       <button class="btn-checkout" (click)="goToCheckout()">
         <i class="zmdi zmdi-check mr-2"></i>Proceed to Checkout
@@ -227,8 +230,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
       border-radius: 12px;
       padding: 15px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 12px;
       transition: all 0.3s ease;
       border: 2px solid transparent;
     }
@@ -240,7 +243,27 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
     }
 
     .item-info {
-      flex: 1;
+      flex: 1 1 auto;
+      min-width: 0; /* allow text truncation instead of pushing layout */
+    }
+
+    .item-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 48px; /* keep thumbnail visible and non-shrinking */
+    }
+
+    .item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .item-name {
@@ -248,6 +271,10 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
       font-weight: 600;
       color: #2d3748;
       margin: 0 0 5px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden; /* prevent long names from pushing the thumbnail */
     }
 
     .item-price {
@@ -260,6 +287,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
       display: flex;
       align-items: center;
       gap: 15px;
+      margin-left: auto; /* push controls to the right, keep thumb visible */
     }
 
     .qty-controls {
@@ -401,6 +429,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
         gap: 10px;
       }
 
+      .item-thumb {
+        width: 56px;
+        height: 56px;
+      }
+
       .item-controls {
         width: 100%;
         justify-content: space-between;
@@ -426,13 +459,53 @@ export class AddToCartDir{
     //this.cart.addToCart(id, qty, replace);
   }
 
-  changeQty(id, qty, replace) {
-    if (qty !== '') {
-      qty = parseInt(qty) || 1;
-      this.cart.addToCart(id, qty, replace);
-    } else {
-      this.cart.addToCart(id, 1, replace);
+  changeQty(id: any, qty: any, replace: string) {
+    if (replace === 'replace') {
+      let parsed = parseInt(qty, 10);
+      if (isNaN(parsed) || parsed < 1) {
+        parsed = 1;
+      }
+      this.cart.addToCart(id, parsed, 'replace');
+      return;
     }
+
+    const delta = parseInt(qty, 10);
+    if (isNaN(delta)) {
+      return;
+    }
+    this.cart.addToCart(id, delta, '');
+  }
+
+  itemsCount(): number {
+    if (this.cart && Array.isArray(this.cart.cartItemsList) && this.cart.cartItemsList.length > 0) {
+      return this.cart.cartItemsList.length;
+    }
+    try {
+      const data = this.cart && this.cart.cartData ? this.cart.cartData : {};
+      return Object.keys(data).length;
+    } catch {
+      return 0;
+    }
+  }
+
+  hasItems(): boolean {
+    if (this.cart && Array.isArray(this.cart.cartItemsList) && this.cart.cartItemsList.length > 0) {
+      return true;
+    }
+    try {
+      const data = this.cart && this.cart.cartData ? this.cart.cartData : {};
+      return Object.keys(data).length > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  unitPrice(item: any): number {
+    if (!item) { return 0; }
+    const total = Number(item.price) || 0;
+    const qty = Number(item.qty) || 0;
+    if (qty <= 0) { return total; }
+    return total / qty;
   }
 
   openEmptyCartModal(content: any) {
