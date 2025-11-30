@@ -46,11 +46,11 @@ public class Stock {
 
 	private String stockIsDeleted;
 
-    @Column(name = "price")
-    private int price;
+    @Column(name = "price", nullable = true)
+    private Integer price;
 
-    @Column(name = "mrp")
-    private int mrp;
+    @Column(name = "mrp", nullable = true)
+    private Integer mrp;
 
 
 
