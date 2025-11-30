@@ -27,471 +27,470 @@ import java.util.Optional;
 @RequestMapping("/neerseva/api/v1/stocks")
 public class StockController {
 
-	public static final Logger logger = LoggerFactory.getLogger(StockController.class);
+    public static final Logger logger = LoggerFactory.getLogger(StockController.class);
 
-	@Autowired
-	private StockService stockService;
+    @Autowired
+    private StockService stockService;
 
-	@Autowired
-	private ShopService shopService;
+    @Autowired
+    private ShopService shopService;
 
-	@Autowired
-	public void setApp(AppProperties app) {
-		this.app = app;
-	}
+    @Autowired
+    public void setApp(AppProperties app) {
+        this.app = app;
+    }
 
-	private AppProperties app;
+    private AppProperties app;
 
-	@Autowired
-	RestTemplate restTemplate;
+    @Autowired
+    RestTemplate restTemplate;
 
-	@Autowired
-	private com.condigence.stockservice.client.ImageClient imageClient;
+    @Autowired
+    private com.condigence.stockservice.client.ImageClient imageClient;
 
+    // Helper to fetch and set pic on a DTO safely
+    private void setPicIfPresent(ItemDTO dto, Long imageId) {
+        if (imageId == null || dto == null) return;
+        try {
+            byte[] pic = imageClient.fetchImagePic(imageId);
+            if (pic != null) dto.setPic(pic);
+        } catch (Exception ex) {
+            logger.warn("Failed to fetch image {}: {}", imageId, ex.getMessage());
+        }
+    }
 
+    private ShopDTO toShopDTO(Shop shop) {
+        if (shop == null) return null;
+        ShopDTO dto = new ShopDTO();
+        dto.setId(shop.getShopId());
+        dto.setName(shop.getShopName());
+        dto.setType(shop.getShopType());
+        dto.setUserId(shop.getUserId());
+        dto.setBranch(shop.getShopBranch());
+        if (shop.getImageId() != null) {
+            dto.setImageId(shop.getImageId());
+            byte[] pic = imageClient.fetchImagePic(shop.getImageId());
+            if (pic != null) dto.setPic(pic);
+        }
+        return dto;
+    }
 
+    //////////////// Shops //////////////////
 
-	//////////// Shops //////////////////
+    @GetMapping("/shops/{id}")
+    public ResponseEntity<?> getShopsById(@PathVariable("id") Long id) {
 
-	@GetMapping("/shops/{id}")
-	public ResponseEntity<?> getShopsById(@PathVariable("id") Long id) {
+        Optional<Shop> shop = shopService.getById(id);
+        if (shop.isPresent()) {
+            ShopDTO dto = toShopDTO(shop.get());
+            return ResponseEntity.ok(dto);
+        } else {
+            logger.error("Unable to Find. Shop with id {} not found.", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to Find. Shop with id " + id + " not found."));
+        }
+    }
 
-		Optional<Shop> shop = shopService.getById(id);
-		if (shop.isPresent()) {
-			ShopDTO dto = new ShopDTO();
-			dto.setId((shop.get().getShopId()));
-			dto.setName(shop.get().getShopName());
-			dto.setType(shop.get().getShopType());
-			dto.setUserId(shop.get().getUserId());
-			dto.setBranch(shop.get().getShopBranch());
-			if(shop.get().getImageId() != null) {
-				dto.setImageId(shop.get().getImageId());
-				byte[] pic = imageClient.fetchImagePic(shop.get().getImageId());
-				if (pic != null) dto.setPic(pic);
-			}
-			return ResponseEntity.ok(dto);
-		} else {
-			logger.error("Unable to Find. Shop with id {} not found.", id);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to Find. Shop with id " + id + " not found."));
-		}
-	}
-
-	@GetMapping("/shops")
-	public ResponseEntity<?> getAllShops() {
-		List<ShopDTO> dtos = new ArrayList<>();
-		List<Shop> shops = shopService.getAll();
-		if (!shops.isEmpty()) {
-			for (Shop s:shops) {
-				ShopDTO dto = new ShopDTO();
-				dto.setId((s.getShopId()));
-				dto.setName(s.getShopName());
-				dto.setType(s.getShopType());
-				dto.setUserId(s.getUserId());
-				dto.setBranch(s.getShopBranch());
-				if(s.getImageId() != null) {
-					dto.setImageId(s.getImageId());
-					byte[] pic = imageClient.fetchImagePic(s.getImageId());
-					if (pic != null) dto.setPic(pic);
-				}
-
-				dtos.add(dto);
-			}
-
-			return ResponseEntity.ok(dtos);
-		} else {
-			logger.error("Unable to Find Shops");
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to Find Shops."));
-		}
-	}
-
-
-	@GetMapping("/shops/vendor/{id}")
-	public ResponseEntity<?> getShopsByVendorId(@PathVariable("id") Long id) {
-
-		List<Shop> shops = shopService.getByVendorId(id);
-		if (shops.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Shop not found."));
-		}
-		List<ShopDTO> dtos = new ArrayList<>();
-		for (Shop shop : shops) {
-			ShopDTO dto = new ShopDTO();
-			dto.setId((shop.getShopId()));
-			dto.setName(shop.getShopName());
-			dto.setType(shop.getShopType());
-			dto.setUserId(shop.getUserId());
-			dto.setBranch(shop.getShopBranch());
-			if (shop.getImageId() != null) {
-				dto.setImageId(shop.getImageId());
-				byte[] pic = imageClient.fetchImagePic(shop.getImageId());
-				if (pic != null) dto.setPic(pic);
-			}
-
-			dtos.add(dto);
-		}
-		return ResponseEntity.ok(dtos);
-
-	}
-
-	@GetMapping("/by/shop/{id}")
-	public ResponseEntity<?> getStocksByShopId(@PathVariable("id") Long id) {
-		List<Stock> stocks = stockService.getStockByShopId(id);
-		List<StockDTO> dtos = new ArrayList<>();
-
-		for (Stock stock : stocks) {
-
-			StockDTO dto = new StockDTO();
-			UserDTO userDTO = new UserDTO();
-			ItemDTO itemDTO = new ItemDTO();
-			ShopDTO shopDTO = new ShopDTO();
-
-			ItemDTO item = getItemById(stock.getItemId());
-
-			dto.setId(stock.getStockId());
-			dto.setQuantity(stock.getStockQuantity());
+    @GetMapping("/shops")
+    public ResponseEntity<List<ShopDTO>> getAllShops() {
+        List<ShopDTO> dtos = new ArrayList<>();
+        List<Shop> shops = shopService.getAll();
+        if (!shops.isEmpty()) {
+            for (Shop s : shops) {
+                dtos.add(toShopDTO(s));
+            }
+            return ResponseEntity.ok(dtos);
+        } else {
+            logger.error("Unable to Find Shops");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(dtos);
+        }
+    }
 
 
-			// prepare Items to display
-			itemDTO.setId(item.getId());
-			itemDTO.setName(item.getName());
-			itemDTO.setDispPrice(item.getDispPrice());
-			itemDTO.setCapacity(item.getCapacity());
-			itemDTO.setDiscount(item.getDiscount());
-			itemDTO.setMrp(item.getMrp());
-			itemDTO.setPrice(item.getPrice());
-			itemDTO.setCode(item.getCode());
+    @GetMapping("/shops/vendor/{id}")
+    public ResponseEntity<?> getShopsByVendorId(@PathVariable("id") Long id) {
 
-			if (item.getImageId() != null) {
-				byte[] pic = imageClient.fetchImagePic(item.getImageId());
-				if (pic != null) itemDTO.setPic(pic);
-			}
+        List<Shop> shops = shopService.getByVendorId(id);
+        if (shops.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Shop not found."));
+        }
+        List<ShopDTO> dtos = new ArrayList<>();
+        for (Shop shop : shops) {
+            dtos.add(toShopDTO(shop));
+        }
+        return ResponseEntity.ok(dtos);
 
-			shopDTO.setId(stock.getShopId());
-			userDTO.setId(stock.getStockCreatedByUser());
-			dto.setItem(itemDTO);
-			dto.setShop(shopDTO);
-			dto.setUser(userDTO);
-			dtos.add(dto);
-		}
-		return ResponseEntity.status(HttpStatus.OK).body(dtos);
-	}
+    }
 
-	private ItemDTO getItemById(long itemId) {
+    @GetMapping("/by/shop/{id}")
+    public ResponseEntity<List<StockDTO>> getStocksByShopId(@PathVariable("id") Long id) {
+        List<Stock> stocks = stockService.getStockByShopId(id);
+        List<StockDTO> dtos = new ArrayList<>();
 
-		ItemDTO itemData = restTemplate.getForObject("http://NS-PRODUCT-SERVICE/neerseva/api/v1/products/items/"+itemId, ItemDTO.class); // Working
+        for (Stock stock : stocks) {
 
-		return itemData;
-	}
+            StockDTO dto = new StockDTO();
+            UserDTO userDTO = new UserDTO();
+            ItemDTO itemDTO = new ItemDTO();
+            ShopDTO shopDTO = new ShopDTO();
 
-	@DeleteMapping(value = "/shops/{id}")
-	public ResponseEntity<?> deleteShopById(@PathVariable("id") Long id) {
-		logger.info("Fetching & Deleting Shop with id {}", id);
-		Optional<Shop> shop = shopService.getById(id);
-		if (shop.isPresent()) {
-			shopService.deleteById(id);
-			return ResponseEntity.ok().build();
-		} else {
-			logger.error("Unable to delete. Brand with id {} not found.", id);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to delete. Brand with id " + id + " not found."));
-		}
-	}
+            ItemDTO item = getItemById(stock.getItemId());
 
-	@PostMapping(value = "/shops")
-	public ResponseEntity<?> addBrands(@RequestBody ShopDTO dto) {
-		logger.info("Entering addShop with shop Details >>>>>>>>  : {}", dto);
-		Shop shop = shopService.save(dto);
-		if (shop == null) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomErrorType("Issue while saving Shop"));
-		}
-		return ResponseEntity.status(HttpStatus.CREATED).build();
-	}
+            dto.setId(stock.getStockId());
+            dto.setQuantity(stock.getStockQuantity());
 
-	@PutMapping(value = "/shops")
-	public ResponseEntity<?> updateStock(@RequestBody ShopDTO dto) {
-		logger.info("Updating Shop with id {}", dto.getId());
-		Optional<Shop> shopOpt = shopService.getById(dto.getId());
-		if (shopOpt.isEmpty()) {
-			logger.error("Unable to update. Shop with id {} not found.", dto.getId());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to update. Shop with id " + dto.getId() + " not found."));
-		} else {
-			Shop shop = shopOpt.get();
-			shop.setShopName(dto.getName());
-			shop.setImageId(dto.getImageId());
-			shop.setShopBranch(dto.getBranch());
-			shop.setShopType(dto.getType());
-			shop.setUserId(dto.getUserId());
-			shopService.update(shop);
-			return ResponseEntity.ok(shop);
-		}
-	}
 
-	//////////////////////// Shop End Here ////////////////////
+            // prepare Items to display
+            if (item != null) {
+                itemDTO.setId(item.getId());
+                itemDTO.setName(item.getName());
+                itemDTO.setDispPrice(item.getDispPrice());
+                itemDTO.setCapacity(item.getCapacity());
+                itemDTO.setDiscount(item.getDiscount());
+                itemDTO.setMrp(item.getMrp());
+                itemDTO.setPrice(item.getPrice());
+                itemDTO.setCode(item.getCode());
 
-	@PostMapping("/")
-	public ResponseEntity<?> addStock(@RequestBody StockBean s) {
+                if (item.getImageId() != null) {
+                    setPicIfPresent(itemDTO, item.getImageId());
+                }
+            }
 
-		Stock stock = stockService.getStockByShopAndItemId(s.getItemId(), s.getShopId());
-		if (stock != null) {
-			stock.setStockQuantity(stock.getStockQuantity() + s.getQuantity());
-			Stock saved = stockService.saveStock(stock);
-			if (saved == null) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomErrorType("Issue while saving stock"));
-			}
-			return ResponseEntity.ok(saved);
+            shopDTO.setId(stock.getShopId());
+            userDTO.setId(stock.getStockCreatedByUser());
+            dto.setItem(itemDTO);
+            dto.setShop(shopDTO);
+            dto.setUser(userDTO);
+            dtos.add(dto);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(dtos);
+    }
 
-		} else {
-			stock = new Stock();
-			stock.setStockQuantity(s.getQuantity());
-			stock.setStockCreatedByUser(s.getUserId());
-			stock.setStockDateCreated(new Date());
-			stock.setItemId(s.getItemId());
-			stock.setShopId(s.getShopId());
-			Stock saved = stockService.saveStock(stock);
-			if (saved == null) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomErrorType("Issue while saving stock"));
-			}
-			return ResponseEntity.ok(saved);
-		}
-	}
+    private ItemDTO getItemById(long itemId) {
 
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<?> updateStock(@RequestBody StockDTO stockDTO) {
-		logger.info("Updating Stock  with id {}", stockDTO.getId());
-		Optional<Stock> stockOpt = stockService.getStockById(stockDTO.getId());
-		if (stockOpt.isEmpty()) {
-			logger.error("Unable to update. Stock with id {} not found.", stockDTO.getId());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to update. Stock with id " + stockDTO.getId() + " not found."));
-		}
-		Stock stock = stockOpt.get();
-		stock.setStockQuantity(stock.getStockQuantity() + stockDTO.getQuantity());
-		Stock saved = stockService.saveStock(stock);
-		if (saved == null) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomErrorType("Issue while saving stock"));
-		}
-		return ResponseEntity.ok(saved);
-	}
+        ItemDTO itemData = restTemplate.getForObject("http://NS-PRODUCT-SERVICE/neerseva/api/v1/products/items/" + itemId, ItemDTO.class); // Working
 
-	@PostMapping(value = "/update/on/order")
-	public ResponseEntity<?> updateStockByOrder(@RequestBody OrderDetailDTO orderDetail) {
-		logger.info("Updating Stock on orderDetails {}", orderDetail);
+        return itemData;
+    }
 
-		// Validate request payload
-		if (orderDetail == null || orderDetail.getShop() == null || orderDetail.getShop().getId() == 0L) {
-			logger.error("Invalid order detail or shop in request: {}", orderDetail);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Invalid order detail or shop"));
-		}
-		Long shopId = orderDetail.getShop().getId();
-		if (orderDetail.getItems() == null || orderDetail.getItems().isEmpty()) {
-			logger.error("No items present in orderDetail: {}", orderDetail);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("No items in order detail"));
-		}
+    @DeleteMapping(value = "/shops/{id}")
+    public ResponseEntity<?> deleteShopById(@PathVariable("id") Long id) {
+        logger.info("Fetching & Deleting Shop with id {}", id);
+        Optional<Shop> shop = shopService.getById(id);
+        if (shop.isPresent()) {
+            shopService.deleteById(id);
+            return ResponseEntity.ok().build();
+        } else {
+            logger.error("Unable to delete. Brand with id {} not found.", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to delete. Brand with id " + id + " not found."));
+        }
+    }
 
-		// Validate and apply updates
-		for (ItemDTO item : orderDetail.getItems()) {
-			if (item == null || item.getId() == null) {
-				logger.error("Invalid item in orderDetail: {}", item);
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Invalid item in order detail"));
-			}
+    @PostMapping(value = "/shops")
+    public ResponseEntity<?> addBrands(@RequestBody ShopDTO dto) {
+        logger.info("Entering addShop with shop Details >>>>>>>>  : {}", dto);
+        Shop shop = shopService.save(dto);
+        if (shop == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomErrorType("Issue while saving Shop"));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
-			Stock stock = stockService.getStockByShopAndItemId(item.getId(), shopId);
-			if (stock == null) {
-				logger.error("Stock not found for item {} in shop {}", item.getId(), shopId);
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Stock not found for item " + item.getId() + " in shop " + shopId));
-			}
+    @PutMapping(value = "/shops")
+    public ResponseEntity<?> updateStock(@RequestBody ShopDTO dto) {
+        logger.info("Updating Shop with id {}", dto.getId());
+        Optional<Shop> shopOpt = shopService.getById(dto.getId());
+        if (shopOpt.isEmpty()) {
+            logger.error("Unable to update. Shop with id {} not found.", dto.getId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to update. Shop with id " + dto.getId() + " not found."));
+        } else {
+            Shop shop = shopOpt.get();
+            shop.setShopName(dto.getName());
+            shop.setImageId(dto.getImageId());
+            shop.setShopBranch(dto.getBranch());
+            shop.setShopType(dto.getType());
+            shop.setUserId(dto.getUserId());
+            shopService.update(shop);
+            return ResponseEntity.ok(shop);
+        }
+    }
 
-			long currentQty = stock.getStockQuantity();
-			long reqQty = (item.getQuantity() == null ? 0L : item.getQuantity());
-			if (reqQty <= 0) {
-				logger.warn("Ignoring non-positive quantity for item {}: {}", item.getId(), reqQty);
-				continue; // nothing to update for this item
-			}
-			if (currentQty < reqQty) {
-				logger.error("Insufficient stock for item {} in shop {}: available={}, required={}", item.getId(), shopId, currentQty, reqQty);
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Insufficient stock for item " + item.getId()));
-			}
+    //////////////////////// Shop End Here ////////////////////
 
-			stock.setStockQuantity((int)(currentQty - reqQty));
-			stockService.saveStock(stock);
-		}
-		return ResponseEntity.ok().build();
-	}
+    @PostMapping("/")
+    public ResponseEntity<?> addStock(@RequestBody StockBean s) {
 
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getStockdetail(@PathVariable("id") Long id) {
-		logger.info("Fetching Stock with id {}", id);
-		Optional<Stock> stockOpt = stockService.getStockById(id);
-		if (stockOpt.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Stock with id " + id + " not found"));
-		}
-		Stock stock = stockOpt.get();
-		StockDTO dto = new StockDTO();
+        Stock stock = stockService.getStockByShopAndItemId(s.getItemId(), s.getShopId());
+        if (stock != null) {
+            stock.setStockQuantity(stock.getStockQuantity() + s.getQuantity());
+            Stock saved = stockService.saveStock(stock);
+            if (saved == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomErrorType("Issue while saving stock"));
+            }
+            return ResponseEntity.ok(saved);
 
-		dto.setId(stock.getStockId());
+        } else {
+            stock = new Stock();
+            stock.setStockQuantity(s.getQuantity());
+            stock.setStockCreatedByUser(s.getUserId());
+            stock.setStockDateCreated(new Date());
+            stock.setItemId(s.getItemId());
+            stock.setShopId(s.getShopId());
+            Stock saved = stockService.saveStock(stock);
+            if (saved == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomErrorType("Issue while saving stock"));
+            }
+            return ResponseEntity.ok(saved);
+        }
+    }
 
-		UserDTO userDTO = new UserDTO();
-		ItemDTO itemDTO = new ItemDTO();
-		ShopDTO shopDTO = new ShopDTO();
-		ItemDTO item = getItemById(stock.getItemId());
-		dto.setQuantity(stock.getStockQuantity());
-		// prepare Items to display
-		itemDTO.setId(item.getId());
-		itemDTO.setName(item.getName());
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<?> updateStock(@RequestBody StockDTO stockDTO) {
+        logger.info("Updating Stock  with id {}", stockDTO.getId());
+        Optional<Stock> stockOpt = stockService.getStockById(stockDTO.getId());
+        if (stockOpt.isEmpty()) {
+            logger.error("Unable to update. Stock with id {} not found.", stockDTO.getId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to update. Stock with id " + stockDTO.getId() + " not found."));
+        }
+        Stock stock = stockOpt.get();
+        stock.setStockQuantity(stock.getStockQuantity() + stockDTO.getQuantity());
+        Stock saved = stockService.saveStock(stock);
+        if (saved == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomErrorType("Issue while saving stock"));
+        }
+        return ResponseEntity.ok(saved);
+    }
 
-		if (item.getImageId() != null) {
-			byte[] pic = imageClient.fetchImagePic(item.getImageId());
-			if (pic != null) itemDTO.setPic(pic);
-		}
+    @PostMapping(value = "/update/on/order")
+    public ResponseEntity<?> updateStockByOrder(@RequestBody OrderDetailDTO orderDetail) {
+        logger.info("Updating Stock on orderDetails {}", orderDetail);
 
-		Optional<Shop> shop = shopService.getById(stock.getShopId());
-		if (shop.isPresent()) {
-			shopDTO.setId(shop.get().getShopId());
-			shopDTO.setName(shop.get().getShopName());
-		}
+        // Validate request payload
+        if (orderDetail == null || orderDetail.getShop() == null || orderDetail.getShop().getId() == 0L) {
+            logger.error("Invalid order detail or shop in request: {}", orderDetail);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Invalid order detail or shop"));
+        }
+        Long shopId = orderDetail.getShop().getId();
+        if (orderDetail.getItems() == null || orderDetail.getItems().isEmpty()) {
+            logger.error("No items present in orderDetail: {}", orderDetail);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("No items in order detail"));
+        }
 
-		userDTO.setId(stock.getStockCreatedByUser());
-		dto.setItem(itemDTO);
-		dto.setShop(shopDTO);
-		dto.setUser(userDTO);
+        // Validate and apply updates
+        for (ItemDTO item : orderDetail.getItems()) {
+            if (item == null || item.getId() == null) {
+                logger.error("Invalid item in orderDetail: {}", item);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Invalid item in order detail"));
+            }
 
-		logger.info("Stock retrieved: {}", dto);
-		return ResponseEntity.ok(dto);
-	}
+            Stock stock = stockService.getStockByShopAndItemId(item.getId(), shopId);
+            if (stock == null) {
+                logger.error("Stock not found for item {} in shop {}", item.getId(), shopId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Stock not found for item " + item.getId() + " in shop " + shopId));
+            }
 
-	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<?> deleteStock(@PathVariable("id") Long id) {
-		logger.info("Fetching & Deleting Stock with id {}", id);
-		Optional<Stock> stockOpt = stockService.getStockById(id);
-		if (stockOpt.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to delete. Stock with id " + id + " not found."));
-		}
-		stockService.deleteStockById(id);
-		return ResponseEntity.noContent().build();
-	}
+            long currentQty = stock.getStockQuantity();
+            long reqQty = (item.getQuantity() == null ? 0L : item.getQuantity());
+            if (reqQty <= 0) {
+                logger.warn("Ignoring non-positive quantity for item {}: {}", item.getId(), reqQty);
+                continue; // nothing to update for this item
+            }
+            if (currentQty < reqQty) {
+                logger.error("Insufficient stock for item {} in shop {}: available={}, required={}", item.getId(), shopId, currentQty, reqQty);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Insufficient stock for item " + item.getId()));
+            }
+
+            stock.setStockQuantity((int) (currentQty - reqQty));
+            stockService.saveStock(stock);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getStockdetail(@PathVariable("id") Long id) {
+        logger.info("Fetching Stock with id {}", id);
+        Optional<Stock> stockOpt = stockService.getStockById(id);
+        if (stockOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Stock with id " + id + " not found"));
+        }
+        Stock stock = stockOpt.get();
+        StockDTO dto = new StockDTO();
+
+        dto.setId(stock.getStockId());
+
+        UserDTO userDTO = new UserDTO();
+        ItemDTO itemDTO = new ItemDTO();
+        ShopDTO shopDTO = new ShopDTO();
+        ItemDTO item = getItemById(stock.getItemId());
+        dto.setQuantity(stock.getStockQuantity());
+        // prepare Items to display
+        if (item != null) {
+            itemDTO.setId(item.getId());
+            itemDTO.setName(item.getName());
+
+            if (item.getImageId() != null) {
+                setPicIfPresent(itemDTO, item.getImageId());
+            }
+        }
+
+        Optional<Shop> shop = shopService.getById(stock.getShopId());
+        shop.ifPresent(s -> {
+            shopDTO.setId(s.getShopId());
+            shopDTO.setName(s.getShopName());
+        });
+
+        userDTO.setId(stock.getStockCreatedByUser());
+        dto.setItem(itemDTO);
+        dto.setShop(shopDTO);
+        dto.setUser(userDTO);
+
+        logger.info("Stock retrieved: {}", dto);
+        return ResponseEntity.ok(dto);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> deleteStock(@PathVariable("id") Long id) {
+        logger.info("Fetching & Deleting Stock with id {}", id);
+        Optional<Stock> stockOpt = stockService.getStockById(id);
+        if (stockOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Unable to delete. Stock with id " + id + " not found."));
+        }
+        stockService.deleteStockById(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 //	private Image getPicById(long imageId) {
 //		String imagePath = app.getLocation();
 //		return imageService.getImage(imageId, imagePath);
 //	}
 	
-	
-	/////////////////////////////// Get ItemStock for vendor Shop
-	
-	
-	@GetMapping("/items/by/vendor/{id}")
-	public ResponseEntity<?> getStocksByVendorId(@PathVariable("id") Long id) {
 
-		// Get All the Shop/s by vendor id. Assume only one shop per vendor
-		List<Shop> shops = shopService.getByVendorId(id);
-		// Get stock by shop id
-		// get items by Shop id
-		//prepare list and send Item dto
-		List<ItemDTO> itemDtos = new ArrayList<>();
-		if(shops.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Items Not Found! Please Contact Admin"));
-		}
-
-		List<Stock> stocks = stockService.getStockByShopId(shops.get(0).getShopId());
-		for (Stock stock : stocks) {
-			ItemDTO itemDTO = new ItemDTO();
-			ItemDTO item = getItemById(stock.getItemId());
-			// prepare Items to display
-			itemDTO.setId(item.getId());
-			itemDTO.setName(item.getName());
-			itemDTO.setCode(item.getCode());
-			itemDTO.setMrp(item.getMrp());
-			itemDTO.setPrice(item.getPrice());
-			itemDTO.setBrandId(item.getBrandId());
-			itemDTO.setDispPrice(item.getDispPrice());
-			
-			if (item.getImageId() != null) {
-				byte[] pic = imageClient.fetchImagePic(item.getImageId());
-				if (pic != null) itemDTO.setPic(pic);
-			}
-		
-			itemDtos.add(itemDTO);
-		}
-		System.out.println(itemDtos);
-		return ResponseEntity.status(HttpStatus.OK).body(itemDtos);
-	}
-
-	@GetMapping("/items/by/shop/{id}")
-	public ResponseEntity<?> getStocksItemByShopId(@PathVariable("id") Long id) {
-
-		// Get All the stocks/s by shop id.
-		List<Stock> stocks = stockService.getStockByShopId(id);
-		// get items by Shop id
-		//prepare list and send Item dto
-		List<ItemDTO> itemDtos = new ArrayList<>();
-		if(stocks.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Items Not Found! Please Contact Admin"));
-		}
-
-		for (Stock stock : stocks) {
-			if(stock.getStockQuantity()>0){
-				ItemDTO itemDTO = new ItemDTO();
-				ItemDTO item = getItemById(stock.getItemId());
-				// prepare Items to display
-				itemDTO.setId(item.getId());
-				itemDTO.setName(item.getName());
-				itemDTO.setCode(item.getCode());
-				itemDTO.setMrp(item.getMrp());
-				itemDTO.setPrice(item.getPrice());
-				itemDTO.setBrandId(item.getBrandId());
-				itemDTO.setDispPrice(item.getDispPrice());
+    /////////////////////////////// Get ItemStock for vendor Shop
 
 
-				if (item.getImageId() != null) {
-					byte[] pic = imageClient.fetchImagePic(item.getImageId());
-					if (pic != null) itemDTO.setPic(pic);
-				}
+    @GetMapping("/items/by/vendor/{id}")
+    public ResponseEntity<?> getStocksByVendorId(@PathVariable("id") Long id) {
 
-				itemDtos.add(itemDTO);
-			}else{
-				logger.warn("Stock is Empty, Please contact admin!");
-			}
+        // Get All the Shop/s by vendor id. Assume only one shop per vendor
+        List<Shop> shops = shopService.getByVendorId(id);
+        // Get stock by shop id
+        // get items by Shop id
+        //prepare list and send Item dto
+        List<ItemDTO> itemDtos = new ArrayList<>();
+        if (shops.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Items Not Found! Please Contact Admin"));
+        }
 
-		}
-		System.out.println(itemDtos);
-		return ResponseEntity.status(HttpStatus.OK).body(itemDtos);
-	}
+        List<Stock> stocks = stockService.getStockByShopId(shops.get(0).getShopId());
+        for (Stock stock : stocks) {
+            ItemDTO itemDTO = new ItemDTO();
+            ItemDTO item = getItemById(stock.getItemId());
+            // prepare Items to display
+            itemDTO.setId(item.getId());
+            itemDTO.setName(item.getName());
+            itemDTO.setCode(item.getCode());
+            itemDTO.setMrp(item.getMrp());
+            itemDTO.setPrice(item.getPrice());
+            itemDTO.setBrandId(item.getBrandId());
+            itemDTO.setDispPrice(item.getDispPrice());
 
-	@GetMapping(value = "/quantity/by/shops/{shopId}/items/{itemId}")
-	public ResponseEntity<Long> getStockQuantityByShopIdAndItemId(@PathVariable("shopId") Long shopId,
-							@PathVariable("itemId") Long itemId) {
-		if (shopId == null || itemId == null) {
-			return ResponseEntity.badRequest().build();
-		}
-		Stock stock = stockService.getStockByShopAndItemId(itemId, shopId);
-		if (stock == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
-		return ResponseEntity.ok((long) stock.getStockQuantity());
-	}
+            if (item.getImageId() != null) {
+                setPicIfPresent(itemDTO, item.getImageId());
+            }
 
-	@GetMapping("/all")
-	public ResponseEntity<?> getAllStock() {
-		List<Stock> stocks = stockService.getAllStocks();
-		List<ItemDTO> dtos = new ArrayList<>();
-		for (Stock stock : stocks) {
-			ItemDTO itemDTO = new ItemDTO();
-			ItemDTO item = getItemById(stock.getItemId());
-			// prepare Items to display
-			itemDTO.setId(item.getId());
-			itemDTO.setName(item.getName());
-			itemDTO.setDispPrice(item.getDispPrice());
-			itemDTO.setCapacity(item.getCapacity());
-			itemDTO.setDiscount(item.getDiscount());
-			itemDTO.setMrp(item.getMrp());
-			itemDTO.setPrice(item.getPrice());
-			itemDTO.setCode(item.getCode());
-            itemDTO.setStockId(stock.getStockId());
+            itemDtos.add(itemDTO);
+        }
+        System.out.println(itemDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(itemDtos);
+    }
 
-			if (item.getImageId() != null) {
-				byte[] pic = imageClient.fetchImagePic(item.getImageId());
-				if (pic != null) itemDTO.setPic(pic);
-			}
-			dtos.add(itemDTO);
-		}
-		return ResponseEntity.status(HttpStatus.OK).body(dtos);
-	}
+    @GetMapping("/items/by/shop/{id}")
+    public ResponseEntity<?> getStocksItemByShopId(@PathVariable("id") Long id) {
+
+        // Get All the stocks/s by shop id.
+        List<Stock> stocks = stockService.getStockByShopId(id);
+        // get items by Shop id
+        //prepare list and send Item dto
+        List<ItemDTO> itemDtos = new ArrayList<>();
+        if (stocks.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Items Not Found! Please Contact Admin"));
+        }
+
+        for (Stock stock : stocks) {
+            if (stock.getStockQuantity() > 0) {
+                ItemDTO itemDTO = new ItemDTO();
+                ItemDTO item = getItemById(stock.getItemId());
+                // prepare Items to display
+                itemDTO.setId(item.getId());
+                itemDTO.setName(item.getName());
+                itemDTO.setCode(item.getCode());
+                itemDTO.setMrp(item.getMrp());
+                itemDTO.setPrice(item.getPrice());
+                itemDTO.setBrandId(item.getBrandId());
+                itemDTO.setDispPrice(item.getDispPrice());
+
+
+                if (item.getImageId() != null) {
+                    setPicIfPresent(itemDTO, item.getImageId());
+                }
+
+                itemDtos.add(itemDTO);
+            } else {
+                logger.warn("Stock is Empty, Please contact admin!");
+            }
+
+        }
+        System.out.println(itemDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(itemDtos);
+    }
+
+    @GetMapping(value = "/quantity/by/shops/{shopId}/items/{itemId}")
+    public ResponseEntity<Long> getStockQuantityByShopIdAndItemId(@PathVariable("shopId") Long shopId,
+                            @PathVariable("itemId") Long itemId) {
+        if (shopId == null || itemId == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        Stock stock = stockService.getStockByShopAndItemId(itemId, shopId);
+        if (stock == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok((long) stock.getStockQuantity());
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<StockDTO>> getAllStock() {
+        List<Stock> stocks = stockService.getAllStocks();
+        List<StockDTO> dtos = new ArrayList<>();
+        for (Stock stock : stocks) {
+            StockDTO dto = new StockDTO();
+            ItemDTO item = getItemById(stock.getItemId());
+            dto.setId(stock.getStockId());
+            dto.setQuantity(stock.getStockQuantity());
+            if (item != null) {
+                ItemDTO itemDTO = new ItemDTO();
+                itemDTO.setId(item.getId());
+                itemDTO.setName(item.getName());
+                itemDTO.setDispPrice(item.getDispPrice());
+                itemDTO.setCapacity(item.getCapacity());
+                itemDTO.setDiscount(item.getDiscount());
+                itemDTO.setMrp(item.getMrp());
+                itemDTO.setPrice(item.getPrice());
+                itemDTO.setCode(item.getCode());
+                itemDTO.setStockId(stock.getStockId());
+
+                if (item.getImageId() != null) {
+                    setPicIfPresent(itemDTO, item.getImageId());
+                }
+                dto.setItem(itemDTO);
+            }
+            ShopDTO shopDTO = toShopDTO(shopService.getById(stock.getShopId()).orElse(null));
+            dto.setShop(shopDTO);
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(stock.getStockCreatedByUser());
+            dto.setUser(userDTO);
+            dtos.add(dto);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(dtos);
+    }
 
 }

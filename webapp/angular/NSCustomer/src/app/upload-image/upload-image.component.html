@@ -1,44 +1,59 @@
 <div class="row">
 
-  <div class="col-sm-3">
-    <div>
-      <input type="file" (change)="onFileChanged($event)" class="btn btn-warning btn-xs">
-     
-    </div>
-  </div>
-  <div class="col-sm-3" style="position: relative;"> 
-      <div *ngIf="imgURL" style="position: relative; display: inline-block;">
-        <img [src]="imgURL" height="100">
+  <div class="col-md-6">
+    <div class="custom-file-upload">
+      <input type="file" 
+             id="fileInput" 
+             (change)="onFileChanged($event)" 
+             accept="image/*"
+             class="file-input-hidden">
+      <label for="fileInput" class="file-upload-label">
+        <div class="upload-icon">
+          <i class="zmdi zmdi-cloud-upload"></i>
+        </div>
+        <div class="upload-text">
+          <span class="primary-text">Choose an image</span>
+          <span class="secondary-text">or drag and drop here</span>
+        </div>
+        <div class="upload-hint">PNG, JPG up to 5MB</div>
+      </label>
+      
+      <!-- Image Preview -->
+      <div *ngIf="imgURL" class="image-preview-container">
+        <img [src]="imgURL" class="preview-image">
         <button 
           type="button" 
-          class="btn btn-danger btn-sm" 
+          class="btn-remove-image" 
           (click)="onRemoveImage()" 
-          style="position: absolute; top: -5px; right: -5px; border-radius: 50%; width: 25px; height: 25px; padding: 0; line-height: 1; font-size: 16px;"
           title="Remove image">
-          &times;
+          <i class="zmdi zmdi-close"></i>
         </button>
       </div>
+    </div>
   </div>
 
-  <div class="col-sm-3" style="left:80px;"> 
-    <input type="button" (click)="onUpload()" value="upload" 
-           class="btn btn-success btn-xs" 
+  <div class="col-sm-3"> 
+    <button type="button" (click)="onUpload()" 
+           class="btn-upload" 
            [disabled]="!isFileSelected || isUploading"
-           [class.btn-secondary]="!isFileSelected">
+           [class.disabled]="!isFileSelected">
+      <i class="zmdi zmdi-cloud-upload"></i> Upload
+    </button>
   </div>
   <div class="col-sm-3">
     <!-- Uploading Loader -->
-    <div *ngIf='isUploading' class="upload-loader">
+    <div *ngIf='isUploading' class="upload-status">
       <div class="mini-spinner"></div>
-      <span class="upload-text">Uploading...</span>
+      <span class="status-text">Uploading...</span>
     </div>
     
-    <!-- Preview after upload -->
-    <div *ngIf='dispalyPreview && !isUploading' class="preview-section">
-      <span class="preview-label">Preview:</span>
-      <!-- <span class="image-id">ID: {{imageId}}</span> -->
-      <div class="preview-image-wrapper">
-        <img height="100" [src]="convertedImage" (load)="onImageLoad()" (error)="onImageError()" [hidden]="imageLoading">
+    <!-- Success after upload -->
+    <div *ngIf='dispalyPreview && !isUploading' class="upload-status success">
+      <i class="zmdi zmdi-check-circle success-icon"></i>
+      <span class="status-text">Uploaded!</span>
+      <!-- Preview thumbnail -->
+      <div class="uploaded-preview-wrapper">
+        <img [src]="convertedImage" (load)="onImageLoad()" (error)="onImageError()" [hidden]="imageLoading">
         <div *ngIf="imageLoading" class="image-loader">
           <div class="mini-spinner"></div>
         </div>

@@ -2,9 +2,15 @@ package com.condigence.nsproductservice.model;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Table(name = "brand")
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Brand {
 
 	@Id
@@ -29,62 +35,4 @@ public class Brand {
 	@Column(name = "is_deleted")
 	private String isDeleted;
 	
-	
-
-	public String getIsDeleted() {
-		return isDeleted;
-	}
-
-	public void setIsDeleted(String isDeleted) {
-		this.isDeleted = isDeleted;
-	}
-
-	@Override
-	public String toString() {
-		return "Brand [id=" + id + ", name=" + name + ", imageId=" + imageId + ", dateCreated=" + dateCreated
-				+ ", createdByUser=" + createdByUser + ", isDeleted=" + isDeleted + "]";
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Long getImageId() {
-		return imageId;
-	}
-
-	public void setImageId(Long imageId) {
-		this.imageId = imageId;
-	}
-
-	public String getDateCreated() {
-		return dateCreated;
-	}
-
-	public void setDateCreated(String dateCreated) {
-		this.dateCreated = dateCreated;
-	}
-
-	public Long getCreatedByUser() {
-		return createdByUser;
-	}
-
-	public void setCreatedByUser(Long createdByUser) {
-		this.createdByUser = createdByUser;
-	}
-	
-
-
 }

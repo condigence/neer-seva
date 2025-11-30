@@ -3,6 +3,8 @@ import Chart from 'chart.js/auto';
 import { UserService } from '../service/user.service';
 import { AddressService } from '../service/address.service';
 import { OrderService } from '../service/order.service';
+import { ItemService } from '../service/item.service';
+import { map, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -15,10 +17,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   userAsCustomer: any;
   userAsVendor: any;
   totalOrders: any;
-  top4Orders: any;
+  top5Orders: any;
   fiveUsers: any;
   totalRevenue: any | number = 12500; // Example total revenue
-  constructor(private userService: UserService, private orderService: OrderService, private addressService: AddressService, private renderer: Renderer2) { }
+  constructor(private userService: UserService, private orderService: OrderService, private addressService: AddressService, private renderer: Renderer2, private itemService: ItemService) { }
   
 
   ngOnInit() {
@@ -46,16 +48,53 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   
     });
 
-    
-    
-
-    this.orderService.getAllOrders()
-    .subscribe(data => {
+  this.orderService.getAllOrders()
+  .pipe(
+    switchMap(data => {
       this.totalOrders = data;  
-    this.top4Orders = [...this.totalOrders].reverse().slice(0, 4);
+      this.top5Orders = [...this.totalOrders].reverse().slice(0, 5);
 
-  console.log(this.top4Orders);
-    });    
+      const itemIds = new Set<number>();
+      this.top5Orders.forEach(order => {
+        if (order.orderDetail && order.orderDetail.length > 0) {
+          order.orderDetail.forEach(detail => {
+            itemIds.add(detail.orderItemId);
+          });
+        }
+      });
+
+      return itemIds.size > 0 
+        ? this.itemService.getItemById(Array.from(itemIds))
+        : of([]);
+    }),
+    // ✅ Add this map operator to ensure we always have an array
+    map(items => Array.isArray(items) ? items : [items])
+  )
+  .subscribe(items => {
+    const itemMap = new Map();
+    items.forEach(item => {
+      itemMap.set(item.id, item);
+    });
+
+    this.top5Orders.forEach(order => {
+      if (order.orderDetail && order.orderDetail.length > 0) {
+        order.orderDetail.forEach(detail => {
+          const item = itemMap.get(detail.orderItemId);
+          if (item) {
+            detail.itemName = item.name;
+            detail.itemImage = item.pic;
+            // detail.itemPrice = item.price;
+            // detail.itemCode = item.code;
+          }
+        });
+      }
+    });
+
+    console.log(this.top5Orders);
+  });
+    
+
+  
   }
 
   // Chart.js instances

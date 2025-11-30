@@ -33,10 +33,10 @@ export class StorageService{
 
   get(key=''){
     if(key!=''){
-      return this.data[key];
+      const value = this.data[key];
+      return value;
     }else{
       return this.data;
-
     }
   }
   delete(key) {

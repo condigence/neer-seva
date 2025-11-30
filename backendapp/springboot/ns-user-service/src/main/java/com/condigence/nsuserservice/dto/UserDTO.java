@@ -4,6 +4,15 @@ import java.util.Arrays;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class UserDTO {
 
     private Long id;
@@ -29,82 +38,6 @@ public class UserDTO {
     private Long addressId;
 
     private boolean isActive;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public String getOtp() {
-        return otp;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public Long getImageId() {
-        return imageId;
-    }
-
-    public byte[] getPic() {
-        return pic;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Long getAddressId() {
-        return addressId;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setContact(String contact) {
-        this.contact = contact;
-    }
-
-    public void setOtp(String otp) {
-        this.otp = otp;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public void setImageId(Long imageId) {
-        this.imageId = imageId;
-    }
 
     // Accept flexible JSON shapes for imageId: a number, a string, or an object like {"id":123} or {"imageId":123}
     @JsonSetter("imageId")
@@ -155,18 +88,6 @@ public class UserDTO {
             // If parsing fails, leave imageId as null (avoid throwing Jackson exceptions)
             this.imageId = null;
         }
-    }
-
-    public void setPic(byte[] pic) {
-        this.pic = pic;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setAddressId(Long addressId) {
-        this.addressId = addressId;
     }
 
     public boolean isActive() {

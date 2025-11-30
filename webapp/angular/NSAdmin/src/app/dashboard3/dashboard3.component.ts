@@ -94,7 +94,7 @@ export class Dashboard3Component implements OnInit, AfterViewInit, OnDestroy {
             grouped[date] = { newOrders: 0, pending: 0, sales: 0 };
           }
 
-          if (order.orderStatus === 'CONFIRMED') {
+          if (order.orderDeliveryStatus === 'CONFIRMED') {
             grouped[date].newOrders++;
             grouped[date].sales += Number(order.orderGrandTotal || 0);
           }
