@@ -8,14 +8,11 @@ import lombok.Data;
 public class ItemDTO {
 
 	private Long id;
-
 	private byte[] pic;
 	private String name;
 	private Integer price;
 	private Integer mrp;
 	private Integer dispPrice;
-
-	private Integer quantity;
 	private String code;
 	private Integer discount;
 	private String type;
@@ -24,7 +21,5 @@ public class ItemDTO {
 	private Long brandId;
 	private Long imageId;
 	private Date dateCreated;
-
-	private Long stockId;
-
 }
+

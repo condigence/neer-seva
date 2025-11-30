@@ -19,16 +19,11 @@ public class ItemService {
 	private ItemRepository itemRepo;
 
 	public Item saveItem(ItemDTO dto) {
-
 		Item item = new Item();
-
 		item.setName(dto.getName());
 		item.setImageId(dto.getImageId());
 		item.setCapacity(dto.getCapacity());
 		item.setBrandId(dto.getBrandId());
-		//item.setCode(dto.getName()+dto.getCapacity()+);
-		//item.setDiscount(dto.getDiscount());
-		//item.setDescription(dto.getDescription());
 		item.setDispPrice(dto.getMrp() - dto.getMrp() * 10/100);
 		item.setMrp(dto.getMrp());
 		item.setPrice(dto.getMrp() + dto.getMrp() * 10/100);
@@ -38,19 +33,6 @@ public class ItemService {
 	public void deleteItemById(long itemId) {
 		itemRepo.deleteById(itemId);
 	}
-//
-//	public Item updateItemById(long itemId) {
-//		Item item = itemRepo.findById(itemId).get();
-//		if (null != item) {
-//			itemRepo.save(item);
-//		}
-//		return item;
-//	}
-//
-//	public Item getItemByOrderItemId(long orderItemId) {
-//		// TODO Auto-generated method stub
-//		return itemRepo.findById(orderItemId).get();
-//	}
 
 	public List<Item> getItems() {
 		return itemRepo.findAll();
@@ -64,10 +46,7 @@ public class ItemService {
 		return itemRepo.findByBrandId(id);
 	}
 
-
 	public Item update(Item item) {
 		return itemRepo.save(item);
-		
 	}
-
 }

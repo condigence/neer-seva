@@ -329,7 +329,6 @@ public class ProductController {
 			dto.setCapacity(item.get().getCapacity());
 			dto.setDispPrice(item.get().getDispPrice());
 			dto.setMrp(item.get().getMrp());
-			dto.setQuantity(item.get().getQuantity());
 			dto.setDescription(item.get().getDescription());
 			dto.setDiscount(item.get().getDiscount());
 			dto.setType(item.get().getType());
@@ -382,14 +381,12 @@ public class ProductController {
 			dto.setCapacity(item.getCapacity());
 			dto.setDispPrice(item.getDispPrice());
 			dto.setMrp(item.getMrp());
-			dto.setQuantity(item.getQuantity());
 			dto.setDescription(item.getDescription());
 			dto.setDiscount(item.getDiscount());
 			dto.setType(item.getType());
 			dto.setBrandId(item.getBrandId());
 			dto.setCode(item.getCode());
 			dto.setPrice(item.getPrice());
-			// dto.setPic(getPicById(item.get().getImageId()).getPic());
 			dtos.add(dto);
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(dtos);

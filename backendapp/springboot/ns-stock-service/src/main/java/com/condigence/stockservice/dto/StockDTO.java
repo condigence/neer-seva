@@ -9,10 +9,8 @@ public class StockDTO {
 
 	private int quantity;
 
-	private UserDTO user;
-
 	private ItemDTO item;
 
-	private ShopDTO shop;
+	private long shopId;
 
 }

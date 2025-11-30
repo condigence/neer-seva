@@ -17,10 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -90,13 +87,28 @@ public class StockController {
         }
     }
 
-    @GetMapping("/shops")
+    @GetMapping("/shops/list")
     public ResponseEntity<List<ShopDTO>> getAllShops() {
         List<ShopDTO> dtos = new ArrayList<>();
         List<Shop> shops = shopService.getAll();
         if (!shops.isEmpty()) {
             for (Shop s : shops) {
                 dtos.add(toShopDTO(s));
+            }
+            return ResponseEntity.ok(dtos);
+        } else {
+            logger.error("Unable to Find Shops");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(dtos);
+        }
+    }
+
+    @GetMapping("/shops")
+    public ResponseEntity<Set<ShopDTO>> getAllShopsForStock() {
+        Set<ShopDTO> dtos = new HashSet<>();
+        List<Stock> stocks = stockService.getAllStocks();
+        if (!stocks.isEmpty()) {
+            for (Stock s : stocks) {
+                dtos.add(toShopDTO(shopService.getById(s.getShopId()).get()));
             }
             return ResponseEntity.ok(dtos);
         } else {
@@ -136,7 +148,7 @@ public class StockController {
             ItemDTO item = getItemById(stock.getItemId());
 
             dto.setId(stock.getStockId());
-            dto.setQuantity(stock.getStockQuantity());
+            //dto.setQuantity(stock.getStockQuantity());
 
 
             // prepare Items to display
@@ -150,6 +162,7 @@ public class StockController {
                 itemDTO.setPrice(item.getPrice());
                 itemDTO.setCode(item.getCode());
 
+
                 if (item.getImageId() != null) {
                     setPicIfPresent(itemDTO, item.getImageId());
                 }
@@ -158,8 +171,7 @@ public class StockController {
             shopDTO.setId(stock.getShopId());
             userDTO.setId(stock.getStockCreatedByUser());
             dto.setItem(itemDTO);
-            dto.setShop(shopDTO);
-            dto.setUser(userDTO);
+            dto.setShopId(stock.getShopId());
             dtos.add(dto);
         }
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
@@ -289,17 +301,12 @@ public class StockController {
             }
 
             long currentQty = stock.getStockQuantity();
-            long reqQty = (item.getQuantity() == null ? 0L : item.getQuantity());
-            if (reqQty <= 0) {
-                logger.warn("Ignoring non-positive quantity for item {}: {}", item.getId(), reqQty);
-                continue; // nothing to update for this item
-            }
-            if (currentQty < reqQty) {
-                logger.error("Insufficient stock for item {} in shop {}: available={}, required={}", item.getId(), shopId, currentQty, reqQty);
+
+            if (currentQty < 0) {
+                stock.setStockQuantity(0);
+                logger.error("Insufficient stock for item {} in shop {}: available={}", item.getId(), shopId, currentQty);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType("Insufficient stock for item " + item.getId()));
             }
-
-            stock.setStockQuantity((int) (currentQty - reqQty));
             stockService.saveStock(stock);
         }
         return ResponseEntity.ok().build();
@@ -334,14 +341,11 @@ public class StockController {
 
         Optional<Shop> shop = shopService.getById(stock.getShopId());
         shop.ifPresent(s -> {
-            shopDTO.setId(s.getShopId());
-            shopDTO.setName(s.getShopName());
+            dto.setShopId(s.getShopId());
         });
 
-        userDTO.setId(stock.getStockCreatedByUser());
         dto.setItem(itemDTO);
-        dto.setShop(shopDTO);
-        dto.setUser(userDTO);
+
 
         logger.info("Stock retrieved: {}", dto);
         return ResponseEntity.ok(dto);
@@ -476,7 +480,6 @@ public class StockController {
                 itemDTO.setMrp(item.getMrp());
                 itemDTO.setPrice(item.getPrice());
                 itemDTO.setCode(item.getCode());
-                itemDTO.setStockId(stock.getStockId());
 
                 if (item.getImageId() != null) {
                     setPicIfPresent(itemDTO, item.getImageId());
@@ -484,10 +487,9 @@ public class StockController {
                 dto.setItem(itemDTO);
             }
             ShopDTO shopDTO = toShopDTO(shopService.getById(stock.getShopId()).orElse(null));
-            dto.setShop(shopDTO);
+            dto.setShopId(stock.getShopId());
             UserDTO userDTO = new UserDTO();
             userDTO.setId(stock.getStockCreatedByUser());
-            dto.setUser(userDTO);
             dtos.add(dto);
         }
         return ResponseEntity.status(HttpStatus.OK).body(dtos);

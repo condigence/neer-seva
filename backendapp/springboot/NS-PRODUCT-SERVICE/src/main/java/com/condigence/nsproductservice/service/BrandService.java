@@ -16,13 +16,11 @@ public class BrandService {
 
 	@Autowired
 	BrandRepository brandRepository;
-	
 
 	public List<Brand> getAll() {
 		return brandRepository.findAll();
 	}
 
-	
 
 	public Optional<Brand> getById(Long id) {
 		return brandRepository.findById(id);
