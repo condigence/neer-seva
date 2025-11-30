@@ -16,6 +16,7 @@
 	<properties>
         <java.version>21</java.version>
         <spring-cloud.version>2023.0.6</spring-cloud.version>
+        <lombok.version>1.18.34</lombok.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -59,6 +60,14 @@
 		</dependency>
 
 		<!-- NOTE: H2 (in-memory DB) removed; tests now expect an external DB or mocks. -->
+
+		<!-- Lombok: reduce boilerplate for DTOs and entities -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
 	</dependencies>
 
@@ -127,9 +136,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>3.10.1</version>
                 <configuration>
                     <release>${java.version}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
 			</plugin>
 			<plugin>
