@@ -12,17 +12,22 @@ import { CartService } from '../services/cart.service';
     <div class="col-lg-4 col-md-6 col-sm-6 mb-4" *ngFor = "let i of items | filter : __searchedItem | sortBy : sortByOption">
         <div class="product-card">
           <div class="product-image-wrapper">
-            <img class="product-image" [src]="'data:image/jpeg;base64,'+i.pic" alt="{{i.name}}">
-            <!-- <div class="product-badge" *ngIf="i.dispPrice && i.dispPrice != i.price">
-              <span class="badge-discount">{{calculateDiscount(i.dispPrice, i.price)}}% OFF</span>
+          <div class="product-quantity" 
+     [class.low-stock]="i.quantity < 5" 
+     [class.out-of-stock]="!i.quantity">
+  {{i.quantity ?? 0}}
+</div>
+            <img class="product-image" [src]="'data:image/jpeg;base64,'+i.item.pic" alt="{{i.item.name}}">
+            <!-- <div class="product-badge" *ngIf="i.item.dispPrice && i.item.dispPrice != i.item.price">
+              <span class="badge-discount">{{calculateDiscount(i.item.dispPrice, i.item.price)}}% OFF</span>
             </div> -->
           </div>
           <div class="product-details">
-            <h6 class="product-name">{{i.name}}</h6>
+            <h6 class="product-name">{{i.item.name}}</h6>
             <div class="product-pricing">
               <div class="price-section">
-                <span class="current-price">&#x20B9;{{i.price}}</span>
-                <del class="original-price" *ngIf="i.dispPrice && i.dispPrice != i.price">&#x20B9;{{i.dispPrice}}</del>
+                <span class="current-price">&#x20B9;{{i.item.price}}</span>
+                <del class="original-price" *ngIf="i.item.dispPrice && i.item.dispPrice != i.item.price">&#x20B9;{{i.item.dispPrice}}</del>
               </div>
             </div>
             <button class="add-to-cart-btn" (click)="addToCart(i.id,1,'')">
@@ -105,6 +110,21 @@ import { CartService } from '../services/cart.service';
        flex-grow: 1;
      }
 
+     .product-quantity {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+       color: white;
+padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: fit-content;
+  height: auto; /* Remove fixed height for responsiveness */
+}
      .product-name {
        font-size: 0.95rem;
        font-weight: 600;
