@@ -16,13 +16,13 @@
                     <div class="card-header-gradient"></div>
                     <div class="card-body text-center pt-5">
                         <div class="profile-img-wrapper">
-                            <div class="image-loader" *ngIf="!imageLoaded && user.pic"></div>
-                            <img *ngIf="user.pic" [src]="'data:image/jpeg;base64,'+user.pic" 
+                            <div class="image-loader" *ngIf="!imageLoaded && user?.pic"></div>
+                            <img *ngIf="user?.pic" [src]="'data:image/jpeg;base64,'+user?.pic" 
                                  alt="profile-image" 
                                  class="profile-img"
                                  (load)="onImageLoad()"
                                  [style.display]="imageLoaded ? 'block' : 'none'">
-                            <i *ngIf="!user.pic" class="zmdi zmdi-account-circle default-profile-icon"></i>
+                            <i *ngIf="!user?.pic" class="zmdi zmdi-account-circle default-profile-icon"></i>
                         </div>
                         <h5 class="card-title mt-3">{{user.name}}</h5>
                         <!-- <p class="card-text">{{user.description}}</p> -->

@@ -13,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   template: `
  <menu></menu>
  
-<div class="container-fluid" style="width: 30%;margin-top: 100px;background: #0AA; border-radius:15px">
+<div class="container-fluid" style="width: 20%;margin-top: 100px;background: #0AA; border-radius:15px">
 
 
 <app-my-carousel (messageEvent)="receiveMessage($event)" [receivedParentMessage]="messageToSendP"></app-my-carousel>
@@ -123,10 +123,11 @@ export class ProductsPage implements OnInit {
     if (!this.searchText) {
       return this.items.length;
     }
-    // Filter items based on search text
-    return this.items.filter(item => 
-      item.name?.toLowerCase().includes(this.searchText.toLowerCase())
-    ).length;
+    // Filter items based on search text - use nested property path
+    return this.items.filter(item => {
+      const itemName = (item as any)?.item?.name || item.name || '';
+      return itemName.toLowerCase().includes(this.searchText.toLowerCase());
+    }).length;
   }
 
 /////

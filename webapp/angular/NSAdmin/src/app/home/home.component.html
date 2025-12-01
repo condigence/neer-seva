@@ -9,9 +9,9 @@
             <div class="media align-items-center">
               <div class="media-body">
                 <p class="text-white">Total Orders</p>
-                <h4 class="text-white line-height-5" *ngIf="totalOrders">
-                  {{ totalOrders.NumberOfOrders || totalOrders.numberOfOrders || totalOrders.count || totalOrders.length }}
-                </h4>
+              <h4 class="text-white line-height-5">
+  {{ totalOrders }}
+</h4>
               </div>
               <div class="w-circle-icon rounded-circle border border-white">
                 <i class="fa fa-cart-plus text-white"></i>
@@ -188,25 +188,7 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="card-header border-0">
-            Recent Orders Table
-            <div class="card-action">
-              <div class="dropdown">
-                <a
-                  href="javascript:void();"
-                  class="dropdown-toggle dropdown-toggle-nocaret"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i class="icon-options"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-         <div class="table-responsive">
+    <div class="table-responsive">
   <table class="table align-items-center table-flush">
     <thead>
       <tr>
@@ -218,39 +200,46 @@
         <th>Amount</th>
       </tr>
     </thead>
+
     <tbody>
-      <tr *ngFor="let order of top5Orders">
-        <td>{{ order.orderDate }}</td>
+      <tr *ngFor="let row of top5Orders">
+        
+        <!-- DATE -->
+        <td>{{ row?.date }}</td>
+
+        <!-- PHOTO -->
         <td>
-          <!-- Use base64 data directly -->
           <img
-            [src]="'data:image/jpeg;base64,' + order.orderDetail[0]?.itemImage"
+            *ngIf="row?.productImage; else fallbackImg"
+            [src]="'data:image/jpeg;base64,' + row.productImage"
             class="product-img"
-            alt="{{ order.orderDetail[0]?.itemName }}"
-            *ngIf="order.orderDetail[0]?.itemImage"
+            alt="product"
           />
-          <!-- Fallback if no image -->
-          <img
-            src="assets/images/default-product.png"
-            class="product-img"
-            *ngIf="!order.orderDetail[0]?.itemImage"
-          />
+          <ng-template #fallbackImg>
+            <img src="assets/images/default-product.png" class="product-img" />
+          </ng-template>
         </td>
-        <td>{{ order.orderDetail[0]?.itemName || 'Loading...' }}</td>
-        <td>{{ order.orderDetail[0]?.orderItemQuantity || 0 }}</td>
+
+        <!-- PRODUCT NAME -->
+        <td>{{ row?.productName || 'Loading...' }}</td>
+
+        <!-- QUANTITY -->
+        <td>{{ row?.qty || 0 }}</td>
+
+        <!-- STATUS -->
         <td>
           <span class="btn btn-sm btn-outline-success btn-round btn-block">
-            {{ order.orderStatus }}
+            {{ row?.status }}
           </span>
         </td>
-        <td>&#x20B9; {{ order.orderDetail[0]?.orderTotalamount || order.orderGrandTotal || 0 }}</td>
+
+        <!-- AMOUNT -->
+        <td>&#x20B9; {{ row?.amount || 0 }}</td>
       </tr>
     </tbody>
   </table>
 </div>
-        </div>
-      </div>
-    </div>
+
     <!--End Row-->
 
     <!--End Dashboard Content-->

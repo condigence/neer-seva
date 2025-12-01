@@ -191,7 +191,16 @@ export class CartService {
     this.cartItemsList = [];
     this.cartTotal = 0;
     this.storage.set({
-      mycart: {}
+      mycart: {},
+      cartItems: { items: [], total: 0 }
     });
+  }
+
+  clearCart() {
+    // Complete cart cleanup - removes all cart data
+    this.cartData = {};
+    this.cartItemsList = [];
+    this.cartTotal = 0;
+    this.storage.deleteAll();
   }
 }

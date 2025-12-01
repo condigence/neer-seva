@@ -100,15 +100,15 @@ export class BillingFormModel {
       validation : [ Validators.required],
       errorMsg : 'Please enter zipcode'
     },
-    {
-      label : 'Payment Mode',
-      placeholder : 'Payment Mode',
-      uid: 'paymentmode',
-      type: 'select',
-      value: '',
-      validation : [Validators.required] ,
-      options : [ 'COD','UPI' ],
-      errorMsg : 'Please enter payment mode'
-    },
+    // {
+    //   label : 'Payment Mode',
+    //   placeholder : 'Payment Mode',
+    //   uid: 'paymentmode',
+    //   type: 'select',
+    //   value: '',
+    //   validation : [Validators.required] ,
+    //   options : [ 'COD','UPI' ],
+    //   errorMsg : 'Please enter payment mode'
+    // },
   ];
 }
