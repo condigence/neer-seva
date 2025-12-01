@@ -191,7 +191,8 @@ export class CartService {
     this.cartItemsList = [];
     this.cartTotal = 0;
     this.storage.set({
-      mycart: {}
+      mycart: {},
+      cartItems: { items: [], total: 0 }
     });
   }
 
