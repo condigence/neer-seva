@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { StorageService } from '../services/storage.service';
 import { CartService } from '../services/cart.service';
 import { FormBuilder } from '@angular/forms';
@@ -48,14 +48,8 @@ import { ToastrService } from 'ngx-toastr';
         <a routerLink="/products" class="btn-continue-shopping">
           <i class="zmdi zmdi-shopping-cart mr-2"></i>Continue Shopping
         </a>
-        <button type="submit" class="btn-place-order" [disabled]="billingForm.invalid || !cart.cartItemsList || !cart.cartTotal || isPlacingOrder">
-          <span *ngIf="!isPlacingOrder">
-            <i class="zmdi zmdi-check-circle mr-2"></i>Confirm and Place Order
-          </span>
-          <span *ngIf="isPlacingOrder" class="loading-content">
-            <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
-            Processing Order...
-          </span>
+        <button type="submit" class="btn-place-order" [disabled]="billingForm.invalid || !cart.cartItemsList || !cart.cartTotal">
+          <i class="zmdi zmdi-arrow-right mr-2"></i>Proceed to Payment
         </button>
       </div>
     </form>
@@ -256,7 +250,7 @@ import { ToastrService } from 'ngx-toastr';
   `]
 })
 
-export class BillingDir {
+export class BillingDir implements OnInit, OnDestroy {
   public billingForm: any = {};
   public errorsInfo: any = {};
   @Input('billingFields') __billing: any = {};
@@ -264,6 +258,7 @@ export class BillingDir {
   currentUser: any;
   order: any;
   isPlacingOrder: boolean = false;
+  private navigationSubscription: any;
 
   constructor(
     public fb: FormBuilder,
@@ -283,6 +278,10 @@ export class BillingDir {
     this.loadForm();
   }
 
+  ngOnDestroy() {
+    // Clean up subscription if needed
+  }
+
   loadForm() {
     let temp = {};
     let billingInfo = this.cart.loadCheckoutInfo('customerInfo');
@@ -298,9 +297,10 @@ export class BillingDir {
     
     this.billingForm = this.fb.group(temp);
 
-    // If billing info is not present but user is logged in, try to auto-populate
-    // from the user's default address and profile info.
-    if ((!billingInfo || Object.keys(billingInfo).length === 0) && this.currentUser) {
+    // Always fetch the latest default address when user is logged in
+    // This ensures we get the most recent default address
+    if (this.currentUser) {
+      this.loadLatestDefaultAddress(billingInfo);
       try {
         // Fill name/email/mobile from currentUser if available
         const name = this.currentUser.name || '';
@@ -370,6 +370,81 @@ export class BillingDir {
     }
   }
 
+  loadLatestDefaultAddress(existingBillingInfo: any) {
+    try {
+      // Fill name/email/mobile from currentUser if available
+      const name = this.currentUser.name || '';
+      const nameParts = name.split(' ');
+      const firstName = nameParts.length > 0 ? nameParts[0] : '';
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+      const patch: any = {};
+      
+      // Only patch user info if not already in form
+      if (this.billingForm.controls['firstName'] && !existingBillingInfo.firstName) {
+        patch['firstName'] = firstName;
+      }
+      if (this.billingForm.controls['lastName'] && !existingBillingInfo.lastName) {
+        patch['lastName'] = lastName;
+      }
+      if (this.billingForm.controls['email'] && !existingBillingInfo.email) {
+        patch['email'] = this.currentUser.email || '';
+      }
+      if (this.billingForm.controls['mobile'] && !existingBillingInfo.mobile) {
+        patch['mobile'] = this.currentUser.contact || '';
+      }
+
+      // Always fetch and update the default address (even if billing info exists)
+      const custId = this.currentUser.id;
+      if (custId) {
+        this.addressService.getDefaultAddressByUserId(custId).subscribe(
+          (addr: any) => {
+            if (addr) {
+              // Always update address fields with latest default address
+              if (this.billingForm.controls['addressOne']) {
+                patch['addressOne'] = addr.line1 || addr.lineOne || '';
+              }
+              if (this.billingForm.controls['addressTwo']) {
+                patch['addressTwo'] = addr.line2 || addr.lineTwo || '';
+              }
+              if (this.billingForm.controls['city']) {
+                patch['city'] = addr.city || '';
+              }
+              if (this.billingForm.controls['state']) {
+                patch['state'] = addr.state || '';
+              }
+              if (this.billingForm.controls['zip']) {
+                patch['zip'] = addr.pin || addr.zip || '';
+              }
+              // Apply the patch values
+              this.billingForm.patchValue(patch);
+              // Persist into storage so checkout flow sees it
+              this.storage.set({ customerInfo: this.billingForm.value });
+            } else if (Object.keys(patch).length > 0) {
+              // No address found, still apply basic profile patch if available
+              this.billingForm.patchValue(patch);
+              this.storage.set({ customerInfo: this.billingForm.value });
+            }
+          },
+          (err) => {
+            console.error('Error fetching default address:', err);
+            // Apply whatever we have from profile
+            if (Object.keys(patch).length > 0) {
+              this.billingForm.patchValue(patch);
+              this.storage.set({ customerInfo: this.billingForm.value });
+            }
+          }
+        );
+      } else if (Object.keys(patch).length > 0) {
+        // No customer id, just patch with profile info
+        this.billingForm.patchValue(patch);
+        this.storage.set({ customerInfo: this.billingForm.value });
+      }
+    } catch (e) {
+      console.error('Error while auto-populating billing form', e);
+    }
+  }
+
   clearCart() {
     let temp = {};
     localStorage.setItem(this.storage.storageName, JSON.stringify(temp));
@@ -380,13 +455,24 @@ export class BillingDir {
 
 
   send() {
-
- // alert('send');
     if (this.currentUser) {
-    //  console.log(this.currentUser);
       if (this.billingForm.valid) {
+        // Store billing information
+        this.storage.set({
+          customerInfo: this.billingForm.value
+        });
+        
+        // Navigate to payment page
+        this.router.navigate(['/payment']);
+      }
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
 
-       
+  placeOrder() {
+    if (this.currentUser) {
+      if (this.billingForm.valid) {
         this.storage.set({
           customerInfo: this.billingForm.value
         });

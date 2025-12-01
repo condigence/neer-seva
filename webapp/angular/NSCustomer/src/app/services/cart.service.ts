@@ -194,4 +194,12 @@ export class CartService {
       mycart: {}
     });
   }
+
+  clearCart() {
+    // Complete cart cleanup - removes all cart data
+    this.cartData = {};
+    this.cartItemsList = [];
+    this.cartTotal = 0;
+    this.storage.deleteAll();
+  }
 }

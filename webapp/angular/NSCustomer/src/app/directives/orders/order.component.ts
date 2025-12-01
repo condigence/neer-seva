@@ -95,11 +95,31 @@ export class OrderComponent implements OnInit {
     this.modalService.close(id);
   }
 
+  getStatusClass(status: string): string {
+    const statusLower = status?.toLowerCase() || '';
+    if (statusLower.includes('delivered') || statusLower.includes('completed')) {
+      return 'status-delivered';
+    } else if (statusLower.includes('pending') || statusLower.includes('processing')) {
+      return 'status-pending';
+    } else if (statusLower.includes('shipped') || statusLower.includes('transit')) {
+      return 'status-shipped';
+    } else if (statusLower.includes('cancelled') || statusLower.includes('rejected')) {
+      return 'status-cancelled';
+    }
+    return 'status-default';
+  }
 
-
-
-
-
-
-
+  getStatusIcon(status: string): string {
+    const statusLower = status?.toLowerCase() || '';
+    if (statusLower.includes('delivered') || statusLower.includes('completed')) {
+      return 'zmdi-check-circle';
+    } else if (statusLower.includes('pending') || statusLower.includes('processing')) {
+      return 'zmdi-time';
+    } else if (statusLower.includes('shipped') || statusLower.includes('transit')) {
+      return 'zmdi-truck';
+    } else if (statusLower.includes('cancelled') || statusLower.includes('rejected')) {
+      return 'zmdi-close-circle';
+    }
+    return 'zmdi-shopping-cart';
+  }
 }

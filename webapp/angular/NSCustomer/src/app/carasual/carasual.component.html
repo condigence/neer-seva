@@ -1,27 +1,25 @@
-<div class="carousel-wrapper">
-  <ngb-carousel [showNavigationArrows]="true" [showNavigationIndicators]="true" [interval]="5000">
-    <ng-template ngbSlide *ngFor="let i of outlets">
-      <div class="vendor-slide" (click)="getShopItemsByShopId(i)">
-        <div class="vendor-card">
-          <div class="vendor-image-wrapper">
-            <img [src]="'data:image/jpeg;base64,'+i.pic" alt="{{i.name}}" class="vendor-image">
-            <div class="image-overlay">
-              <div class="overlay-content">
-                <i class="zmdi zmdi-eye"></i>
-                <span>View Shop</span>
-              </div>
-            </div>
-          </div>
-          <div class="vendor-info">
-            <h3 class="vendor-name">{{i.name}}</h3>
-            <p class="vendor-description" *ngIf="i.description">{{i.description}}</p>
-            <div class="vendor-badge">
-              <i class="zmdi zmdi-store"></i>
-              <span>Click to explore</span>
-            </div>
-          </div>
+<div class="vendor-slider-wrapper">
+  <div class="vendor-slider-container" #sliderContainer (scroll)="onScroll()">
+    <div class="vendor-card" *ngFor="let i of outlets; let idx = index" (click)="getShopItemsByShopId(i)">
+      <div class="vendor-image">
+        <img [src]="'data:image/jpeg;base64,'+i.pic" alt="{{i.name}}">
+        <div class="image-overlay">
+          <i class="zmdi zmdi-eye"></i>
         </div>
       </div>
-    </ng-template>
-  </ngb-carousel>
+      <div class="vendor-info">
+        <h4 class="vendor-name">{{i.name}}</h4>
+        <p class="vendor-description" *ngIf="i.description">{{i.description}}</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="slider-indicators" *ngIf="outlets && outlets.length > 1">
+    <span 
+      class="indicator-dot" 
+      *ngFor="let outlet of outlets; let i = index" 
+      [class.active]="i === currentSlide"
+      (click)="goToSlide(i)">
+    </span>
+  </div>
 </div>

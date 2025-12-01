@@ -14,8 +14,11 @@ export class FilterPipe implements PipeTransform{
       return items;
     }
 
-    return items.filter(items => {
-      return items.name.startsWith(searchText.toUpperCase());
+    return items.filter(item => {
+      // Get the item name from nested structure
+      const itemName = item.item?.name || item.name || '';
+      const search = searchText.toLowerCase();
+      return itemName.toLowerCase().includes(search);
     });
 
   }

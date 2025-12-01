@@ -1,139 +1,62 @@
-.carousel-wrapper {
-  margin: 20px 0;
-  padding: 0 20px;
-  background: transparent;
-  
-  ::ng-deep {
-    .carousel {
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    .carousel-inner {
-      border-radius: 20px;
-      min-height: 280px;
-    }
-
-    .carousel-item {
-      transition: transform 0.6s ease-in-out;
-    }
-
-    // Beautiful Navigation Arrows
-    .carousel-control-prev,
-    .carousel-control-next {
-      width: 60px;
-      height: 60px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 50%;
-      opacity: 0.9;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    .carousel-control-prev {
-      left: 20px;
-    }
-
-    .carousel-control-next {
-      right: 20px;
-    }
-
-    .carousel-control-prev:hover,
-    .carousel-control-next:hover {
-      opacity: 1;
-      transform: translateY(-50%) scale(1.1);
-      box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
-    }
-
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-      width: 30px;
-      height: 30px;
-      background-size: 100%;
-    }
-
-    // Beautiful Navigation Indicators
-    .carousel-indicators {
-      bottom: 20px;
-      margin-bottom: 0;
-    }
-
-    .carousel-indicators li {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.5);
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
-      margin: 0 5px;
-    }
-
-    .carousel-indicators li.active {
-      width: 40px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-color: white;
-      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
-    }
-  }
+.vendor-slider-wrapper {
+  margin: 10px auto;
+  max-width: 220px;
+  width: 100%;
+  padding: 0 10px;
 }
 
-.vendor-slide {
-  padding: 20px 60px;
-  min-height: 280px;
+.vendor-slider-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  padding: 6px 2px 10px 2px;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+  
+  /* Hide scrollbar in Chrome, Safari and Edge */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .vendor-card {
+  min-width: 100%;
+  max-width: 100%;
   background: white;
-  border-radius: 15px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  max-width: 700px;
-  width: 100%;
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s ease;
   cursor: pointer;
-  animation: slideUp 0.6s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 22px rgba(102, 126, 234, 0.28);
   }
 }
 
-.vendor-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-}
-
-.vendor-image-wrapper {
-  position: relative;
-  width: 100%;
-  height: 180px;
-  overflow: hidden;
-}
 
 .vendor-image {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.vendor-card:hover .vendor-image {
-  transform: scale(1.1);
+  height: 130px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .vendor-card:hover & img {
+    transform: scale(1.05);
+  }
 }
 
 .image-overlay {
@@ -142,130 +65,142 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.75) 0%, rgba(118, 75, 162, 0.75) 100%);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.25s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.vendor-card:hover .image-overlay {
-  opacity: 1;
-}
-
-.overlay-content {
-  text-align: center;
-  color: white;
-  transform: translateY(20px);
-  transition: transform 0.3s ease;
-}
-
-.vendor-card:hover .overlay-content {
-  transform: translateY(0);
-}
-
-.overlay-content i {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: 8px;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
+  
+  .vendor-card:hover & {
+    opacity: 1;
   }
-  50% {
-    transform: scale(1.1);
+  
+  i {
+    color: white;
+    font-size: 2rem;
   }
 }
 
-.overlay-content span {
-  font-size: 1rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.slider-indicators {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 0;
+}
+
+.indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #b0b0b0;
+    transform: scale(1.2);
+  }
+  
+  &.active {
+    width: 24px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+  }
 }
 
 .vendor-info {
-  padding: 20px;
+  padding: 12px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
 }
 
 .vendor-name {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
   color: #2d3748;
-  margin: 0 0 10px 0;
+  margin: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .vendor-description {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #718096;
-  margin: 0 0 12px 0;
-  line-height: 1.5;
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.vendor-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
-  transition: all 0.3s ease;
+
+/* ===================================
+   RESPONSIVE STYLES
+   =================================== */
+
+/* Tablet (991px and below) */
+@media (max-width: 991px) {
+  .vendor-slider-wrapper {
+    max-width: 210px;
+  }
+  
+  .vendor-image {
+    height: 120px;
+  }
 }
 
-.vendor-card:hover .vendor-badge {
-  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
-  transform: scale(1.05);
+/* Mobile (767px and below) */
+@media (max-width: 767px) {
+  .vendor-slider-wrapper {
+    margin: 10px auto;
+    max-width: 150px;
+    padding: 0 8px;
+  }
+  
+  .vendor-slider-container {
+    padding: 6px 0 10px 0;
+  }
+  
+  .vendor-image {
+    height: 110px;
+  }
 }
 
-.vendor-badge i {
-  font-size: 1rem;
+/* Small Mobile (480px and below) */
+@media (max-width: 480px) {
+  .vendor-slider-wrapper {
+    max-width: 190px;
+    padding: 0 6px;
+  }
+  
+  .vendor-image {
+    height: 105px;
+  }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .carousel-wrapper {
-    padding: 0 10px;
+/* Very Small Mobile (360px and below) */
+@media (max-width: 360px) {
+  .vendor-slider-wrapper {
+    max-width: 180px;
+    padding: 0 5px;
   }
-
-  .vendor-slide {
-    padding: 20px;
-  }
-
-  .vendor-image-wrapper {
-    height: 200px;
-  }
-
-  .vendor-name {
-    font-size: 1.5rem;
-  }
-
-  ::ng-deep {
-    .carousel-control-prev,
-    .carousel-control-next {
-      width: 40px;
-      height: 40px;
-    }
-
-    .carousel-control-prev {
-      left: 10px;
-    }
-
-    .carousel-control-next {
-      right: 10px;
-    }
+  
+  .vendor-image {
+    height: 100px;
   }
 }
 

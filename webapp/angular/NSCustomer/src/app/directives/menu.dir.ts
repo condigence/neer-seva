@@ -4,6 +4,7 @@ import { Component, OnChanges, OnInit, HostListener, ElementRef } from '@angular
 import { Router } from '@angular/router';
 
 import { AuthenticationService } from '../services/auth.service';
+import { CartService } from '../services/cart.service';
 import { User } from '../model/user.model';
 
 
@@ -11,73 +12,115 @@ import { User } from '../model/user.model';
 @Component({
   selector: 'menu',
   template: `
-  
+  <header class="topbar-nav">
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light d-print-none">
 
-  <header class="topbar-nav"  >
-  <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light d-print-none" >
+  <!-- Logo -->
+  <a class="navbar-brand" routerLink='/products'>
+      <img src="/assets/images/lg.png" class="logo" alt="Logo" />
+  </a>
 
-  <ul class="navbar-nav mr-auto align-items-center">
-      <li>
-          <div class="col"><a class="navbar-brand" routerLink='/products'><img src="/assets/images/lg.png"
-                      class="logo mr-2" /></a>
+  <!-- Mobile Menu Toggle -->
+  <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" type="button" [class.open]="isMobileMenuOpen">
+      <span class="toggle-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+      </span>
+  </button>
+
+  <!-- Desktop Navigation -->
+  <div class="desktop-nav">
+      <ul class="navbar-nav nav-links">
+          <li class="nav-item">
+              <a class="nav-link" routerLinkActive="active" routerLink='/products'>Products</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" routerLinkActive="active" routerLink='/address/list'>Address</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" routerLinkActive="active" routerLink='/orders'>Orders</a>
+          </li>
+      </ul>
+
+      <div class="nav-right">
+          <div *ngIf="currentUser" class="user-greeting-container">
+              <div class="user-greeting">
+                  <span class="greeting-text">Hello,</span>
+                  <span class="user-name">{{currentUser.name || currentUser.contact}}</span>
+                  <span class="greeting-wave">👋</span>
+              </div>
           </div>
-      </li>
 
-  </ul>
-  <ul class="navbar-nav mr-auto align-items-center">
-      <li class="nav-item">
-          <a class="nav-link" routerLinkActive="active" routerLink='/products'>Products</a>
-      </li>
-      <li class="nav-item">
-          <a class="nav-link" routerLinkActive="active" routerLink='/address/list'>Address</a>
-      </li>
-
-      <li class="nav-item">
-          <a class="nav-link" routerLinkActive="active" routerLink='/orders'>Orders</a>
-      </li>
-
-      <!-- <li class="nav-item">
-          <a class="nav-link" routerLinkActive="active" routerLink='/profile/my-profile'>Profile</a>
-      </li> -->
-  </ul>
-  <div *ngIf="currentUser" class="user-greeting-container">
-      <div class="user-greeting">
-          <span class="greeting-text">Hello,</span>
-          <span class="user-name">{{currentUser.name || currentUser.contact}}</span>
-          <span class="greeting-wave">👋</span>
-      </div>
-  </div>
-  <ul class="navbar-nav align-items-center right-nav-link">
-      <li class="dropdown-divider"></li>
-      <li class="dropdown user-dropdown">
-          <a class="dropdown-toggle" (click)="toggleDropdown()" style="cursor: pointer;">
-              <div class="media" *ngIf="currentUser">
+          <div class="user-dropdown" *ngIf="currentUser">
+              <a class="dropdown-toggle" (click)="toggleDropdown()" style="cursor: pointer;">
                   <div class="avatar">
-                      <img *ngIf="currentUser.pic" class="align-self-start mr-3" [src]="'data:image/jpeg;base64,'+currentUser.pic"
-                          alt="user avatar">
+                      <img *ngIf="currentUser.pic" [src]="'data:image/jpeg;base64,'+currentUser.pic" alt="user avatar">
                       <i *ngIf="!currentUser.pic" class="zmdi zmdi-account-circle default-user-icon"></i>
                   </div>
+              </a>
+              <div class="dropdown-menu-custom" [class.show]="isDropdownOpen">
+                  <a class="dropdown-item-custom" routerLink="/profile/my-profile" (click)="closeDropdown()">
+                      <i class="zmdi zmdi-account"></i> Profile
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item-custom" (click)="closeDropdown()">
+                      <i class="zmdi zmdi-settings"></i> Preferences
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item-custom" (click)="logout()">
+                      <i class="zmdi zmdi-power"></i> Logout
+                  </a>
               </div>
-          </a>
-          <div class="dropdown-menu-custom" [class.show]="isDropdownOpen">
-              <a class="dropdown-item-custom" routerLink="/profile/my-profile" (click)="closeDropdown()">
-                  <i class="zmdi zmdi-account"></i> Profile
-              </a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item-custom" (click)="closeDropdown()">
-                  <i class="zmdi zmdi-settings"></i> Preferences
-              </a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item-custom" (click)="logout()">
-                  <i class="zmdi zmdi-power"></i> Logout
-              </a>
           </div>
-      </li>
-  </ul>
+      </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" [class.show]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
+  
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.show]="isMobileMenuOpen">
+      <div class="mobile-menu-header">
+          <h5 *ngIf="currentUser">Hello, {{currentUser.name || currentUser.contact}}! 👋</h5>
+      </div>
+      
+      <ul class="mobile-nav-links">
+          <li>
+              <a routerLink='/products' (click)="closeMobileMenu()" routerLinkActive="active">
+                  <i class="zmdi zmdi-shopping-basket"></i>
+                  <span>Products</span>
+              </a>
+          </li>
+          <li>
+              <a routerLink='/address/list' (click)="closeMobileMenu()" routerLinkActive="active">
+                  <i class="zmdi zmdi-pin"></i>
+                  <span>Address</span>
+              </a>
+          </li>
+          <li>
+              <a routerLink='/orders' (click)="closeMobileMenu()" routerLinkActive="active">
+                  <i class="zmdi zmdi-shopping-cart"></i>
+                  <span>Orders</span>
+              </a>
+          </li>
+          <li>
+              <a routerLink='/profile/my-profile' (click)="closeMobileMenu()" routerLinkActive="active">
+                  <i class="zmdi zmdi-account"></i>
+                  <span>Profile</span>
+              </a>
+          </li>
+          <li>
+              <a (click)="logout()" style="cursor: pointer;">
+                  <i class="zmdi zmdi-power"></i>
+                  <span>Logout</span>
+              </a>
+          </li>
+      </ul>
+  </div>
 
 </nav>
-
-<header>
+</header>
 
 
 
@@ -307,6 +350,193 @@ import { User } from '../model/user.model';
       border-top: 1px solid #e0e0e0;
     }
 
+    /* Mobile Menu Toggle Button */
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 1001;
+      position: relative;
+    }
+
+    .toggle-icon {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 28px;
+      height: 22px;
+      justify-content: center;
+      position: relative;
+    }
+
+    .toggle-icon span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background: #667eea;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .mobile-menu-toggle.open .toggle-icon span:nth-child(1) {
+      transform: rotate(45deg) translate(8px, 8px);
+    }
+
+    .mobile-menu-toggle.open .toggle-icon span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-toggle.open .toggle-icon span:nth-child(3) {
+      transform: rotate(-45deg) translate(8px, -8px);
+    }
+
+    /* Desktop Navigation */
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex: 1;
+      margin-left: 30px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: row;
+      gap: 5px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    /* Mobile Menu Overlay */
+    .mobile-menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Mobile Menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 280px;
+      height: 100%;
+      background: white;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .mobile-menu.show {
+      right: 0;
+    }
+
+    .mobile-menu-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .mobile-menu-header h5 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .mobile-nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .mobile-nav-links li {
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .mobile-nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 18px 20px;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .mobile-nav-links a:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      color: #667eea;
+    }
+
+    .mobile-nav-links a.active {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+      color: #667eea;
+      border-left: 4px solid #667eea;
+    }
+
+    .mobile-nav-links a i {
+      font-size: 22px;
+      color: #667eea;
+    }
+
+    .mobile-nav-links a span {
+      flex: 1;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 991px) {
+      .mobile-menu-toggle {
+        display: block;
+      }
+
+      .desktop-nav {
+        display: none;
+      }
+
+      .mobile-menu,
+      .mobile-menu-overlay {
+        display: block;
+      }
+
+      .navbar {
+        padding: 12px 15px;
+      }
+
+      .logo {
+        height: 45px;
+      }
+    }
+
     @media (max-width: 768px) {
       .user-greeting {
         padding: 8px 15px;
@@ -323,6 +553,21 @@ import { User } from '../model/user.model';
       .greeting-wave {
         font-size: 1rem;
       }
+
+      .logo {
+        height: 40px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .mobile-menu {
+        width: 100%;
+        right: -100%;
+      }
+
+      .logo {
+        height: 35px;
+      }
     }
   `]
 })
@@ -333,10 +578,12 @@ export class MenuDir  {
   userloggedOut:any;
   currentUser: any;
   isDropdownOpen: boolean = false;
+  isMobileMenuOpen: boolean = false;
   
   constructor(
     private router: Router,
     private authenticationService: AuthenticationService,
+    private cartService: CartService,
     private elementRef: ElementRef
   ) {
 
@@ -370,9 +617,32 @@ export class MenuDir  {
     }
   }
 
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    // Prevent body scroll when menu is open
+    if (this.isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+    document.body.style.overflow = 'auto';
+  }
+
   logout() {
     this.isDropdownOpen = false;
+    this.closeMobileMenu();
+    
+    // Clear cart before logout
+    this.cartService.clearCart();
+    
+    // Logout user
     this.authenticationService.logout();
+    
+    // Navigate to login
     this.router.navigate(['/login']);
   }
 }

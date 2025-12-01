@@ -96,10 +96,24 @@ export class AuthenticationService {
 
   logout() {
     console.log("Logged Out!");
+    
+    // Remove user data
     localStorage.removeItem("currentUser");
     localStorage.removeItem("userContact");
+    localStorage.removeItem("newUser");
+    
+    // Clear cart and all related data
+    localStorage.removeItem("cartinfo");
+    
+    // Clear selected shop
+    localStorage.removeItem("selectedShop");
+    
+    // Update current user subject
     this.currentUserSubject.next(null);
+    
+    // Set logout flag
     localStorage.setItem("userloggedOut", "true");
-    console.log(localStorage.getItem("currentuser"));
+    
+    console.log("User logged out and cart cleared");
   }
 }
