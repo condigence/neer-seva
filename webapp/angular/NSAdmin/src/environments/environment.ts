@@ -9,8 +9,8 @@ export const environment = {
 
    AUTH_API_URL: 'http://localhost:9092/neerseva/api/',
   USERS_API_URL: 'http://localhost:9092/neerseva/api/v1/users/',
-  BRANDS_API_URL: 'http://localhost:9091/neerseva/api/v1/products/brands/',
-  ITEMS_API_URL: 'http://localhost:9091/neerseva/api/v1/products/items/',
+  BRANDS_API_URL: 'http://localhost:9091/neerseva/api/v1/products/brands',
+  ITEMS_API_URL: 'http://localhost:9091/neerseva/api/v1/products/items',
   IMAGES_API_URL: 'http://localhost:9095/neerseva/api/v1/images/',
   VENDOR_API_URL: 'http://localhost:9093/neerseva/api/v1/stocks/',
   ORDER_API_URL: 'http://localhost:9094/neerseva/api/v1/orders/',
