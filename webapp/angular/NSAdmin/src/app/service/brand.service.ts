@@ -18,22 +18,24 @@ export class BrandService {
   private brandsURL = environment.BRANDS_API_URL;
 
   getAllBrands() {
-    return this.http.get<Brand[]>(this.brandsURL);
+    return this.http.get<Brand[]>(this.brandsURL + "/");
   }
 
   deleteBrand(id: string) {
-    return this.http.delete(this.brandsURL + id);
+    return this.http.delete(this.brandsURL + "/" + id);
   }
 
   addBrand(brand: Brand) {
-    return this.http.post(this.brandsURL, brand);
+    return this.http.post(this.brandsURL + "/", brand);
   }
 
   getBrandById(id: any): Observable<Brand> {
-    return this.http.get<Brand>(this.brandsURL + id);
+    
+    return this.http.get<Brand>(this.brandsURL + "/" + id);
   }
 
   updateBrand(brand: Brand) {
+  
     return this.http.put(this.brandsURL, brand);
   }
 

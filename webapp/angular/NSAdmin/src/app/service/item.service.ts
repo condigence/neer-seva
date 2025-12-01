@@ -18,23 +18,23 @@ export class ItemService {
   private itemUrl = environment.ITEMS_API_URL;
 
   getAllItems() {
-    return this.http.get<Item[]>(this.itemUrl);
+    return this.http.get<Item[]>(this.itemUrl + "/");
   }
 
   getItemById(id: any) {
-    return this.http.get<Item>(this.itemUrl+ id);
+    return this.http.get<Item>(this.itemUrl + "/"+ id);
   }
 
   deleteItem(id: string) {
-    return this.http.delete(this.itemUrl+ id);
+    return this.http.delete(this.itemUrl + "/"+ id);
   }
 
   addItem(item: Item) {
-    return this.http.post(this.itemUrl, item);
+    return this.http.post(this.itemUrl + "/", item);
   }
 
   updateItem(item: Item) {
-    return this.http.put(this.itemUrl, item);
+    return this.http.put(this.itemUrl , item);
   }
 
 }
