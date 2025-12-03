@@ -42,7 +42,7 @@ export class ListStockComponent implements OnInit {
 
   ngOnInit() {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    localStorage.getItem('currentUser');
+    // localStorage.getItem('currentUser');
     this.getShopByUserId(this.currentUser.id);
   }
 
@@ -50,6 +50,7 @@ export class ListStockComponent implements OnInit {
     this.shopService.getShopByVendorId(id)
       .subscribe(response => {
         this.shops = response;
+        
       });
   }
 
@@ -62,7 +63,8 @@ export class ListStockComponent implements OnInit {
               this.result = 'NO item';
               console.log(this.result);
             }        
-            this.stocks = data;                       
+            this.stocks = data; 
+            // console.log( "line number 67, list-stock",this.stocks);                      
           });
     }    
     else {
@@ -70,12 +72,16 @@ export class ListStockComponent implements OnInit {
     }
   }
 
+  
+
   deleteStock(stock) {
     console.log(stock);
     this.stockService.deleteStock(+stock.id)
-      .subscribe(data => {
-        this.getShopByUserId(this.currentUser.id);
-      });
+      // .subscribe(data => {
+      //   this.getShopByUserId(this.currentUser.id);
+      // });
+       // Update UI locally
+    this.stocks = this.stocks.filter(s => s.id !== stock.id);
   }
 
   updateStock(stocks: Stock) {

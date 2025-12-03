@@ -148,7 +148,7 @@ public class StockController {
             ItemDTO item = getItemById(stock.getItemId());
 
             dto.setId(stock.getStockId());
-            //dto.setQuantity(stock.getStockQuantity());
+            dto.setQuantity(stock.getStockQuantity());
 
 
             // prepare Items to display
