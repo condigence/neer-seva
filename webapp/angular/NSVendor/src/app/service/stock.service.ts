@@ -37,23 +37,24 @@ export class StockService {
   }
 
   getStockById(id: any) {
-    return this.http.get<Stock>(this.baseUrl + '/v1/stocks/' + id);
+    return this.http.get<Stock>(this.baseUrl + id);
   }
 
 
-  updateStock(stock: Stock) {
-    console.log(stock);
-    return this.http.put(this.baseUrl  +'/v1/stock/'+stock.id, stock );
-  }
+  updateStock(stockDTO: Stock) {
+  return this.http.put(`${this.baseUrl}${stockDTO.id}`, stockDTO);
+}
+
 
   deleteStock(id: any) {
-    return this.http.delete(this.baseUrl + '/v1/stock/' + id);
+    return this.http.delete(this.baseUrl  + id);
   }
 
   getShopByUserId(id) {
-    return this.http.get<Stock>(this.baseUrl + '/shops/by/shop/' + id);
+    return this.http.get<Stock>(this.baseUrl + 'shops/by/shop/' + id);
   }
 
+  
   getStockByUserId(id) {
     return this.http.get<Stock>(this.baseUrl + 'items/by/user/' + id);
   }

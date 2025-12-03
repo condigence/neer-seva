@@ -11,21 +11,37 @@
       
               </h4>
 
-              <div class="form-group row">
+              <!-- <div class="form-group row">
                   <label class="col-lg-3 col-form-label form-control-label">Shop Name</label>
                   <div class="col-lg-9">
                       <input class="form-control" type="text" readonly
                           value="{{stock.shop.name}}">
                   </div>
-              </div>
+              </div> -->
 
-              <div class="form-group row">
+               <!-- Shop Name -->
+  <div class="form-group row">
+    <label class="col-lg-3 col-form-label form-control-label">Shop Name</label>
+    <div class="col-lg-9">
+      <input class="form-control" type="text" readonly [value]="shop?.name">
+    </div>
+  </div>
+
+              <!-- <div class="form-group row">
                   <label class="col-lg-3 col-form-label form-control-label">Item Name</label>
                   <div class="col-lg-9">
                       <input class="form-control" type="text" readonly
                           value="{{stock.item.name}}">
                   </div>
-              </div>
+              </div> -->
+
+              <!-- Item Name -->
+  <div class="form-group row">
+    <label class="col-lg-3 col-form-label form-control-label">Item Name</label>
+    <div class="col-lg-9">
+      <input class="form-control" type="text" readonly [value]="stock?.item?.name">
+    </div>
+  </div>
 
               <!-- <div class="form-group row">
                 <label for="name" class="col-sm-2 col-form-label">Shop</label>
@@ -52,7 +68,7 @@
 
 
 
-              <div class="form-group row">
+              <!-- <div class="form-group row">
                 <label for="quantity" class="col-lg-3 col-form-label form-control-label">Quantity</label>
                 <div class="col-lg-9">
                  
@@ -63,7 +79,18 @@
                 </div>
               </div> 
               <button type="submit" class="btn btn-success"><i class="fa fa-check-square-o"></i> Update</button>
-              <a href="javascript:history.go(-1)" style="margin-left: 20px;">Back</a>
+              <a href="javascript:history.go(-1)" style="margin-left: 20px;">Back</a> -->
+
+              <!-- Quantity -->
+  <div class="form-group row">
+    <label class="col-lg-3 col-form-label form-control-label">Quantity</label>
+    <div class="col-lg-9">
+      <input formControlName="quantity" type="text" class="form-control">
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-success">Update</button>
+  <a href="javascript:history.go(-1)" style="margin-left: 20px;">Back</a>
             </form>
           </div>
         </div>

@@ -1,7 +1,8 @@
 export class Stock {
   id: number;
   quantity: number;
-  itemId: number;
-  shopId: number;
-  userId: number;
+  itemId?: number;
+  shopId?: number;
+  userId?: number;
+  item?: number | any;
 }

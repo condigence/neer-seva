@@ -5,6 +5,7 @@ import { Stock } from '../model/stock.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { AuthenticationService } from '../service/auth.service';
+import { ShopService } from '../service/shop.service';
 
 
 @Component({
@@ -15,6 +16,7 @@ import { AuthenticationService } from '../service/auth.service';
 export class EditStockComponent implements OnInit {
 
   stock: any;
+   shop: any;     // <-- store shop info here
   editForm: FormGroup;
   submitted = false;
   currentUser;
@@ -22,10 +24,11 @@ export class EditStockComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router,
     private stockService: StockService,
+    private shopService: ShopService,
     private authenticationService: AuthenticationService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    localStorage.getItem('currentUser');
+    // localStorage.getItem('currentUser');
   }
 
   ngOnInit() {
@@ -45,39 +48,59 @@ export class EditStockComponent implements OnInit {
       userId: [this.currentUser.id, Validators.required]
 
     });
-    this.stockService.getStockById(+id)
-      .subscribe(data => {
+   // Load stock
+    this.stockService.getStockById(+id).subscribe(stockData => {
+      this.stock = stockData;
+      console.log("Stock:", this.stock);
 
-        this.stock = data;
+      // Load shop info (backend does NOT return shop object)
+      this.shopService.getShopById(stockData.shopId).subscribe(shopData => {
+        this.shop = shopData;
+      });
 
-
-
-        // this.editForm.setValue(data);
-
-
+      // Populate form
+      this.editForm.patchValue({
+        id: stockData.id,
+        quantity: stockData.quantity,
+        itemId: stockData.item.id,
+        shopId: stockData.shopId,
+        userId: this.currentUser.id
+      });
       });
   }
 
-  get f() { return this.editForm.controls; }
+  // get f() { return this.editForm.controls; }
+
+  // onSubmit() {
+  //   this.editForm.controls['id'].setValue(this.stock.id);
+  //   this.editForm.controls['shopId'].setValue(this.stock.shop.id);
+  //   this.editForm.controls['itemId'].setValue(this.stock.item.id);
+  //   this.editForm.controls['userId'].setValue(this.currentUser.id);
+
+  //   //console.log(this.editForm.value);
+  //   this.stockService.updateStock(this.editForm.value)
+  //     .pipe(first())
+  //     .subscribe(
+  //       data => {
+  //         this.router.navigate(['list-stock']);
+  //       },
+  //       error => {
+  //         console.log(error);
+  //       });
+  // }
+
+get f() { return this.editForm.controls; }
 
   onSubmit() {
-    this.editForm.controls['id'].setValue(this.stock.id);
-    this.editForm.controls['shopId'].setValue(this.stock.shop.id);
-    this.editForm.controls['itemId'].setValue(this.stock.item.id);
-    this.editForm.controls['userId'].setValue(this.currentUser.id);
+    this.submitted = true;
+    if (this.editForm.invalid) return;
 
-    //console.log(this.editForm.value);
     this.stockService.updateStock(this.editForm.value)
       .pipe(first())
       .subscribe(
-        data => {
-          this.router.navigate(['list-stock']);
-        },
-        error => {
-          console.log(error);
-        });
+        () => this.router.navigate(['list-stock']),
+        error => console.log(error)
+      );
   }
-
-
 
 }
