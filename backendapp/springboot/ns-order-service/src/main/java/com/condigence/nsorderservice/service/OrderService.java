@@ -5,6 +5,7 @@ import com.condigence.nsorderservice.dto.*;
 import com.condigence.nsorderservice.entity.Order;
 import com.condigence.nsorderservice.entity.OrderDetail;
 import com.condigence.nsorderservice.repository.OrderRepository;
+import com.condigence.nsorderservice.repository.OrderDetailRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -33,10 +34,14 @@ public class OrderService {
 
 	private final OrderRepository orderRepository;
 
+	private final OrderDetailRepository orderDetailRepository;
+
 	@Autowired
-	public OrderService(RestTemplate restTemplate, OrderRepository orderRepository) {
+	public OrderService(RestTemplate restTemplate, OrderRepository orderRepository,
+			OrderDetailRepository orderDetailRepository) {
 		this.restTemplate = restTemplate;
 		this.orderRepository = orderRepository;
+		this.orderDetailRepository = orderDetailRepository;
 	}
 
 
@@ -98,22 +103,17 @@ public class OrderService {
 				// add to list
 				orderDetailList.add(orderDetail);
 			}
+			// attach order details to order so they are cascaded on save
+			order.setOrderDetail(orderDetailList);
 			// TODO: compute grandTotal from items if price available
 			order.setOrderGrandTotal(grandTotal);
-			//order.setOrderDetail(orderDetailList);
-
-			// ensure bidirectional link: set order on each detail (defensive)
-//			for (OrderDetail od : order.getOrderDetail()) {
-//				if (od.getOrder() == null) od.setOrder(order);
-//			}
-
 		}
 		order.setOrderDate(java.time.LocalDate.now());
 		order.setOrderTime(java.time.LocalTime.now());
 		order.setOrderStatus("PENDING");
 		order.setOrderDeliveryStatus("CONFIRMED");
 		order.setEta("NOTSET");
-		// persist and flush so DB assigns identity values immediately
+		// persist and flush so DB assigns identity values immediately, including for details
 		order = orderRepository.saveAndFlush(order);
 
 		// Log saved order minimal info to avoid lazy-loading issues during JSON serialization
