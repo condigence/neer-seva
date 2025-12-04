@@ -583,22 +583,26 @@ export class PaymentPage implements OnInit {
     const prepareAndPlace = (shopIdValue: any) => {
       const shop = { id: Number(shopIdValue) };
 
-      let items = [];
+      let stockItems = [];
       for (let i = 0; i < this.cart.cartItemsList.length; i++) {
-        let item = { id: this.cart.cartItemsList[i].id, quantity: this.cart.cartItemsList[i].qty };
-        items.push(item);
+        const cartItem = this.cart.cartItemsList[i];
+        const stockId = cartItem.id; // stock identifier from catalog
+        const itemId = cartItem.itemId ?? null; // underlying product id
+        let stockItem = { stockId: stockId, itemId: itemId, quantity: cartItem.qty };
+        stockItems.push(stockItem);
       }
 
+      console.log('Preparing to place order for customer:', customer, 'shop:', shop, 'items:', stockItems);
       // prepare Order data with payment info
       this.order = { 
         customer: customer, 
         shop: shop, 
-        items: items,
+        stockItems: stockItems,
         paymentMethod: this.selectedPaymentMethod,
         paymentStatus: this.selectedPaymentMethod === 'cod' ? 'pending' : 'completed'
       };
       
-      console.log('Placing order with data:', this.order);
+      console.log('Payments Page. Placing order with data:', this.order);
 
       try {
         this.orderService.placeMyOrder(this.order)

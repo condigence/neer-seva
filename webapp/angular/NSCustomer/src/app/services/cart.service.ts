@@ -27,7 +27,7 @@ export class CartService {
       if (this.cartItemsList && this.cartItemsList.length > 0) {
         try {
           this.storage.set({
-            cartItems: { items: this.cartItemsList, total: this.cartTotal }
+            cartItems: { stockItems: this.cartItemsList, total: this.cartTotal }
           });
         } catch (e) {
           console.error('allItems setter - error saving snapshot:', e);
@@ -54,8 +54,8 @@ export class CartService {
     // even if product catalog (allItems) is not yet loaded.
     try {
       const snapshot: any = this.storage.get('cartItems');
-      if (snapshot && snapshot.items && snapshot.items.length > 0) {
-        this.cartItemsList = snapshot.items;
+      if (snapshot && snapshot.stockItems && snapshot.stockItems.length > 0) {
+        this.cartItemsList = snapshot.stockItems;
         this.cartTotal = snapshot.total || 0;
       } else {
         console.log('loadCart - no valid snapshot to restore');
@@ -98,7 +98,7 @@ export class CartService {
     try {
       if (this.cartItemsList && this.cartItemsList.length > 0) {
         this.storage.set({
-          cartItems: { items: this.cartItemsList, total: this.cartTotal }
+          cartItems: { stockItems: this.cartItemsList, total: this.cartTotal }
         });
       } else {
         console.log('storeItems - skipping snapshot save, cartItemsList is empty (allItems not loaded yet)');
@@ -142,6 +142,7 @@ export class CartService {
 
       tempCart.push({
         id: catalogItem.id,
+        itemId: product.id,
         name: product.name || catalogItem.name,
         qty: qty,
         mrp: product.mrp || product.itemMrp || product.dispPrice || product.itemDispPrice || 0,
@@ -192,7 +193,7 @@ export class CartService {
     this.cartTotal = 0;
     this.storage.set({
       mycart: {},
-      cartItems: { items: [], total: 0 }
+      cartItems: { stockItems: [], total: 0 }
     });
   }
 

@@ -1,6 +1,7 @@
 package com.condigence.nspaymentservice.service;
 
 import com.condigence.nspaymentservice.entity.OrderPayment;
+import com.razorpay.RazorpayClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ public class PaymentService {
     private final AtomicLong idGen = new AtomicLong(1000);
 
     @Autowired(required = false)
-    private com.razorpay.RazorpayClient razorpayClient;
+    private RazorpayClient razorpayClient;
 
     public OrderPayment createOrder(double amount, String paymentMethod) {
         OrderPayment o = new OrderPayment();
@@ -29,7 +30,7 @@ public class PaymentService {
         return o;
     }
 
-    public Map<String, Object> createRazorpayOrder(double amount) throws Exception {
+    public Map<String, Object> createRazorpayOrder(double amount) {
         int amtInPaise = (int) (amount * 100);
         Map<String, Object> payload = new HashMap<>();
         payload.put("amount", amtInPaise);
@@ -47,7 +48,7 @@ public class PaymentService {
         }
 
         // create local order record
-        OrderPayment o = createOrder(amount, "RAZORPAY");
+        OrderPayment o = createOrder(amount, "RAZORPAY_UPI");
         o.setRazorpayOrderId((String) resp.get("id"));
         store.put(o.getOrder_id(), o);
 
@@ -65,5 +66,4 @@ public class PaymentService {
             o.setStatus("PAID");
         }
     }
-
 }

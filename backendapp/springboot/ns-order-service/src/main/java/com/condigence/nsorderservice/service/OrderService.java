@@ -89,10 +89,10 @@ public class OrderService {
 
 			order.setOrderToShopId(orderdetailDTO.getShop().getId());
 
-			for (ItemDTO itemDto : orderdetailDTO.getItems()) {
+			for (StockDTO stockItemDto : orderdetailDTO.getStockItems()) {
 				OrderDetail orderDetail = new OrderDetail();
-				orderDetail.setOrderItemId(itemDto.getId());
-				orderDetail.setOrderItemQuantity(itemDto.getQuantity());
+				orderDetail.setOrderItemId(stockItemDto.getItemId());
+				orderDetail.setOrderItemQuantity(stockItemDto.getQuantity());
 				// set parent relationship
 				orderDetail.setOrder(order);
 				// add to list
@@ -100,12 +100,12 @@ public class OrderService {
 			}
 			// TODO: compute grandTotal from items if price available
 			order.setOrderGrandTotal(grandTotal);
-			order.setOrderDetail(orderDetailList);
+			//order.setOrderDetail(orderDetailList);
 
 			// ensure bidirectional link: set order on each detail (defensive)
-			for (OrderDetail od : order.getOrderDetail()) {
-				if (od.getOrder() == null) od.setOrder(order);
-			}
+//			for (OrderDetail od : order.getOrderDetail()) {
+//				if (od.getOrder() == null) od.setOrder(order);
+//			}
 
 		}
 		order.setOrderDate(java.time.LocalDate.now());
@@ -129,8 +129,8 @@ public class OrderService {
 		            logger.error("Stock service did not confirm update for order {}. status={} body={}", order.getOrderId(), response.getStatusCode(), response.getBody());
 		            // Construct a more specific not-found message with shop and item details
 		                    StringBuilder itemDetails = new StringBuilder();
-		                    if (orderdetailDTO != null && orderdetailDTO.getItems() != null) {
-		                        orderdetailDTO.getItems().forEach(i -> itemDetails.append("[id:").append(i.getId()).append(",qty:").append(i.getQuantity()).append("]"));
+		                    if (orderdetailDTO != null && orderdetailDTO.getStockItems() != null) {
+		                        orderdetailDTO.getStockItems().forEach(i -> itemDetails.append("[id:").append(i.getItemId()).append(",qty:").append(i.getQuantity()).append("]"));
 		                    }
 		                    Long shopId = null;
 		                    if (orderdetailDTO != null && orderdetailDTO.getShop() != null) shopId = orderdetailDTO.getShop().getId();

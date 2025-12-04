@@ -494,7 +494,7 @@ export class BillingDir implements OnInit, OnDestroy {
 
           // prepare Order data
           this.order = { customer: customer, shop: shop, items: items };
-          console.log('Placing order with data:', this.order);
+          console.log('Billing Page. Placing order with data:', this.order);
           
           // Show loading spinner
           this.isPlacingOrder = true;

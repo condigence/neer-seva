@@ -29,14 +29,11 @@ public class StockService {
 		stockRepo.deleteById(stockId);
 	}
 
-	public Stock getStockByShopAndItemId(long l, long m) {
-		Optional<Stock> stock = stockRepo.getItemStockForShop(l,m);
-		if(!stock.isPresent()) {
-			Stock s = null;
-			return s;
-		}else {
-			return stock.get();
-		}
+	// Note: method accepts parameters in (shopId, itemId) order to match its name.
+	public Stock getStockByShopAndItemId(long shopId, long itemId) {
+		// Repository expects (itemId, shopId)
+		Optional<Stock> stock = stockRepo.getItemStockForShop(itemId, shopId);
+		return stock.orElse(null);
 	}
 	
 	

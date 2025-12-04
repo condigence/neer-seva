@@ -15,4 +15,6 @@ public class OrderDetailDTO {
 
 	private List<ItemDTO> items;
 
+    private List<StockItemDTO> stockItems;
+
 }

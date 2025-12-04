@@ -25,5 +25,6 @@ public class OrderDetailDTO {
 	private ShopDTO shop;
 	private CustomerDTO customer;
 	private List<ItemDTO> items;
+    private List<StockDTO> stockItems;
 
 }

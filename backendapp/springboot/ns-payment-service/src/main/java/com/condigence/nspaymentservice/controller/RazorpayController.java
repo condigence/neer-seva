@@ -5,12 +5,14 @@ import com.condigence.nspaymentservice.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/payments")
 public class RazorpayController {
 
     @Autowired
@@ -20,7 +22,17 @@ public class RazorpayController {
     @PostMapping("/createOrder")
     public ResponseEntity<?> createOrder(@RequestParam double amount, @RequestParam(required = false, defaultValue = "UPI") String method) {
         OrderPayment order = paymentService.createOrder(amount, method);
-        return ResponseEntity.ok(Map.of("orderId", order.getOrder_id(), "amount", order.getAmount()));
+        return ResponseEntity.ok(Map.of(
+                "orderId", order.getOrder_id(),
+                "amount", order.getAmount(),
+                "paymentMethod", order.getPaymentMethod()));
+    }
+
+    // Create Razorpay order for UPI payment
+    @PostMapping("/createRazorpayOrder")
+    public ResponseEntity<?> createRazorpayOrder(@RequestParam double amount) throws Exception {
+        Map<String, Object> resp = paymentService.createRazorpayOrder(amount);
+        return ResponseEntity.ok(resp);
     }
 
     // Mark order paid (demo)

@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StockDTO {
 
-	private Long id;
+	private Long stockId;
 	private Long itemId;
 	private Long shopId;
 	private Integer quantity;
-
 }
