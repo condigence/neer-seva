@@ -1,9 +1,9 @@
-import { MenuDir } from './directives/menu.dir';
-import { ProductsListDir } from './directives/productslist.dir';
-import { AddToCartDir } from './directives/addtocart.dir';
-import { BillingDir } from './directives/billing.dir';
-import { BillingCartDir } from './directives/billingcart.dir';
-import { CheckOutDir } from './directives/checkout.dir';
+import { MenuDir } from './directives/menu/menu.dir';
+import { ProductsListDir } from './directives/productlist/productlist.dir';
+import { AddToCartDir } from './directives/addToCart/addtocart.dir';
+import { BillingDir } from './directives/billing/billing.dir';
+import { BillingCartDir } from './directives/billingcart/billing.cart';
+import { CheckOutDir } from './directives/checkout/checkout.dir';
 import { ListAddressDir, DeleteAddressModalContent } from './directives/address/list/listaddressdir.component';
 import { AddAddressDir } from './directives/address/add/address.component';
 import { EditAddressDir, UpdateSuccessModalContent, UnsavedChangesModalContent } from './directives/address/edit/addressdir';

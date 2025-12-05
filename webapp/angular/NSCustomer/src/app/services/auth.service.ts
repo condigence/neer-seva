@@ -32,13 +32,8 @@ export class AuthenticationService {
     return this.http.post<any>(this.baseUrl + `verify/login`, user).pipe(
       map(
         (user) => {
-          // console.log(user);
-          if (user) {
-            // store user details and jwt token in local storage to keep user logged in between page refreshes
-            // console.log(JSON.stringify(user.contact));
-            localStorage.setItem("userContact", user.contact);
-            // localStorage.setItem('currentUser', JSON.stringify(user));
-            //  this.currentUserSubject.next(user);
+          if (user) {            
+            localStorage.setItem("userContact", user.contact);           
           }
           return user;
         },
@@ -53,11 +48,7 @@ export class AuthenticationService {
     return this.http.post<any>(this.baseUrl + `verify/otp`, user).pipe(
       map(
         (user) => {
-          // login successful if there's a jwt token in the response
-          //if (user && user.token) {
-
           if (user) {
-            // store user details and jwt token in local storage to keep user logged in between page refreshes
             localStorage.setItem("currentUser", JSON.stringify(user));
             this.currentUserSubject.next(user);
           }
@@ -94,26 +85,18 @@ export class AuthenticationService {
       );
   }
 
-  logout() {
-    console.log("Logged Out!");
-    
+  logout() {    
     // Remove user data
     localStorage.removeItem("currentUser");
     localStorage.removeItem("userContact");
-    localStorage.removeItem("newUser");
-    
+    localStorage.removeItem("newUser");    
     // Clear cart and all related data
-    localStorage.removeItem("cartinfo");
-    
+    localStorage.removeItem("cartinfo");    
     // Clear selected shop
-    localStorage.removeItem("selectedShop");
-    
+    localStorage.removeItem("selectedShop");    
     // Update current user subject
-    this.currentUserSubject.next(null);
-    
+    this.currentUserSubject.next(null);    
     // Set logout flag
-    localStorage.setItem("userloggedOut", "true");
-    
-    console.log("User logged out and cart cleared");
+    localStorage.setItem("userloggedOut", "true");    
   }
 }

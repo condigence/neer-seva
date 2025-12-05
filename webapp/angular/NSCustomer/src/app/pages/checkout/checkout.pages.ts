@@ -3,23 +3,9 @@ import { CartService } from '../../services/cart.service';
 import { ProductsModel } from '../../model/products.model';
 
 @Component({
-  template:`
-   <menu></menu>
-  <div class="checkout-wrapper">
-    <div class="container">
-      <checkout-dir
-        [allProductList]="items"
-      ></checkout-dir>
-    </div>
-  </div>
-  `,
-  styles: [`
-    .checkout-wrapper {
-      min-height: 100vh;
-      padding: 100px 20px 30px;
-      background: linear-gradient(135deg, #f5f7fa 0%, #edf2f7 100%);
-    }
-  `]
+selector: 'app-checkout',
+templateUrl: './checkout.pages.html',
+styleUrls: ['./checkout.pages.scss']
 })
 
 export class CheckoutPage{

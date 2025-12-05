@@ -1,0 +1,46 @@
+ <div class="row product-grid" >
+    <div class="col-lg-4 col-md-6 col-sm-6 mb-4" *ngFor = "let i of items | filter : __searchedItem | sortBy : sortByOption">
+        <div class="product-card">
+          <div class="product-image-wrapper">
+            <img class="product-image" [src]="'data:image/jpeg;base64,'+i.item.pic" alt="{{i.item.name}}">
+            <!-- <div class="product-badge" *ngIf="i.item.dispPrice && i.item.dispPrice != i.item.price">
+              <span class="badge-discount">{{calculateDiscount(i.item.dispPrice, i.item.price)}}% OFF</span>
+            </div> -->
+          </div>
+          <div class="product-details">
+            <h6 class="product-name">{{i.item.name}}</h6>
+            
+            <div class="product-pricing">
+              <div class="price-section">
+                <del class="orignal-price">&#x20B9;{{i.item.price}}</del>
+                <del class="current-price" *ngIf="i.item.dispPrice && i.item.dispPrice != i.item.price">&#x20B9;{{i.item.dispPrice}}</del>
+              </div>
+            </div>
+            
+            <div class="seller-info" *ngIf="getVendorName(i)">
+              <span class="seller-text">Seller: {{getVendorName(i)}}</span>
+            </div>
+            
+            <!-- Stock Info -->
+            <div class="stock-info" *ngIf="i.quantity > 0 && i.quantity <= 10" [class.low-stock-alert]="i.quantity <= 10">
+              <i class="zmdi zmdi-alert-circle"></i>
+              <span>Only {{i.quantity}} left!</span>
+            </div>
+            
+            <div class="stock-info available-stock" *ngIf="i.quantity > 10">
+              <i class="zmdi zmdi-check-circle"></i>
+              <span>Available stock: {{i.quantity}}</span>
+            </div>
+            
+            <button class="add-to-cart-btn" 
+                    (click)="addToCart(i.id,1,'')" 
+                    [disabled]="!i.quantity || i.quantity === 0"
+                    [class.out-of-stock-btn]="!i.quantity || i.quantity === 0">
+              <i class="zmdi zmdi-shopping-cart-plus mr-2" *ngIf="i.quantity > 0"></i>
+              <i class="zmdi zmdi-block mr-2" *ngIf="!i.quantity || i.quantity === 0"></i>
+              {{i.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}}
+            </button>
+          </div>
+      </div>
+    </div>
+  </div>
