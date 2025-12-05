@@ -1,14 +1,16 @@
 package com.condigence.stockservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 @Data
 public class StockItemDTO {
 
-	private long stockId;
+    private Long stockId;
 
-	private int quantity;
+    private int quantity;
 
-	private long itemId;
+    @JsonAlias({"id", "itemId"})
+    private Long itemId;
 
 }

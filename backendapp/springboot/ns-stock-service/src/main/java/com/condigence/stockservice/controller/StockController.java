@@ -6,9 +6,6 @@ import com.condigence.stockservice.client.ProductClient;
 import com.condigence.stockservice.dto.*;
 import com.condigence.stockservice.entity.Shop;
 import com.condigence.stockservice.entity.Stock;
-import com.condigence.stockservice.exception.InsufficientStockException;
-import com.condigence.stockservice.exception.InvalidOrderException;
-import com.condigence.stockservice.exception.StockNotFoundException;
 import com.condigence.stockservice.mapper.ShopMapper;
 import com.condigence.stockservice.mapper.StockMapper;
 import com.condigence.stockservice.service.ImageService;
@@ -214,19 +211,8 @@ public class StockController {
     @PostMapping(value = "/update/on/order")
     public ResponseEntity<?> updateStockByOrder(@RequestBody OrderDetailDTO orderDetail) {
         logger.info("Updating Stock on orderDetails {}", orderDetail);
-        try {
-            stockService.updateStockByOrder(orderDetail);
-            return ResponseEntity.ok().build();
-        } catch (InvalidOrderException e) {
-            logger.error("Invalid order while updating stock: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType(e.getMessage()));
-        } catch (StockNotFoundException e) {
-            logger.error("Stock not found while updating stock: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType(e.getMessage()));
-        } catch (InsufficientStockException e) {
-            logger.error("Insufficient stock while updating stock: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorType(e.getMessage()));
-        }
+        stockService.updateStockByOrder(orderDetail);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
