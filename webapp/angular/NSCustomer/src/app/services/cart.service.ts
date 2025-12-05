@@ -66,24 +66,69 @@ export class CartService {
   }
 
   addToCart(id, qty, replace) {
+    // Get available stock for this item
+    const availableStock = this.getAvailableStock(id);
+    
+    // Store the previous quantity to detect changes
+    const previousQty = this.cartData[id] || 0;
+    
     if (this.cartData[id] === undefined) {
       this.cartData[id] = 0;
     }
+    
+    let requestedQty = 0;
+    
     if (replace === '') {
       // relative change (delta)
-      this.cartData[id] = (this.cartData[id] || 0) + (Number(qty) || 0);
+      let newQty = (this.cartData[id] || 0) + (Number(qty) || 0);
+      requestedQty = newQty;
+      // Enforce stock limit
+      if (availableStock !== null && newQty > availableStock) {
+        newQty = availableStock;
+      }
+      this.cartData[id] = newQty;
     } else {
       // absolute replace
       let next = parseInt(qty, 10);
       if (isNaN(next) || next < 1) {
         next = 1;
       }
+      requestedQty = next;
+      // Enforce stock limit
+      if (availableStock !== null && next > availableStock) {
+        next = availableStock;
+      }
       this.cartData[id] = next;
     }
+    
+    const finalQty = this.cartData[id];
+    const quantityChanged = finalQty !== previousQty;
+    
     if (this.cartData[id] <= 0) {
       delete this.cartData[id];
     }
-    this.storeItems();
+    
+    // Only store and recalculate if quantity actually changed
+    if (quantityChanged) {
+      this.storeItems();
+    }
+    
+    // Return the actual quantity added (for feedback)
+    return {
+      success: true,
+      quantity: finalQty,
+      previousQuantity: previousQty,
+      quantityChanged: quantityChanged,
+      limitReached: availableStock !== null && finalQty >= availableStock && requestedQty > finalQty
+    };
+  }
+  
+  getAvailableStock(id: any): number | null {
+    if (!this.allItems || this.allItems.length === 0) {
+      return null;
+    }
+    const item = this.allItems.find((i: any) => i.id == id);
+    return item ? (item.quantity ?? null) : null;
   }
 
   storeItems() {
@@ -148,7 +193,8 @@ export class CartService {
         mrp: product.mrp || product.itemMrp || product.dispPrice || product.itemDispPrice || 0,
         price: lineTotal,
         unitPrice: unitPrice,
-        image: product.pic || product.image || null
+        image: product.pic || product.image || null,
+        availableStock: catalogItem.quantity ?? 0
       });
       tempTotal += lineTotal;
     });

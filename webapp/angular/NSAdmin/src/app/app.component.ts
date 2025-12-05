@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Renderer2, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { AuthenticationService } from './service/auth.service';
 import { UserService } from './service/user.service';
@@ -8,7 +8,7 @@ import { UserService } from './service/user.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
 
   user: any;
   isUserActive: any;
@@ -131,6 +131,15 @@ export class AppComponent implements OnInit {
   onEscape(event: KeyboardEvent) {
     if (this.isSidebarOpen) {
       this.closeSidebar();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    // Initialize sidebar menu after view is rendered
+    if (typeof (window as any).$ !== 'undefined' && typeof (window as any).$.sidebarMenu === 'function') {
+      (window as any).$('.sidebar-menu').each(function() {
+        (window as any).$.sidebarMenu((window as any).$(this));
+      });
     }
   }
 

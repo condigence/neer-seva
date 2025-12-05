@@ -1,25 +1,66 @@
-<div class="vendor-slider-wrapper">
-  <div class="vendor-slider-container" #sliderContainer (scroll)="onScroll()">
-    <div class="vendor-card" *ngFor="let i of outlets; let idx = index" (click)="getShopItemsByShopId(i)">
-      <div class="vendor-image">
-        <img [src]="'data:image/jpeg;base64,'+i.pic" alt="{{i.name}}">
-        <div class="image-overlay">
-          <i class="zmdi zmdi-eye"></i>
+<div class="vendor-grid-wrapper">
+  <!-- Welcome Section -->
+  <div class="vendor-welcome-section">
+    <h2 class="welcome-title">
+      <i class="zmdi zmdi-flower-alt mr-2"></i>Our Trusted Vendors
+    </h2>
+    <p class="welcome-message">
+      We're delighted to serve you! Choose from our carefully selected vendors, 
+      each committed to bringing you the finest quality products and exceptional service. 
+      Your satisfaction is our priority. 🌟
+    </p>
+  </div>
+  
+  <div class="vendor-grid-header">
+    <h3 class="vendor-grid-title">
+      <i class="zmdi zmdi-store mr-2"></i>Select Your Vendor
+    </h3>
+    <div class="vendor-page-info" *ngIf="outlets && outlets.length > getCardsPerPage()">
+      <span class="page-badge">Page {{currentPage}} of {{totalPages}}</span>
+    </div>
+  </div>
+  
+  <div class="vendor-grid-container" #gridContainer>
+    <div class="vendor-grid">
+      <div class="vendor-card" 
+           *ngFor="let outlet of getCurrentPageVendors()" 
+           (click)="getShopItemsByShopId(outlet)"
+           [class.selected]="isShopSelected(outlet.id)">
+        <div class="vendor-image">
+          <img [src]="'data:image/jpeg;base64,'+outlet.pic" alt="{{outlet.name}}">
+          <div class="image-overlay">
+            <i class="zmdi zmdi-eye"></i>
+          </div>
         </div>
-      </div>
-      <div class="vendor-info">
-        <h4 class="vendor-name">{{i.name}}</h4>
-        <p class="vendor-description" *ngIf="i.description">{{i.description}}</p>
+        <div class="vendor-info">
+          <h4 class="vendor-name">{{outlet.name}}</h4>
+          <p class="vendor-description" *ngIf="outlet.description">{{outlet.description}}</p>
+        </div>
       </div>
     </div>
   </div>
   
-  <div class="slider-indicators" *ngIf="outlets && outlets.length > 1">
-    <span 
-      class="indicator-dot" 
-      *ngFor="let outlet of outlets; let i = index" 
-      [class.active]="i === currentSlide"
-      (click)="goToSlide(i)">
-    </span>
+  <!-- Navigation arrows and dots -->
+  <div class="vendor-navigation" *ngIf="outlets && outlets.length > getCardsPerPage()">
+    <button class="nav-arrow prev" 
+            (click)="previousPage()" 
+            [disabled]="currentPage === 1">
+      <i class="zmdi zmdi-chevron-left"></i>
+    </button>
+    
+    <div class="page-dots">
+      <span 
+        class="page-dot" 
+        *ngFor="let page of getPageArray(); let i = index" 
+        [class.active]="i + 1 === currentPage"
+        (click)="goToPage(i + 1)">
+      </span>
+    </div>
+    
+    <button class="nav-arrow next" 
+            (click)="nextPage()" 
+            [disabled]="currentPage === totalPages">
+      <i class="zmdi zmdi-chevron-right"></i>
+    </button>
   </div>
 </div>

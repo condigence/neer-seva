@@ -482,7 +482,11 @@ export class PaymentPage implements OnInit {
   public upiId: string = '';
   public upiIdError: string = '';
   public isProcessing: boolean = false;
-  public qrCodeUrl: string = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=merchant@upi&pn=NeerSeva&am=';
+  // Replace with your own QR code image path or UPI payment URL
+  // Option 1: Use static QR code image from assets
+  // public qrCodeUrl: string = 'assets/images/upi-qr-code.png';
+  // Option 2: Generate QR code dynamically with your UPI ID
+  public qrCodeUrl: string = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=yourmerchant@paytm&pn=NeerSeva&am=';
   private currentUser: any;
   private order: any;
 
@@ -504,8 +508,8 @@ export class PaymentPage implements OnInit {
 
   ngOnInit() {
     this.ref();
-    // Update QR code with cart total
-    if (this.cart.cartTotal) {
+    // Update QR code with cart total (only if using dynamic QR generation)
+    if (this.cart.cartTotal && this.qrCodeUrl.includes('qrserver.com')) {
       this.qrCodeUrl += this.cart.cartTotal;
     }
   }

@@ -123,9 +123,15 @@ $(function() {
             return this.href == i;
         }).addClass("active").parent().addClass("active"); ;) {
             if (!o.is("li")) break;
-            o = o.parent().addClass("in").parent().addClass("active");
+            // Only add 'active' to parent if it contains a submenu with the active link
+            var parent = o.parent();
+            if (parent.hasClass("sidebar-submenu")) {
+                o = parent.parent().addClass("active");
+            } else {
+                break;
+            }
         }
-    }), 	   
+    }),
 	   
 /* Back To Top */
 
