@@ -1,42 +1,4 @@
-import { Component } from '@angular/core';
-import { CartService } from '../services/cart.service';
-@Component({
-  selector :'billing-cart',
-  template : `
-    <div class="cart-summary-card">
-      <div class="cart-header">
-        <h5 class="cart-title">
-          <i class="zmdi zmdi-shopping-basket mr-2"></i>Order Summary
-        </h5>
-        <span class="items-badge">{{cart.cartItemsList.length}} Items</span>
-      </div>
-
-      <div class="cart-items-list">
-        <div class="cart-item" *ngFor="let itm of cart.cartItemsList">
-          <div class="item-details">
-            <h6 class="item-name">{{itm.name}}</h6>
-            <div class="item-meta">
-              <span class="quantity-badge">
-                <i class="zmdi zmdi-collection-item mr-1"></i>{{itm.qty}} × &#x20B9;{{itm.price/itm.qty}}
-              </span>
-            </div>
-          </div>
-          <div class="item-price">
-            &#x20B9;{{itm.price}}
-          </div>
-        </div>
-      </div>
-
-      <div class="cart-total">
-        <div class="total-row">
-          <span class="total-label">Total Amount</span>
-          <span class="total-amount">&#x20B9;{{cart.cartTotal}}</span>
-        </div>
-      </div>
-    </div>
-  `,
-  styles : [`
-    .cart-summary-card {
+ .cart-summary-card {
       background: #ffffff;
       border-radius: 15px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -209,20 +171,3 @@ import { CartService } from '../services/cart.service';
         margin-bottom: 20px;
       }
     }
-  `]
-})
-
-export class BillingCartDir{
-
-  constructor(
-    public cart: CartService
-  ){
-  }
-
-  ngOnInit() {
-    // Force cart to reload from localStorage when component initializes
-    this.cart.loadCart();
-    console.log('Billing cart initialized, items:', this.cart.cartItemsList.length);
-  }
-
-}

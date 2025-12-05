@@ -1,0 +1,120 @@
+ <menu></menu>
+  <div class="content-wrapper">
+    <div class="container-fluid px-0">
+      <div class="row no-gutters justify-content-center">
+        <div class="col-lg-8 col-md-10 col-sm-12">
+          <div class="card payment-card shadow-lg border-0">
+            <div class="card-header bg-gradient text-white">
+              <h4 class="mb-0">
+                <i class="zmdi zmdi-card mr-2"></i>Payment Options
+              </h4>
+            </div>
+            <div class="card-body p-4">
+              
+              <!-- Payment Method Selection -->
+              <div class="payment-methods mb-4">
+                <h5 class="section-title mb-3">Choose Payment Method</h5>
+                
+                <div class="payment-option" [class.active]="selectedPaymentMethod === 'upi'" 
+                     (click)="selectPaymentMethod('upi')">
+                  <div class="option-radio">
+                    <input type="radio" name="payment" id="upi" [checked]="selectedPaymentMethod === 'upi'">
+                    <label for="upi"></label>
+                  </div>
+                  <div class="option-content">
+                    <i class="zmdi zmdi-smartphone-android payment-icon"></i>
+                    <div class="option-details">
+                      <h6>UPI Payment</h6>
+                      <p>Pay using UPI ID or QR Code</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="payment-option" [class.active]="selectedPaymentMethod === 'cod'" 
+                     (click)="selectPaymentMethod('cod')">
+                  <div class="option-radio">
+                    <input type="radio" name="payment" id="cod" [checked]="selectedPaymentMethod === 'cod'">
+                    <label for="cod"></label>
+                  </div>
+                  <div class="option-content">
+                    <i class="zmdi zmdi-money payment-icon"></i>
+                    <div class="option-details">
+                      <h6>Cash on Delivery</h6>
+                      <p>Pay when you receive the order</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- UPI Payment Details -->
+              <div *ngIf="selectedPaymentMethod === 'upi'" class="upi-section animate-in">
+                <div class="row">
+                  <div class="col-md-6 mb-4">
+                    <div class="qr-code-container">
+                      <h6 class="text-center mb-3">Scan QR Code</h6>
+                      <div class="qr-code-wrapper">
+                        <img [src]="qrCodeUrl" alt="UPI QR Code" class="qr-code-image">
+                      </div>
+                      <p class="text-center mt-2 small text-muted">Scan with any UPI app</p>
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-6">
+                    <div class="upi-input-section">
+                      <h6 class="mb-3">Or Enter UPI ID</h6>
+                      <div class="form-group">
+                        <label>UPI ID</label>
+                        <input type="text" 
+                               class="form-control" 
+                               [(ngModel)]="upiId"
+                               placeholder="yourname@upi"
+                               [class.is-invalid]="upiIdError">
+                        <div class="invalid-feedback" *ngIf="upiIdError">
+                          <i class="zmdi zmdi-alert-circle-o mr-1"></i>{{upiIdError}}
+                        </div>
+                      </div>
+                      
+                      <div class="payment-amount-display">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span class="text-muted">Amount to Pay:</span>
+                          <span class="amount">₹{{cart.cartTotal || 0}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- COD Confirmation -->
+              <div *ngIf="selectedPaymentMethod === 'cod'" class="cod-section animate-in">
+                <div class="alert alert-info">
+                  <i class="zmdi zmdi-info mr-2"></i>
+                  <strong>Cash on Delivery Selected</strong>
+                  <p class="mb-0 mt-2">Please keep exact amount ready. Amount to be paid: <strong>₹{{cart.cartTotal || 0}}</strong></p>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="payment-actions mt-4">
+                <button class="btn btn-secondary" (click)="goBack()" [disabled]="isProcessing">
+                  <i class="zmdi zmdi-arrow-left mr-2"></i>Back to Billing
+                </button>
+                
+                <button class="btn btn-primary" 
+                        (click)="confirmPayment()" 
+                        [disabled]="!selectedPaymentMethod || isProcessing">
+                  <span *ngIf="!isProcessing">
+                    <i class="zmdi zmdi-check-circle mr-2"></i>Confirm Payment
+                  </span>
+                  <span *ngIf="isProcessing">
+                    <span class="spinner-border spinner-border-sm mr-2"></span>
+                    Processing...
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

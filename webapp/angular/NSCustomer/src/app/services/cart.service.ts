@@ -182,7 +182,7 @@ export class CartService {
 
       const qty = Number(cartDataItems[catalogItem.id]) || 0;
       const product = catalogItem.item ? catalogItem.item : catalogItem;
-      const unitPrice = Number(product.price) || 0;
+      const unitPrice = Number(product.dispPrice) || 0;
       const lineTotal = unitPrice * qty;
 
       tempCart.push({
