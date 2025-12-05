@@ -21,16 +21,16 @@ import { UserService } from '../services/user.service';
           </div>
           <div class="product-details">
             <h6 class="product-name">{{i.item.name}}</h6>
-            <div class="seller-info" *ngIf="getVendorName(i)">
-              <i class="zmdi zmdi-store-24 mr-1"></i>
-              <span class="seller-label">Seller:</span>
-              <span class="seller-name">{{getVendorName(i)}}</span>
-            </div>
+            
             <div class="product-pricing">
               <div class="price-section">
                 <span class="current-price">&#x20B9;{{i.item.price}}</span>
                 <del class="original-price" *ngIf="i.item.dispPrice && i.item.dispPrice != i.item.price">&#x20B9;{{i.item.dispPrice}}</del>
               </div>
+            </div>
+            
+            <div class="seller-info" *ngIf="getVendorName(i)">
+              <span class="seller-text">Seller: {{getVendorName(i)}}</span>
             </div>
             
             <!-- Stock Info -->
@@ -82,7 +82,7 @@ import { UserService } from '../services/user.service';
 
      .product-image-wrapper {
        position: relative;
-       background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+       background: linear-gradient(135deg, #667eea 0%, #ffffff 100%);
        padding: 15px;
        display: flex;
        align-items: center;
@@ -189,31 +189,15 @@ import { UserService } from '../services/user.service';
      }
 
      .seller-info {
-       display: flex;
-       align-items: center;
-       gap: 4px;
+       margin-top: 8px;
        margin-bottom: 10px;
-       padding: 6px 10px;
-       background: linear-gradient(135deg, #f0f4ff 0%, #fef3f7 100%);
-       border-radius: 8px;
-       border: 1px solid rgba(102, 126, 234, 0.15);
      }
 
-     .seller-info i {
-       color: #667eea;
-       font-size: 1rem;
-     }
-
-     .seller-label {
-       font-size: 0.8rem;
-       color: #718096;
-       font-weight: 500;
-     }
-
-     .seller-name {
+     .seller-text {
        font-size: 0.85rem;
        color: #667eea;
-       font-weight: 600;
+       font-weight: 500;
+       font-style: normal;
      }
 
      .product-pricing {
