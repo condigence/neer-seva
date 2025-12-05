@@ -35,15 +35,20 @@ import { User } from '../model/user.model';
           <li class="nav-item">
               <a class="nav-link" routerLinkActive="active" routerLink='/products'>Products</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" *ngIf="currentUser">
               <a class="nav-link" routerLinkActive="active" routerLink='/address/list'>Address</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" *ngIf="currentUser">
               <a class="nav-link" routerLinkActive="active" routerLink='/orders'>Orders</a>
           </li>
       </ul>
 
       <div class="nav-right">
+          <!-- Login Button for non-logged in users -->
+          <a *ngIf="!currentUser" class="login-btn" routerLink='/login'>
+              <i class="zmdi zmdi-account-circle"></i>
+              <span>Login</span>
+          </a>
           <div *ngIf="currentUser" class="user-greeting-container">
               <div class="user-greeting">
                   <span class="greeting-text">Hello,</span>
@@ -92,25 +97,31 @@ import { User } from '../model/user.model';
                   <span>Products</span>
               </a>
           </li>
-          <li>
+          <li *ngIf="currentUser">
               <a routerLink='/address/list' (click)="closeMobileMenu()" routerLinkActive="active">
                   <i class="zmdi zmdi-pin"></i>
                   <span>Address</span>
               </a>
           </li>
-          <li>
+          <li *ngIf="currentUser">
               <a routerLink='/orders' (click)="closeMobileMenu()" routerLinkActive="active">
                   <i class="zmdi zmdi-shopping-cart"></i>
                   <span>Orders</span>
               </a>
           </li>
-          <li>
+          <li *ngIf="!currentUser">
+              <a routerLink='/login' (click)="closeMobileMenu()" class="login-link">
+                  <i class="zmdi zmdi-account"></i>
+                  <span>Login</span>
+              </a>
+          </li>
+          <li *ngIf="currentUser">
               <a routerLink='/profile/my-profile' (click)="closeMobileMenu()" routerLinkActive="active">
                   <i class="zmdi zmdi-account"></i>
                   <span>Profile</span>
               </a>
           </li>
-          <li>
+          <li *ngIf="currentUser">
               <a (click)="logout()" style="cursor: pointer;">
                   <i class="zmdi zmdi-power"></i>
                   <span>Logout</span>
@@ -184,6 +195,38 @@ import { User } from '../model/user.model';
 
     .nav-link.active::before {
       width: 70%;
+    }
+
+    /* Login Button Styling - Right Side */
+    .login-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 10px 24px;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      color: white;
+      text-decoration: none;
+    }
+
+    .login-btn i {
+      font-size: 1.3rem;
+    }
+
+    .login-btn span {
+      letter-spacing: 0.5px;
     }
 
     .user-greeting-container {
@@ -642,7 +685,7 @@ export class MenuDir  {
     // Logout user
     this.authenticationService.logout();
     
-    // Navigate to login
-    this.router.navigate(['/login']);
+    // Navigate to products page (home page)
+    this.router.navigate(['/products']);
   }
 }

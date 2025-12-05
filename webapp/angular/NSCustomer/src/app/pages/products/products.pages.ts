@@ -203,9 +203,6 @@ messageToSendP: string = '';
   }
 
   ngOnInit() {
-    // Clear vendor selection on page load - force user to select
-    localStorage.removeItem('selectedShop');
-    
     // Check if user just logged in
     this.route.queryParams.subscribe(params => {
       if (params['justLoggedIn'] === 'true') {
@@ -225,13 +222,24 @@ messageToSendP: string = '';
             this.showLoginSuccessModal = false;
           }, 2000);
         }, 300);
+        
+        // After login, if vendor was selected, load that vendor's items
+        const selectedShop = localStorage.getItem('selectedShop');
+        if (selectedShop) {
+          this.switchToVendor(selectedShop);
+        } else {
+          this.getDefaultStock();
+        }
       } else {
         console.log('No justLoggedIn param found');
+        
+        // Clear vendor selection only on fresh page load (not after login)
+        localStorage.removeItem('selectedShop');
+        this.getDefaultStock();
       }
     });
     
     this.ref();
-    this.getDefaultStock();
    // let defaultVendorId = this.getVendorIdByName("NeerSeva");
     //localStorage.setItem('selectedVendor', defaultVendorId);
   
