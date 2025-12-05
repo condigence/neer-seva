@@ -18,25 +18,38 @@ import { ActivatedRoute, Router } from '@angular/router';
 </div>
 
  <div class="container">
- <div class="form-row align-items-center">
- <div class="col-md-9">
- <div class="input-group mb-4 mt-2">
- <div class="input-group-prepend">
- <div class="input-group-text">Search Products</div>
- </div>
- <input [(ngModel)]= "searchText" class="form-control" placeholder="Please enter any product name to search ">
- </div>
- </div>
- <div class="col-md-3">
- <div class=" mb-4 mt-2">
- <select class="form-control" [(ngModel)] = "sortOption">
- <option value="name|asc">Sort By Name (A to Z)</option>
- <option value="name|desc">Sort By Name (Z to A)</option>
- <option value="price|lth">Sort By Price (Low to High)</option>
- <option value="price|htl">Sort By Price (High to Low)</option>
- </select>
- </div>
- </div>
+ <div class="row">
+   <!-- Search Container - takes product list width (col-md-7) -->
+   <div class="col-md-7">
+     <div class="search-wrapper mb-3">
+       <i class="zmdi zmdi-search search-icon"></i>
+       <input 
+         [(ngModel)]="searchText" 
+         class="search-input" 
+         type="text"
+         placeholder="Search for products...">
+       <button 
+         *ngIf="searchText" 
+         class="clear-search-btn" 
+         (click)="searchText = ''"
+         type="button">
+         <i class="zmdi zmdi-close"></i>
+       </button>
+     </div>
+   </div>
+   
+   <!-- Sort Container - takes cart width (col-md-5) -->
+   <div class="col-md-5">
+     <div class="sort-wrapper mb-3">
+       <i class="zmdi zmdi-sort sort-icon"></i>
+       <select class="sort-select" [(ngModel)]="sortOption">
+         <option value="name|asc">Name (A to Z)</option>
+         <option value="name|desc">Name (Z to A)</option>
+         <option value="price|lth">Price (Low to High)</option>
+         <option value="price|htl">Price (High to Low)</option>
+       </select>
+     </div>
+   </div>
  </div>
  <div class="row">
  <div class="col-md-7">
