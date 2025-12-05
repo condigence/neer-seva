@@ -1,10 +1,10 @@
 package com.condigence.imageservice.controller;
 
 
-import com.condigence.imageservice.dto.ImageDTO;
 import com.condigence.imageservice.dto.ImageSummary;
 import com.condigence.imageservice.entity.Image;
 import com.condigence.imageservice.service.ImageService;
+import com.condigence.imageservice.service.ExternalService;
 import com.condigence.imageservice.util.AppProperties;
 import com.condigence.imageservice.util.CustomErrorType;
 import org.slf4j.Logger;
@@ -16,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Base64;
-
 @RestController
 @RequestMapping("/neerseva/api/v1/images")
 @CrossOrigin(origins = "*")
@@ -25,13 +23,15 @@ import java.util.Base64;
 public class ImageController {
 
     private final ImageService imageService;
+    private final ExternalService externalService;
     private final AppProperties app;
     private final Environment env;
 
     public static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
-    public ImageController(ImageService imageService, AppProperties app, Environment env) {
+    public ImageController(ImageService imageService, ExternalService externalService, AppProperties app, Environment env) {
         this.imageService = imageService;
+        this.externalService = externalService;
         this.app = app;
         this.env = env;
     }
@@ -55,35 +55,14 @@ public class ImageController {
             throw e;
         }
 
-        // Build DTO and populate metadata from savedImageObj
-        ImageDTO dto = new ImageDTO();
-        dto.setId(savedImageObj.getId());
-        // name in DB is the stored filename; original filename is available from MultipartFile
-        dto.setName(savedImageObj.getName());
-        dto.setImageName(savedImageObj.getImageName());
-        dto.setImageSize(savedImageObj.getImageSize());
-        dto.setModuleName(savedImageObj.getModuleName());
-        dto.setType(savedImageObj.getType());
-
-        // Read the stored file and set pic as Base64 string
+        // Build DTO using service helper (service will handle reading bytes)
+        com.condigence.imageservice.dto.ImageDTO dto;
         try {
-            java.nio.file.Path imagesBase = java.nio.file.Paths.get(imagePath.replace('/', java.io.File.separatorChar));
-            java.nio.file.Path imgPath = imagesBase.resolve(savedImageObj.getName()).normalize();
-            if (java.nio.file.Files.exists(imgPath) && imgPath.startsWith(imagesBase)) {
-                byte[] bytes = java.nio.file.Files.readAllBytes(imgPath);
-                if (bytes.length > 0) {
-                    String base64 = Base64.getEncoder().encodeToString(bytes);
-                    dto.setPic(base64);
-                } else {
-                    dto.setPic("");
-                }
-            } else {
-                logger.warn("Uploaded file was saved but not found on disk for id={} name={}", savedImageObj.getId(), savedImageObj.getName());
-                dto.setPic("");
-            }
+            byte[] bytes = imageService.readImageBytesByPath(savedImageObj.getName(), imagePath);
+            dto = imageService.toDto(savedImageObj, bytes);
         } catch (Exception ex) {
             logger.warn("Failed to read stored image file for id={}: {}", savedImageObj.getId(), ex.getMessage());
-            dto.setPic("");
+            dto = imageService.toDto(savedImageObj, null);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(dto);
@@ -140,35 +119,10 @@ public class ImageController {
                         .body(new CustomErrorType("Server misconfiguration: app.location not set"));
             }
 
-            // Normalize to system path separators and build Path
-            java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
+            byte[] bytes = imageService.readImageBytesByPath(image.getName(), baseDirRaw);
+            if (bytes == null || bytes.length == 0) return ResponseEntity.notFound().build();
 
-            // Sanitize filename (prevent path traversal) and build path
-            String rawName = image.getName();
-            if (rawName == null || rawName.isBlank()) return ResponseEntity.notFound().build();
-            String safeName = java.nio.file.Paths.get(rawName).getFileName().toString();
-
-            java.nio.file.Path imgPath = imagesBase.resolve(safeName).normalize();
-            if (!java.nio.file.Files.exists(imgPath) || !imgPath.startsWith(imagesBase)) {
-                logger.warn("Image file not found or outside base directory: {}", imgPath);
-                return ResponseEntity.notFound().build();
-            }
-
-            byte[] bytes = java.nio.file.Files.readAllBytes(imgPath);
-            if (bytes.length == 0) return ResponseEntity.notFound().build();
-
-            // Convert to base64 string
-            String base64 = Base64.getEncoder().encodeToString(bytes);
-
-            // Build DTO
-            ImageDTO dto = new ImageDTO();
-            dto.setId(image.getId());
-            dto.setName(image.getName());
-            dto.setImageName(image.getImageName());
-            dto.setImageSize(image.getImageSize());
-            dto.setModuleName(image.getModuleName());
-            dto.setType(image.getType());
-            dto.setPic(base64);
+            com.condigence.imageservice.dto.ImageDTO dto = imageService.toDto(image, bytes);
 
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
@@ -189,26 +143,15 @@ public class ImageController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(new CustomErrorType("Server misconfiguration: app.location not set"));
             }
-            java.nio.file.Path imagesBase = java.nio.file.Paths.get(baseDirRaw.replace('/', java.io.File.separatorChar));
 
-            String rawName = image.getName();
-            if (rawName == null || rawName.isBlank()) return ResponseEntity.notFound().build();
-            String safeName = java.nio.file.Paths.get(rawName).getFileName().toString();
-
-            java.nio.file.Path imgPath = imagesBase.resolve(safeName).normalize();
-            if (!java.nio.file.Files.exists(imgPath) || !imgPath.startsWith(imagesBase)) {
-                logger.warn("Image file not found or outside base directory: {}", imgPath);
-                return ResponseEntity.notFound().build();
-            }
-
-            byte[] bytes = java.nio.file.Files.readAllBytes(imgPath);
-            if (bytes.length == 0) return ResponseEntity.notFound().build();
+            byte[] bytes = imageService.readImageBytesByPath(image.getName(), baseDirRaw);
+            if (bytes == null || bytes.length == 0) return ResponseEntity.notFound().build();
 
             String contentType = (image.getType() != null && !image.getType().isBlank()) ? image.getType() : "application/octet-stream";
             return ResponseEntity.ok()
                     .header("Content-Type", contentType)
                     .header("Content-Length", String.valueOf(bytes.length))
-                    .header("Content-Disposition", "inline; filename=\"" + safeName + "\"")
+                    .header("Content-Disposition", "inline; filename=\"" + java.nio.file.Paths.get(image.getName()).getFileName().toString() + "\"")
                     .body(bytes);
         } catch (Exception e) {
             logger.error("Error streaming raw image for id={}", id, e);
@@ -232,5 +175,10 @@ public class ImageController {
             logger.error("Error fetching all images (paged)", e);
             return new ResponseEntity<>(new CustomErrorType("Failed to fetch images"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/ping-external")
+    public ResponseEntity<?> pingExternal() {
+        return externalService.pingExternal();
     }
 }

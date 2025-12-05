@@ -6,10 +6,7 @@ import com.condigence.nsorderservice.dto.OrderDetailDTO;
 import com.condigence.nsorderservice.entity.Order;
 import com.condigence.nsorderservice.service.OrderService;
 import com.condigence.nsorderservice.util.CustomErrorType;
-import com.condigence.nsorderservice.exception.BadRequestException;
-import com.condigence.nsorderservice.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,29 +27,15 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
-    // AppProperties isn't used in this controller currently; keep wiring in service if needed.
-
     @PostMapping(value = "/")
     public ResponseEntity<?> placeOrder(@RequestBody OrderDetailDTO orderdetailDTO) {
         logger.info("Entering placeOrder with Order Details >>>>>>>>  : {}", orderdetailDTO);
         HttpHeaders headers = new HttpHeaders();
-        try {
-            boolean saved = orderService.saveOrderDetail(orderdetailDTO);
-            if (!saved) {
-                return new ResponseEntity<>(new CustomErrorType("Unable to save order. Check shop id and payload."), HttpStatus.BAD_REQUEST);
-            }
-            return new ResponseEntity<>(headers, HttpStatus.CREATED);
-        } catch (ResourceNotFoundException rnfe) {
-            logger.warn("placeOrder - resource not found: {}", rnfe.getMessage());
-            String userMsg = extractMessageFromResourceNotFound(rnfe.getMessage());
-            return new ResponseEntity<>(new CustomErrorType(userMsg), HttpStatus.NOT_FOUND);
-        } catch (BadRequestException bre) {
-            logger.warn("placeOrder - bad request: {}", bre.getMessage());
-            return new ResponseEntity<>(new CustomErrorType(bre.getMessage()), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            logger.error("placeOrder - unexpected error: {}", e.getMessage());
-            return new ResponseEntity<>(new CustomErrorType("Internal server error"), HttpStatus.INTERNAL_SERVER_ERROR);
+        boolean saved = orderService.saveOrderDetail(orderdetailDTO);
+        if (!saved) {
+            return new ResponseEntity<>(new CustomErrorType("Unable to save order. Check shop id and payload."), HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     @GetMapping("/")
@@ -89,23 +72,11 @@ public class OrderController {
     public ResponseEntity<?> placeOrderItems(@RequestBody OrderDetailDTO orderdetailDTO) {
         logger.info("placeOrderItems detail is>>>>>>>>  : {}", orderdetailDTO);
         HttpHeaders headers = new HttpHeaders();
-        try {
-            boolean saved = orderService.saveOrderDetail(orderdetailDTO);
-            if (!saved) {
-                return new ResponseEntity<>(new CustomErrorType("Unable to save order. Check shop id and payload."), HttpStatus.BAD_REQUEST);
-            }
-            return new ResponseEntity<>(headers, HttpStatus.CREATED);
-        } catch (ResourceNotFoundException rnfe) {
-            logger.warn("placeOrderItems - resource not found: {}", rnfe.getMessage());
-            String userMsg = extractMessageFromResourceNotFound(rnfe.getMessage());
-            return new ResponseEntity<>(new CustomErrorType(userMsg), HttpStatus.NOT_FOUND);
-        } catch (BadRequestException bre) {
-            logger.warn("placeOrderItems - bad request: {}", bre.getMessage());
-            return new ResponseEntity<>(new CustomErrorType(bre.getMessage()), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            logger.error("placeOrderItems - unexpected error: {}", e.getMessage());
-            return new ResponseEntity<>(new CustomErrorType("Internal server error"), HttpStatus.INTERNAL_SERVER_ERROR);
+        boolean saved = orderService.saveOrderDetail(orderdetailDTO);
+        if (!saved) {
+            return new ResponseEntity<>(new CustomErrorType("Unable to save order. Check shop id and payload."), HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     @GetMapping("/count")
