@@ -350,7 +350,7 @@ export class ProductsListDir {
           timeOut: 5000, 
           progressBar: true,
           closeButton: true,
-          positionClass: 'toast-top-center'
+          positionClass: 'toast-top-right'
         }
       );
       return;
