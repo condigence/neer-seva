@@ -13,10 +13,8 @@ import { ActivatedRoute, Router } from '@angular/router';
   template: `
  <menu></menu>
  
-<div class="container-fluid" style="width: 20%;margin-top: 100px;background: #0AA; border-radius:15px">
-
-
-<app-my-carousel (messageEvent)="receiveMessage($event)" [receivedParentMessage]="messageToSendP"></app-my-carousel>
+<div class="vendor-section-wrapper" style="margin-top: 100px;">
+  <app-my-carousel (messageEvent)="receiveMessage($event)" [receivedParentMessage]="messageToSendP"></app-my-carousel>
 </div>
 
  <div class="container">
@@ -101,6 +99,45 @@ import { ActivatedRoute, Router } from '@angular/router';
   </div>
 </div>
 
+<!-- Vendor Switch Confirmation Modal -->
+<div class="modal fade show" *ngIf="showVendorSwitchModal" style="display: block; background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title">
+          <i class="zmdi zmdi-alert-triangle mr-2"></i>Switch Vendor?
+        </h5>
+        <button type="button" class="close" (click)="cancelVendorSwitch()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-3">
+          <i class="zmdi zmdi-shopping-cart zmdi-hc-3x text-warning"></i>
+        </div>
+        <h5 class="text-center mb-3">Clear Your Cart?</h5>
+        <p class="text-center">
+          Your cart contains items from another vendor. We currently <strong>do not support multi-vendor orders</strong>.
+        </p>
+        <p class="text-center text-danger font-weight-bold">
+          Switching vendors will remove all items from your cart.
+        </p>
+        <p class="text-center text-muted small">
+          Do you want to clear your cart and continue with the new vendor?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelVendorSwitch()">
+          <i class="zmdi zmdi-close mr-1"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-warning text-dark font-weight-bold" (click)="confirmVendorSwitch()">
+          <i class="zmdi zmdi-delete mr-1"></i>Clear Cart & Switch
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
   `
 })
 
@@ -114,6 +151,8 @@ export class ProductsPage implements OnInit {
   shopErrorMessage: string = '';
   isLoading: boolean = false;
   showLoginSuccessModal: boolean = false;
+  showVendorSwitchModal: boolean = false;
+  pendingVendorId: any = null;
 
   // Computed property to get filtered items count
   get filteredItemsCount(): number {
@@ -150,7 +189,10 @@ messageToSendP: string = '';
 
   }
 
-  ngOnInit() {    
+  ngOnInit() {
+    // Clear vendor selection on page load - force user to select
+    localStorage.removeItem('selectedShop');
+    
     // Check if user just logged in
     this.route.queryParams.subscribe(params => {
       if (params['justLoggedIn'] === 'true') {
@@ -251,10 +293,50 @@ messageToSendP: string = '';
 
   receiveMessage($event) {
     this.shopId = $event;
-   localStorage.setItem('selectedShop', this.shopId);
+    
+    // Check if cart has items and user is switching vendors
+    const currentVendor = localStorage.getItem('selectedShop');
+    const hasCartItems = this.cartService.cartItemsList && this.cartService.cartItemsList.length > 0;
+    
+    if (currentVendor && currentVendor !== this.shopId && hasCartItems) {
+      // Store pending vendor switch and show confirmation modal
+      this.pendingVendorId = this.shopId;
+      this.showVendorSwitchModal = true;
+      return;
+    }
+    
+    // No cart items or same vendor - proceed with switch
+    this.switchToVendor(this.shopId);
+  }
+  
+  confirmVendorSwitch() {
+    // Clear the cart
+    this.cartService.emptyCart();
+    
+    // Close modal
+    this.showVendorSwitchModal = false;
+    
+    // Proceed with vendor switch
+    this.switchToVendor(this.pendingVendorId);
+    this.pendingVendorId = null;
+    
+    // Refresh cart UI
+    this.ref();
+  }
+  
+  cancelVendorSwitch() {
+    // Close modal without switching
+    this.showVendorSwitchModal = false;
+    this.pendingVendorId = null;
+    // Keep current vendor selection
+  }
+  
+  switchToVendor(vendorId: any) {
+   localStorage.setItem('selectedShop', vendorId);
+   this.shopId = vendorId;
    this.shopErrorMessage = '';
    this.isLoading = true;
-   this.itemService.getStockItemsByShopId(+this.shopId).subscribe(
+   this.itemService.getStockItemsByShopId(+vendorId).subscribe(
      (data: any) => {
        // clear any previous error
        this.shopErrorMessage = '';

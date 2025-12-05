@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { StorageService } from '../services/storage.service';
 import { CartService } from '../services/cart.service';
+import { ToastrService } from 'ngx-toastr';
+import { UserService } from '../services/user.service';
 
 
 
@@ -12,11 +14,6 @@ import { CartService } from '../services/cart.service';
     <div class="col-lg-4 col-md-6 col-sm-6 mb-4" *ngFor = "let i of items | filter : __searchedItem | sortBy : sortByOption">
         <div class="product-card">
           <div class="product-image-wrapper">
-          <div class="product-quantity" 
-     [class.low-stock]="i.quantity < 5" 
-     [class.out-of-stock]="!i.quantity">
-  {{i.quantity ?? 0}}
-</div>
             <img class="product-image" [src]="'data:image/jpeg;base64,'+i.item.pic" alt="{{i.item.name}}">
             <!-- <div class="product-badge" *ngIf="i.item.dispPrice && i.item.dispPrice != i.item.price">
               <span class="badge-discount">{{calculateDiscount(i.item.dispPrice, i.item.price)}}% OFF</span>
@@ -24,14 +21,36 @@ import { CartService } from '../services/cart.service';
           </div>
           <div class="product-details">
             <h6 class="product-name">{{i.item.name}}</h6>
+            <div class="seller-info" *ngIf="getVendorName(i)">
+              <i class="zmdi zmdi-store-24 mr-1"></i>
+              <span class="seller-label">Seller:</span>
+              <span class="seller-name">{{getVendorName(i)}}</span>
+            </div>
             <div class="product-pricing">
               <div class="price-section">
                 <span class="current-price">&#x20B9;{{i.item.price}}</span>
                 <del class="original-price" *ngIf="i.item.dispPrice && i.item.dispPrice != i.item.price">&#x20B9;{{i.item.dispPrice}}</del>
               </div>
             </div>
-            <button class="add-to-cart-btn" (click)="addToCart(i.id,1,'')">
-              <i class="zmdi zmdi-shopping-cart-plus mr-2"></i>Add to Cart
+            
+            <!-- Stock Info -->
+            <div class="stock-info" *ngIf="i.quantity > 0 && i.quantity <= 10" [class.low-stock-alert]="i.quantity <= 10">
+              <i class="zmdi zmdi-alert-circle"></i>
+              <span>Only {{i.quantity}} left!</span>
+            </div>
+            
+            <div class="stock-info available-stock" *ngIf="i.quantity > 10">
+              <i class="zmdi zmdi-check-circle"></i>
+              <span>Available stock: {{i.quantity}}</span>
+            </div>
+            
+            <button class="add-to-cart-btn" 
+                    (click)="addToCart(i.id,1,'')" 
+                    [disabled]="!i.quantity || i.quantity === 0"
+                    [class.out-of-stock-btn]="!i.quantity || i.quantity === 0">
+              <i class="zmdi zmdi-shopping-cart-plus mr-2" *ngIf="i.quantity > 0"></i>
+              <i class="zmdi zmdi-block mr-2" *ngIf="!i.quantity || i.quantity === 0"></i>
+              {{i.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}}
             </button>
           </div>
       </div>
@@ -110,32 +129,91 @@ import { CartService } from '../services/cart.service';
        flex-grow: 1;
      }
 
-     .product-quantity {
-  position: absolute;
-  top: 10px;
-  right: 10px;
- background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-       color: white;
-padding: 8px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  min-width: fit-content;
-  height: auto; /* Remove fixed height for responsiveness */
-}
+     .stock-info {
+       border-radius: 8px;
+       padding: 8px 12px;
+       margin-bottom: 10px;
+       display: flex;
+       align-items: center;
+       gap: 6px;
+     }
+
+     .stock-info.low-stock-alert {
+       background: #fff5f5;
+       border: 1px solid #feb2b2;
+       animation: pulse 2s ease-in-out infinite;
+     }
+
+     .stock-info.low-stock-alert i {
+       color: #e53e3e;
+       font-size: 1.1rem;
+     }
+
+     .stock-info.low-stock-alert span {
+       color: #c53030;
+       font-weight: 600;
+       font-size: 0.85rem;
+     }
+
+     .stock-info.available-stock {
+       background: #f0fdf4;
+       border: 1px solid #86efac;
+     }
+
+     .stock-info.available-stock i {
+       color: #16a34a;
+       font-size: 1.1rem;
+     }
+
+     .stock-info.available-stock span {
+       color: #15803d;
+       font-weight: 600;
+       font-size: 0.85rem;
+     }
+
+     @keyframes pulse {
+       0%, 100% { opacity: 1; }
+       50% { opacity: 0.7; }
+     }
      .product-name {
        font-size: 0.95rem;
        font-weight: 600;
        color: #2d3748;
-       margin-bottom: 10px;
+       margin-bottom: 8px;
        height: 40px;
        overflow: hidden;
        display: -webkit-box;
        -webkit-line-clamp: 2;
        -webkit-box-orient: vertical;
        line-height: 1.4;
+     }
+
+     .seller-info {
+       display: flex;
+       align-items: center;
+       gap: 4px;
+       margin-bottom: 10px;
+       padding: 6px 10px;
+       background: linear-gradient(135deg, #f0f4ff 0%, #fef3f7 100%);
+       border-radius: 8px;
+       border: 1px solid rgba(102, 126, 234, 0.15);
+     }
+
+     .seller-info i {
+       color: #667eea;
+       font-size: 1rem;
+     }
+
+     .seller-label {
+       font-size: 0.8rem;
+       color: #718096;
+       font-weight: 500;
+     }
+
+     .seller-name {
+       font-size: 0.85rem;
+       color: #667eea;
+       font-weight: 600;
      }
 
      .product-pricing {
@@ -199,6 +277,20 @@ padding: 8px 12px;
        font-size: 1.2rem;
      }
 
+     .add-to-cart-btn:disabled,
+     .out-of-stock-btn {
+       background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+       cursor: not-allowed;
+       opacity: 0.7;
+       box-shadow: none;
+     }
+
+     .add-to-cart-btn:disabled:hover,
+     .out-of-stock-btn:hover {
+       transform: none;
+       box-shadow: none;
+     }
+
      /* Responsive adjustments */
      @media (max-width: 768px) {
        .product-card {
@@ -216,9 +308,13 @@ padding: 8px 12px;
   `]
 })
 export class ProductsListDir {
+  private vendors: any[] = [];
+  
   constructor(
     public storage: StorageService,
-    public cart: CartService
+    public cart: CartService,
+    private toastr: ToastrService,
+    private userService: UserService
   ) {  }
 
   @Input("allProductList") items: any = {};
@@ -228,11 +324,77 @@ export class ProductsListDir {
 
   ngOnInit() {
     this.sortByOption;
+    this.loadVendors();
+  }
+  
+  loadVendors() {
+    this.userService.getAllOutlets().subscribe(
+      (data: any) => {
+        this.vendors = data || [];
+      },
+      (err) => {
+        console.error('Failed to load vendors', err);
+        this.vendors = [];
+      }
+    );
+  }
+  
+  getVendorName(item: any): string {
+    if (!item || this.vendors.length === 0) {
+      return '';
+    }
+    
+    // Try to get shopId from different possible locations in the item structure
+    const shopId = item.shopId || item.shop_id || (item.stock && item.stock.shopId) || null;
+    
+    if (!shopId) {
+      return '';
+    }
+    
+    const vendor = this.vendors.find(v => String(v.id) === String(shopId));
+    return vendor ? vendor.name : '';
   }
   addToCart(itemId, itemQty, note?: string) {
+    // Check if vendor/shop is selected
+    const selectedShop = localStorage.getItem('selectedShop');
+    
+    if (!selectedShop || selectedShop === 'null' || selectedShop === 'undefined') {
+      this.toastr.error(
+        'Please select a vendor from the carousel above before adding items to cart.',
+        'Vendor Not Selected',
+        { 
+          timeOut: 5000, 
+          progressBar: true,
+          closeButton: true,
+          positionClass: 'toast-top-center'
+        }
+      );
+      return;
+    }
+    
     this.cart.allItems = this.items;
-    this.cart.addToCart(itemId, itemQty, note || '');
-    this.refresh.emit('true');
+    const result = this.cart.addToCart(itemId, itemQty, note || '');
+    
+    // Only refresh if quantity actually changed
+    if (result && result.success) {
+      // Check if we hit the stock limit
+      if (result.limitReached && result.quantity > 0) {
+        const item = this.items.find((i: any) => i.id == itemId);
+        const itemName = item?.item?.name || 'This item';
+        const availableStock = item?.quantity || 0;
+        
+        this.toastr.warning(
+          `${itemName} has only ${availableStock} items in stock. Cannot add more.`,
+          'Limited Stock',
+          { timeOut: 4000, progressBar: true }
+        );
+      }
+      
+      // Only emit refresh if quantity actually increased
+      if (result.quantityChanged) {
+        this.refresh.emit('true');
+      }
+    }
   }
 
   calculateDiscount(originalPrice: number, currentPrice: number): number {

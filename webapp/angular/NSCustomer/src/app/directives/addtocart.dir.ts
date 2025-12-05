@@ -41,6 +41,10 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
           <div class="item-info">
             <h6 class="item-name">{{item.name}}</h6>
             <p class="item-price">&#x20B9;{{unitPrice(item) | number:'1.2-2'}} each</p>
+            <div class="stock-warning" *ngIf="item.availableStock && item.availableStock < 10">
+              <i class="zmdi zmdi-alert-triangle"></i>
+              <span>Limited stock: {{item.availableStock}} available</span>
+            </div>
           </div>
           <div class="item-controls">
             <div class="qty-controls">
@@ -48,8 +52,13 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
                 <i class="zmdi zmdi-minus"></i>
               </button>
               <input type="text" class="qty-input" [value]="item.qty"
-                     #qtyRef (keyup)="changeQty(item.id,qtyRef.value,'replace')">
-              <button class="qty-btn qty-plus" type="button" (click)="changeQty(item.id,1,'')">
+                     #qtyRef (keyup)="changeQty(item.id,qtyRef.value,'replace')"
+                     [max]="item.availableStock">
+              <button class="qty-btn qty-plus" 
+                      type="button" 
+                      (click)="changeQty(item.id,1,'')" 
+                      [disabled]="item.qty >= item.availableStock"
+                      [title]="item.qty >= item.availableStock ? 'Maximum stock reached' : 'Add one more'">
                 <i class="zmdi zmdi-plus"></i>
               </button>
             </div>
@@ -280,7 +289,27 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
     .item-price {
       font-size: 0.85rem;
       color: #718096;
-      margin: 0;
+      margin: 0 0 5px 0;
+    }
+
+    .stock-warning {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      color: #e53e3e;
+      font-weight: 600;
+      margin-top: 3px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .stock-warning i {
+      font-size: 0.9rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .item-controls {
@@ -328,9 +357,20 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
       color: white;
     }
 
-    .qty-plus:hover {
+    .qty-plus:hover:not(:disabled) {
       transform: scale(1.1);
       box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
+    }
+
+    .qty-plus:disabled {
+      background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .qty-plus:disabled:hover {
+      transform: none;
+      box-shadow: none;
     }
 
     .qty-input {
@@ -464,6 +504,11 @@ export class AddToCartDir{
       let parsed = parseInt(qty, 10);
       if (isNaN(parsed) || parsed < 1) {
         parsed = 1;
+      }
+      // Get available stock
+      const availableStock = this.cart.getAvailableStock(id);
+      if (availableStock !== null && parsed > availableStock) {
+        parsed = availableStock;
       }
       this.cart.addToCart(id, parsed, 'replace');
       return;
