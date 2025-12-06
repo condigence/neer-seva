@@ -12,7 +12,6 @@ import com.condigence.nsproductservice.model.Item;
 import com.condigence.nsproductservice.service.BrandService;
 import com.condigence.nsproductservice.service.ItemService;
 import com.condigence.nsproductservice.util.AppProperties;
-import com.condigence.nsproductservice.util.CustomErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +27,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import com.condigence.nsproductservice.exception.ResourceNotFoundException;
+import com.condigence.nsproductservice.exception.TechnicalException;
+import com.condigence.nsproductservice.error.ErrorCode;
+import com.condigence.nsproductservice.error.ApiErrorResponse;
 
 @Tag(name = "Products", description = "Operations related to product brands and items")
 @RestController
@@ -139,8 +144,12 @@ public class ProductController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Brand created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid brand payload"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+            @ApiResponse(responseCode = "400", description = "Invalid brand payload",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
     })
 	@RequestMapping(path = {"/brands", "/brands/"}, method = RequestMethod.POST)
 	public ResponseEntity<?> addBrands(@RequestBody BrandBean brandBean) {
@@ -156,7 +165,9 @@ public class ProductController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of brands returned successfully"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
     })
 	@GetMapping(path = {"/brands", "/brands/"})
 //	@CircuitBreaker(name=USER_SERVICE,fallbackMethod = "userFallback")
@@ -196,20 +207,23 @@ public class ProductController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Brand deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Brand not found"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+            @ApiResponse(responseCode = "404", description = "Brand not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
     })
 	public ResponseEntity<?> deleteBrand(@PathVariable("id") long id) {
 		logger.info("Fetching & Deleting Brand with id {}", id);
 		Optional<Brand> brand = brandService.getById(id);
 		if (brand.isPresent()) {
 			brandService.deleteById(id);
+			return new ResponseEntity<Brand>(HttpStatus.OK);
 		} else {
 			logger.error("Unable to delete. Brand with id {} not found.", id);
-			return new ResponseEntity(new CustomErrorType("Unable to delete. Brand with id " + id + " not found."),
-					HttpStatus.NOT_FOUND);
+			throw new ResourceNotFoundException("Brand not found with id " + id, ErrorCode.BRAND_NOT_FOUND);
 		}
-		return new ResponseEntity<Brand>(HttpStatus.OK);
 	}
 
 	@Operation(
@@ -218,8 +232,12 @@ public class ProductController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Brand details returned successfully"),
-            @ApiResponse(responseCode = "404", description = "Brand not found"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+            @ApiResponse(responseCode = "404", description = "Brand not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
     })
 	@GetMapping("/brands/{id}")
 	public ResponseEntity<?> getBrand(
@@ -242,7 +260,7 @@ public class ProductController {
 
 			}
 		} else {
-			return new ResponseEntity(new CustomErrorType("Brand not found."), HttpStatus.NOT_FOUND);
+			throw new ResourceNotFoundException("Brand not found with id " + id, ErrorCode.BRAND_NOT_FOUND);
 		}
 
 		return ResponseEntity.status(HttpStatus.OK).body(dto);
@@ -250,16 +268,25 @@ public class ProductController {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@PutMapping(value = "/brands")
+	@Operation(
+            summary = "Update a brand",
+            description = "Updates an existing brand. Returns 404 if the brand does not exist."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Brand updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Brand not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
 	public ResponseEntity<?> updateUser(@RequestBody BrandDTO dto) {
 		logger.info("Updating Brand  with id {}", dto.getId());
-		System.out.println(dto);
 		Optional<Brand> brand = brandService.getById(dto.getId());
-		System.out.println(brand.get());
 		if (!brand.isPresent()) {
 			logger.error("Unable to update. Brand with id {} not found.", dto.getId());
-			return new ResponseEntity(
-					new CustomErrorType("Unable to upate. Brand with id " + dto.getId() + " not found."),
-					HttpStatus.NOT_FOUND);
+			throw new ResourceNotFoundException("Brand not found with id " + dto.getId(), ErrorCode.BRAND_NOT_FOUND);
 		} else {
 			brand.get().setName(dto.getName());
 			brand.get().setImageId(dto.getImageId());
@@ -270,28 +297,47 @@ public class ProductController {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@PostMapping(path = {"/items", "/items/"})
+	@Operation(
+            summary = "Create a new item",
+            description = "Creates a new item. Returns 500 if an unexpected error occurs when saving."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Item created successfully"),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
 	public ResponseEntity<?> addItems(@RequestBody ItemDTO itemDTO) {
 		logger.info("Entering addItems with Item Details >>>>>>>>  : {}", itemDTO);
 		HttpHeaders headers = new HttpHeaders();
 		Item item = itemService.saveItem(itemDTO);
 		if (item == null) {
-			return new ResponseEntity(new CustomErrorType("Issue while saving Item"), HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new TechnicalException("Issue while saving Item", ErrorCode.INTERNAL_ERROR);
 		}
 		return new ResponseEntity<>(headers, HttpStatus.CREATED);
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@PutMapping(value = "/items")
-	public ResponseEntity<?> updateItems(@RequestBody ItemDTO dto) {
+	@Operation(
+            summary = "Update an item",
+            description = "Updates an existing item. Returns 404 if the item does not exist."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Item updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Item not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    public ResponseEntity<?> updateItems(@RequestBody ItemDTO dto) {
 		logger.info("Updating Item  with id {}", dto.getId());
-		System.out.println(dto);
 		Optional<Item> itme = itemService.getItemById(dto.getId());
-		System.out.println(itme.get());
 		if (!itme.isPresent()) {
 			logger.error("Unable to update. Item with id {} not found.", dto.getId());
-			return new ResponseEntity(
-					new CustomErrorType("Unable to upate. Item with id " + dto.getId() + " not found."),
-					HttpStatus.NOT_FOUND);
+			throw new ResourceNotFoundException("Item not found with id " + dto.getId(), ErrorCode.ITEM_NOT_FOUND);
 		} else {
 
 			if (!dto.getName().equalsIgnoreCase("")) {
@@ -320,17 +366,29 @@ public class ProductController {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@DeleteMapping(value = "/items/{id}")
-	public ResponseEntity<?> deleteItem(@PathVariable("id") long id) {
+	@Operation(
+            summary = "Delete an item",
+            description = "Deletes an item by ID. Returns 404 if the item does not exist."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Item deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Item not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    public ResponseEntity<?> deleteItem(@PathVariable("id") long id) {
 		logger.info("Fetching & Deleting Item with id {}", id);
 		Optional<Item> item = itemService.getItemById(id);
 		if (item.isPresent()) {
 			itemService.deleteItemById(id);
+			return new ResponseEntity<Item>(HttpStatus.OK);
 		} else {
 			logger.error("Unable to delete. Item with id {} not found.", id);
-			return new ResponseEntity(new CustomErrorType("Unable to delete. Item with id " + id + " not found."),
-					HttpStatus.NOT_FOUND);
+			throw new ResourceNotFoundException("Item not found with id " + id, ErrorCode.ITEM_NOT_FOUND);
 		}
-		return new ResponseEntity<Item>(HttpStatus.OK);
 	}
 
 	@GetMapping(path = {"/items", "/items/"})
@@ -362,6 +420,19 @@ public class ProductController {
 	}
 
 	@GetMapping("/items/{id}")
+	@Operation(
+            summary = "Get item by ID",
+            description = "Retrieves an item by ID including its image bytes when available."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Item details returned successfully"),
+            @ApiResponse(responseCode = "404", description = "Item not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
 	public ResponseEntity<?> getItemWithImage(@PathVariable("id") Long id) {
 
 		ItemDTO dto = new ItemDTO();
@@ -391,7 +462,7 @@ public class ProductController {
 
 			// dto.setPic(getPicById(item.get().getImageId()).getPic());
 		} else {
-			return new ResponseEntity(new CustomErrorType("Item not found."), HttpStatus.NOT_FOUND);
+			throw new ResourceNotFoundException("Item not found with id " + id, ErrorCode.ITEM_NOT_FOUND);
 		}
 
 		return ResponseEntity.status(HttpStatus.OK).body(dto);
@@ -416,7 +487,6 @@ public class ProductController {
 
 		List<ItemDTO> dtos = new ArrayList<>();
 		List<Item> items = itemService.getItemByBrandId(id);
-		System.out.println(items);
 		for (Item item : items) {
 			ItemDTO dto = new ItemDTO();
 			dto.setId(item.getId());

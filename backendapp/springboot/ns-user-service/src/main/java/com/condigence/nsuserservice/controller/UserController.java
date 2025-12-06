@@ -12,6 +12,8 @@ import com.condigence.nsuserservice.dto.AddressDTO;
 import com.condigence.nsuserservice.dto.UserDTO;
 import com.condigence.nsuserservice.entity.Address;
 import com.condigence.nsuserservice.entity.User;
+import com.condigence.nsuserservice.exception.BusinessException;
+import com.condigence.nsuserservice.exception.ErrorCode;
 import com.condigence.nsuserservice.service.UserService;
 import com.condigence.nsuserservice.service.ImageService;
 import com.condigence.nsuserservice.util.AppProperties;
@@ -70,21 +72,18 @@ public class UserController {
         logger.info("Entering addUsers with user Details >>>>>>>>  : {}", dto);
         HttpHeaders headers = new HttpHeaders();
 
-        // Check If User Already Exists
         Optional<User> user = service.findByContact(dto.getContact());
         if (user.isPresent()) {
-            return new ResponseEntity(new CustomErrorType("User Already Registered!"), HttpStatus.CONFLICT);
-        } else {
-            // New User
-            User savedUser = service.save(dto);
-            if (savedUser == null) {
-                return new ResponseEntity(new CustomErrorType("Issue while saving User! Please contact Admin!"),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            } else {
-                return new ResponseEntity<String>(headers, HttpStatus.CREATED);
-            }
-
+            // Use standardized business exception + error code
+            throw new BusinessException(ErrorCode.USER_ALREADY_REGISTERED, "User Already Registered!");
         }
+
+        User savedUser = service.save(dto);
+        if (savedUser == null) {
+            // Keep behavior via generic 500 but mark as technical in service or generic handler
+            throw new BusinessException(ErrorCode.INTERNAL_ERROR, "Issue while saving User! Please contact Admin!");
+        }
+        return new ResponseEntity<String>(headers, HttpStatus.CREATED);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -101,21 +100,21 @@ public class UserController {
         // Quick-register only when type is explicitly CUSTOMER
         if (dto.getType() != null && dto.getType().equalsIgnoreCase("CUSTOMER")) {
             if (dto.getContact() == null || dto.getContact().trim().isEmpty()) {
-                return new ResponseEntity(new CustomErrorType("Please provide contact!"), HttpStatus.BAD_REQUEST);
+                throw new BusinessException(ErrorCode.CONTACT_MISSING, "Please provide contact!");
             }
             User user = quickRegisterMode(dto);
             return new ResponseEntity(user, HttpStatus.OK);
         } else {
             // Normal flow: contact is mandatory
             if (dto.getContact() == null || dto.getContact().trim().isEmpty()) {
-                return new ResponseEntity(new CustomErrorType("Please provide contact!"), HttpStatus.NOT_FOUND);
+                throw new BusinessException(ErrorCode.CONTACT_MISSING, "Please provide contact!");
             }
             Optional<User> user = service.findByContact(dto.getContact());
             if (user.isPresent()) {
                 return new ResponseEntity(user.get(), HttpStatus.OK);
             } else {
                 logger.info("User Not Found for contact {}", dto.getContact());
-                return new ResponseEntity(new CustomErrorType("Contact Not Found! Please Register"), HttpStatus.NOT_FOUND);
+                throw new BusinessException(ErrorCode.USER_NOT_FOUND, "Contact Not Found! Please Register");
             }
         }
     }
@@ -146,10 +145,9 @@ public class UserController {
         logger.info("Entering Verify User with user Details >>>>>>>>  : {}", dto);
         Optional<User> user = service.findByContact(dto.getContact());
         if (user.isPresent()) {
-            return new ResponseEntity(new CustomErrorType("User Already Registered!"), HttpStatus.CONFLICT);
-        } else {
-            return new ResponseEntity(dto, HttpStatus.OK);
+            throw new BusinessException(ErrorCode.USER_ALREADY_REGISTERED, "User Already Registered!");
         }
+        return new ResponseEntity(dto, HttpStatus.OK);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -198,12 +196,12 @@ public class UserController {
                 return new ResponseEntity(dto, HttpStatus.OK);
             } else {
                 logger.info("OTP did not Match for contact {}", dto.getContact());
-                return new ResponseEntity(new CustomErrorType("Sorry, Invalid OTP. Try again!"), HttpStatus.NOT_FOUND);
+                throw new BusinessException(ErrorCode.INVALID_OTP, "Sorry, Invalid OTP. Try again!");
             }
 
         } else {
             logger.info("User Not present for contact {}", dto.getContact());
-            return new ResponseEntity(new CustomErrorType("Sorry, Contact Admin!"), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "Sorry, Contact Admin!");
         }
 
     }
@@ -221,7 +219,7 @@ public class UserController {
         List<User> users = service.getAll();
 
         if (users.isEmpty()) {
-            return new ResponseEntity(new CustomErrorType("Users Not Found! Please Register"), HttpStatus.NOT_FOUND);
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "Users Not Found! Please Register");
         }
 
         for (User user : users) {
@@ -253,7 +251,7 @@ public class UserController {
 
         List<User> users = service.getAll();
         if (users.isEmpty()) {
-            return new ResponseEntity<>(new CustomErrorType("No Users Found! Please Register"), HttpStatus.NOT_FOUND);
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "No Users Found! Please Register");
         }
 
         List<User> top5Customers = users.stream()
@@ -292,8 +290,7 @@ public class UserController {
         List<User> top5Vendors = service.getTop5Vendors();
 
         if (top5Vendors == null || top5Vendors.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("No Vendors Found! Please Register"));
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "No Vendors Found! Please Register");
         }
 
         List<UserDTO> dtos = new ArrayList<>();
@@ -351,7 +348,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(dto);
 
         } else {
-            return new ResponseEntity(new CustomErrorType("Profile not found."), HttpStatus.NOT_FOUND);
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "Profile not found.");
         }
 
     }
@@ -367,9 +364,8 @@ public class UserController {
 
         if (user.isEmpty()) {
             logger.error("Unable to update. Profile with id {} not found.", dto.getId());
-            return new ResponseEntity(
-                    new CustomErrorType("Unable to upate. Profile with id " + dto.getId() + " not found."),
-                    HttpStatus.NOT_FOUND);
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND,
+                    "Unable to upate. Profile with id " + dto.getId() + " not found.");
         } else {
             if (dto.getName() != null && !dto.getName().trim().isEmpty()) {
                 user.get().setName(dto.getName());
@@ -406,8 +402,8 @@ public class UserController {
             service.deleteById(id);
         } else {
             logger.error("Unable to delete. User with id {} not found.", id);
-            return new ResponseEntity(new CustomErrorType("Unable to delete. User with id " + id + " not found."),
-                    HttpStatus.NOT_FOUND);
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND,
+                    "Unable to delete. User with id " + id + " not found.");
         }
         return new ResponseEntity<User>(HttpStatus.OK);
     }
@@ -501,8 +497,8 @@ public class UserController {
         List<Address> addresses = service.getAllAddressesByUserId(id);
 
         if (addresses == null || addresses.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("No addresses found for user id " + id));
+            throw new BusinessException(ErrorCode.ADDRESS_NOT_FOUND,
+                    "No addresses found for user id " + id);
         }
 
         Optional<Address> defaultAddress = addresses.stream()
@@ -510,8 +506,8 @@ public class UserController {
                 .findFirst();
 
         if (!defaultAddress.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("Default address not found for user id " + id));
+            throw new BusinessException(ErrorCode.ADDRESS_NOT_FOUND,
+                    "Default address not found for user id " + id);
         }
 
         Address address = defaultAddress.get();
@@ -543,8 +539,8 @@ public class UserController {
         Optional<Address> address = service.getAddressesById(id);
 
         if (address.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("Address not found for id " + id));
+            throw new BusinessException(ErrorCode.ADDRESS_NOT_FOUND,
+                    "Address not found for id " + id);
         }
 
         Address addr = address.get();
