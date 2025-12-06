@@ -391,21 +391,33 @@ public class UserController {
     public ResponseEntity<?> getAllUserAddressesById(@PathVariable("id") long id) {
         List<AddressDTO> dtos = new ArrayList<>();
         List<Address> addresses = service.getAllAddressesByUserId(id);
+
+        // safe-null: if service returns null or empty, return empty list
+        if (addresses == null || addresses.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(dtos);
+        }
+
         for (Address address : addresses) {
             AddressDTO dto = new AddressDTO();
             dto.setId(address.getId());
+            dto.setType(address.getType());
             dto.setLine1(address.getLine1());
             dto.setLine2(address.getLine2());
             dto.setLine3(address.getLine3());
             dto.setLine4(address.getLine4());
+            dto.setPin(address.getPin());
             dto.setCity(address.getCity());
             dto.setState(address.getState());
             dto.setCountry(address.getCountry());
-            dto.setType(address.getType());
             dto.setUserId(address.getUserId());
             dto.setIsDefault(address.getIsDefault());
-            dtos.add(dto);
 
+            // The Address entity currently does not expose location fields; initialize DTO fields explicitly
+            dto.setLocationLong(null);
+            dto.setLocationLatt(null);
+            dto.setLocationName(null);
+
+            dtos.add(dto);
         }
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
     }
@@ -432,40 +444,73 @@ public class UserController {
 
     @GetMapping("/v1/getDefault/addresses/by/user/{id:\\d+}")
     public ResponseEntity<?> getDefaultAddressesById(@PathVariable("id") long id) {
-        AddressDTO dto = new AddressDTO();
-
         List<Address> addresses = service.getAllAddressesByUserId(id);
-        for (Address address : addresses) {
-            if (address.getIsDefault().equalsIgnoreCase("Y")) {
-                dto.setId(address.getId());
-                dto.setLine1(address.getLine1());
-                dto.setType(address.getType());
-                dto.setUserId(address.getUserId());
-                dto.setIsDefault(address.getIsDefault());
-            }
+
+        if (addresses == null || addresses.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CustomErrorType("No addresses found for user id " + id));
         }
+
+        Optional<Address> defaultAddress = addresses.stream()
+                .filter(a -> a.getIsDefault() != null && a.getIsDefault().equalsIgnoreCase("Y"))
+                .findFirst();
+
+        if (!defaultAddress.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CustomErrorType("Default address not found for user id " + id));
+        }
+
+        Address address = defaultAddress.get();
+        AddressDTO dto = new AddressDTO();
+        dto.setId(address.getId());
+        dto.setType(address.getType());
+        dto.setLine1(address.getLine1());
+        dto.setLine2(address.getLine2());
+        dto.setLine3(address.getLine3());
+        dto.setLine4(address.getLine4());
+        dto.setPin(address.getPin());
+        dto.setCity(address.getCity());
+        dto.setState(address.getState());
+        dto.setCountry(address.getCountry());
+        dto.setUserId(address.getUserId());
+        dto.setIsDefault(address.getIsDefault());
+
+        // The Address entity currently does not expose location fields; initialize DTO fields explicitly
+        dto.setLocationLong(null);
+        dto.setLocationLatt(null);
+        dto.setLocationName(null);
+
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 
     @GetMapping("/v1/addresses/by/{id:\\d+}")
     public ResponseEntity<?> getAddressesById(@PathVariable("id") long id) {
-        AddressDTO dto = new AddressDTO();
-
         Optional<Address> address = service.getAddressesById(id);
 
-        if (address.isPresent()) {
-            dto.setId(address.get().getId());
-            dto.setLine1(address.get().getLine1());
-            dto.setLine2(address.get().getLine2());
-            dto.setLine3(address.get().getLine3());
-            dto.setLine4(address.get().getLine4());
-            dto.setCity(address.get().getCity());
-            dto.setState(address.get().getState());
-            dto.setCountry(address.get().getCountry());
-            dto.setType(address.get().getType());
-            dto.setUserId(address.get().getUserId());
-            dto.setIsDefault(address.get().getIsDefault());
+        if (address.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CustomErrorType("Address not found for id " + id));
         }
+
+        Address addr = address.get();
+        AddressDTO dto = new AddressDTO();
+        dto.setId(addr.getId());
+        dto.setType(addr.getType());
+        dto.setLine1(addr.getLine1());
+        dto.setLine2(addr.getLine2());
+        dto.setLine3(addr.getLine3());
+        dto.setLine4(addr.getLine4());
+        dto.setPin(addr.getPin());
+        dto.setCity(addr.getCity());
+        dto.setState(addr.getState());
+        dto.setCountry(addr.getCountry());
+        dto.setUserId(addr.getUserId());
+        dto.setIsDefault(addr.getIsDefault());
+
+        // The Address entity currently does not expose location fields; initialize DTO fields explicitly
+        dto.setLocationLong(null);
+        dto.setLocationLatt(null);
+        dto.setLocationName(null);
 
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
