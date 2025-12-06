@@ -1,12 +1,18 @@
 package com.condigence.imageservice.controller;
 
-
+import com.condigence.imageservice.dto.ImageDTO;
 import com.condigence.imageservice.dto.ImageSummary;
 import com.condigence.imageservice.entity.Image;
-import com.condigence.imageservice.service.ImageService;
 import com.condigence.imageservice.service.ExternalService;
+import com.condigence.imageservice.service.ImageService;
 import com.condigence.imageservice.util.AppProperties;
 import com.condigence.imageservice.util.CustomErrorType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -20,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/neerseva/api/v1/images")
 @CrossOrigin(origins = "*")
 @SuppressWarnings("unused") // controller methods are invoked by Spring via reflection
+@Tag(name = "Images", description = "Operations for uploading and retrieving images")
 public class ImageController {
 
     private final ImageService imageService;
@@ -36,7 +43,14 @@ public class ImageController {
         this.env = env;
     }
 
-    @PostMapping("/upload")
+    @Operation(summary = "Upload image", description = "Upload an image file and store its metadata and contents")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Image uploaded successfully",
+                    content = @Content(schema = @Schema(implementation = ImageDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Server misconfiguration or storage error",
+                    content = @Content(schema = @Schema(implementation = CustomErrorType.class)))
+    })
+    @PostMapping(value = "/upload")
     public ResponseEntity<?> uplaodImage(@RequestParam("myFile") MultipartFile file,
                                          @RequestParam("moduleName") String moduleName) throws Exception {
         String imagePath = app.getResolvedLocation();
@@ -56,7 +70,7 @@ public class ImageController {
         }
 
         // Build DTO using service helper (service will handle reading bytes)
-        com.condigence.imageservice.dto.ImageDTO dto;
+        ImageDTO dto;
         try {
             byte[] bytes = imageService.readImageBytesByPath(savedImageObj.getName(), imagePath);
             dto = imageService.toDto(savedImageObj, bytes);
@@ -68,14 +82,16 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 
+    @Operation(summary = "Get image metadata by id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Image metadata found",
+                    content = @Content(schema = @Schema(implementation = Image.class))),
+            @ApiResponse(responseCode = "404", description = "Image not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<?> getImageWithId(@PathVariable("id") Long id) {
         Image image = null;
         try {
-            String dsUrl = env.getProperty("spring.datasource.url", "<not configured>");
-            String[] activeProfiles = env.getActiveProfiles();
-            String active = activeProfiles.length > 0 ? String.join(",", activeProfiles) : "<none>";
-
             image = imageService.getImage(id);
         } catch (Exception e) {
             logger.error("Error fetching image id={}", id, e);
@@ -87,6 +103,12 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK).body(image);
     }
 
+    @Operation(summary = "Get image metadata by name")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Image metadata found",
+                    content = @Content(schema = @Schema(implementation = Image.class))),
+            @ApiResponse(responseCode = "404", description = "Image not found")
+    })
     @GetMapping("/name/{imageName}")
     public ResponseEntity<?> getImageWithName(@PathVariable("imageName") String imageName) {
         Image image = null;
@@ -102,8 +124,15 @@ public class ImageController {
     }
 
     /**
-     * Return image bytes (Content-Type set from stored MIME type). Use this to serve the actual image.
+     * Return image bytes wrapped in ImageDTO with base64 pic.
      */
+    @Operation(summary = "Get image data as DTO", description = "Returns image metadata plus base64 encoded image data")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Image data found",
+                    content = @Content(schema = @Schema(implementation = ImageDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Image or image data not found"),
+            @ApiResponse(responseCode = "500", description = "Server error")
+    })
     @GetMapping(value = "/{id}/data")
     public ResponseEntity<?> getImageData(@PathVariable("id") Long id) {
         try {
@@ -122,7 +151,7 @@ public class ImageController {
             byte[] bytes = imageService.readImageBytesByPath(image.getName(), baseDirRaw);
             if (bytes == null || bytes.length == 0) return ResponseEntity.notFound().build();
 
-            com.condigence.imageservice.dto.ImageDTO dto = imageService.toDto(image, bytes);
+            ImageDTO dto = imageService.toDto(image, bytes);
 
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
@@ -131,6 +160,12 @@ public class ImageController {
         }
     }
 
+    @Operation(summary = "Get raw image bytes", description = "Streams the original image bytes with appropriate content type")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Image bytes streamed"),
+            @ApiResponse(responseCode = "404", description = "Image or image data not found"),
+            @ApiResponse(responseCode = "500", description = "Server error")
+    })
     @GetMapping(value = "/{id}/raw")
     public ResponseEntity<?> getImageRaw(@PathVariable("id") Long id) {
         try {
@@ -162,6 +197,12 @@ public class ImageController {
     /**
      * GET /all - return all images from the database
      */
+    @Operation(summary = "List images (paged)", description = "Return a paged list of image summaries")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Page of images returned"),
+            @ApiResponse(responseCode = "204", description = "No images found"),
+            @ApiResponse(responseCode = "500", description = "Server error")
+    })
     @GetMapping("/all")
     public ResponseEntity<?> getAllImages(@RequestParam(value = "page", defaultValue = "0") int page,
                                           @RequestParam(value = "size", defaultValue = "50") int size) {
@@ -177,6 +218,11 @@ public class ImageController {
         }
     }
 
+    @Operation(summary = "Ping external service", description = "Example endpoint hitting an external service using RestTemplate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "External service responded"),
+            @ApiResponse(responseCode = "500", description = "External call error")
+    })
     @GetMapping("/ping-external")
     public ResponseEntity<?> pingExternal() {
         return externalService.pingExternal();
