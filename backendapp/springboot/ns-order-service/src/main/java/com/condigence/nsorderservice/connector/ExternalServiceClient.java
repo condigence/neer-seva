@@ -2,6 +2,8 @@ package com.condigence.nsorderservice.connector;
 
 import com.condigence.nsorderservice.dto.*;
 import com.condigence.nsorderservice.exception.BadRequestException;
+import com.condigence.nsorderservice.exception.BusinessException;
+import com.condigence.nsorderservice.exception.ErrorCode;
 import com.condigence.nsorderservice.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -32,7 +34,8 @@ public class ExternalServiceClient {
         } catch (HttpClientErrorException.NotFound nf) {
             String body = safeBody(nf);
             logger.debug("Shop not found: {}", body);
-            throw new ResourceNotFoundException("Shop not found: " + body);
+            throw new BusinessException(ErrorCode.BUS_SHOP_NOT_FOUND,
+                    bodyContainsMessage(body) ? extractMessage(body) : "Shop not found: " + body);
         } catch (HttpClientErrorException hce) {
             String body = safeBody(hce);
             logger.warn("Error fetching shop {}: {}", shopId, body);
@@ -48,7 +51,8 @@ public class ExternalServiceClient {
             return restTemplate.getForObject("http://NS-PRODUCT-SERVICE/neerseva/api/v1/products/items/" + itemId, ItemDTO.class);
         } catch (HttpClientErrorException.NotFound nf) {
             String body = safeBody(nf);
-            throw new ResourceNotFoundException("Item not found: " + body);
+            throw new BusinessException(ErrorCode.BUS_ITEM_NOT_FOUND,
+                    bodyContainsMessage(body) ? extractMessage(body) : "Item not found: " + body);
         } catch (RestClientException rce) {
             throw new BadRequestException("Error fetching item: " + rce.getMessage());
         }
@@ -108,11 +112,13 @@ public class ExternalServiceClient {
         } catch (HttpClientErrorException.NotFound nf) {
             String body = safeBody(nf);
             logger.warn("Stock not found: {}", body);
-            throw new ResourceNotFoundException(bodyContainsMessage(body) ? extractMessage(body) : "Stock not found: " + body);
+            throw new BusinessException(ErrorCode.BUS_STOCK_NOT_FOUND,
+                    bodyContainsMessage(body) ? extractMessage(body) : "Stock not found: " + body);
         } catch (HttpClientErrorException.BadRequest br) {
             String body = safeBody(br);
             logger.warn("Stock service returned BadRequest: {}", body);
-            throw new BadRequestException(bodyContainsMessage(body) ? extractMessage(body) : "Stock service returned bad request: " + body);
+            throw new BusinessException(ErrorCode.BUS_INSUFFICIENT_STOCK,
+                    bodyContainsMessage(body) ? extractMessage(body) : "Stock service returned bad request: " + body);
         } catch (HttpClientErrorException hce) {
             String body = safeBody(hce);
             logger.warn("Stock update client error: {}", body);

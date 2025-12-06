@@ -5,11 +5,15 @@ import com.condigence.nsorderservice.connector.ExternalServiceClient;
 import com.condigence.nsorderservice.dto.*;
 import com.condigence.nsorderservice.entity.Order;
 import com.condigence.nsorderservice.entity.OrderDetail;
-import com.condigence.nsorderservice.repository.OrderRepository;
+import com.condigence.nsorderservice.exception.BadRequestException;
+import com.condigence.nsorderservice.exception.BusinessException;
+import com.condigence.nsorderservice.exception.ErrorCode;
+import com.condigence.nsorderservice.exception.ResourceNotFoundException;
 import com.condigence.nsorderservice.repository.OrderDetailRepository;
+import com.condigence.nsorderservice.repository.OrderRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.condigence.nsorderservice.exception.BadRequestException;
-import com.condigence.nsorderservice.exception.ResourceNotFoundException;
 
 @Service("OrderService")
 public class OrderService {
@@ -50,7 +51,6 @@ public class OrderService {
     @Transactional
     public boolean saveOrderDetail(OrderDetailDTO orderdetailDTO) {
 
-
         Order order = new Order();
         List<OrderDetail> orderDetailList = new ArrayList<>();
         Long grandTotal = 0L;
@@ -63,12 +63,12 @@ public class OrderService {
             Long shopId;
             if (shopDto == null) {
                 logger.error("Shop information is missing in OrderDetailDTO");
-                throw new BadRequestException("Shop information is missing in request");
+                throw new BusinessException(ErrorCode.BUS_INVALID_REQUEST, "Shop information is missing in request");
             } else {
                 shopId = shopDto.getId();
                 if (shopId == null || shopId <= 0) {
                     logger.error("Invalid shop id in OrderDetailDTO: {}", shopId);
-                    throw new BadRequestException("Invalid shop id: " + shopId);
+                    throw new BusinessException(ErrorCode.BUS_INVALID_REQUEST, "Invalid shop id: " + shopId);
                 }
             }
 
@@ -76,7 +76,7 @@ public class OrderService {
 
             if (shopData == null) {
                 logger.error("Shop service returned null for id {}", shopId);
-                throw new ResourceNotFoundException("Shop not found for id " + shopId);
+                throw new BusinessException(ErrorCode.BUS_SHOP_NOT_FOUND, "Shop not found for id " + shopId);
             }
 
             order.setOrderToVendorId(shopData.getUserId());
@@ -117,7 +117,8 @@ public class OrderService {
                     logger.error("Stock service did not confirm update for order {}.", order.getOrderId());
                     order.setOrderStatus("STOCK_UPDATE_FAILED");
                     orderRepository.save(order);
-                    throw new BadRequestException("Stock update failed for order " + order.getOrderId());
+                    throw new BusinessException(ErrorCode.BUS_INSUFFICIENT_STOCK,
+                            "Stock update failed for order " + order.getOrderId());
                 }
             } catch (ResourceNotFoundException rnfe) {
                 // Delete created order as stock resource missing
@@ -127,7 +128,8 @@ public class OrderService {
                 } catch (Exception ex) {
                     logger.error("Failed to delete order {} after stock not found: {}", order.getOrderId(), ex.getMessage());
                 }
-                throw rnfe; // let global handler translate to 404
+                // Wrap into business exception with specific code for stock not found
+                throw new BusinessException(ErrorCode.BUS_STOCK_NOT_FOUND, rnfe.getMessage());
             } catch (BadRequestException bre) {
                 logger.warn("Stock update returned BadRequest for order {}: {}", order.getOrderId(), bre.getMessage());
                 try {
@@ -135,7 +137,8 @@ public class OrderService {
                 } catch (Exception ex) {
                     logger.error("Failed to delete order {} after bad stock request: {}", order.getOrderId(), ex.getMessage());
                 }
-                throw bre;
+                // Treat as business insufficient stock or invalid stock-related request
+                throw new BusinessException(ErrorCode.BUS_INSUFFICIENT_STOCK, bre.getMessage());
             } catch (Exception e) {
                 logger.error("Stock update failed for order {}: {}", order.getOrderId(), e.getMessage());
                 order.setOrderStatus("STOCK_UPDATE_FAILED");

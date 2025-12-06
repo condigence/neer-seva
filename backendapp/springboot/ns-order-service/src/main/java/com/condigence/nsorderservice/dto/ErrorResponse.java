@@ -15,5 +15,6 @@ public class ErrorResponse {
     private String error;
     private String message;
     private String path;
+    // Standardized application-level error code (e.g. BUS-0001, TECH-1001)
+    private String errorCode;
 }
-

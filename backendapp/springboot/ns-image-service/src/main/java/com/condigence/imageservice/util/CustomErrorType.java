@@ -1,5 +1,9 @@
 package com.condigence.imageservice.util;
 
+/**
+ * Legacy error type used in some responses. Prefer {@link com.condigence.imageservice.exception.ErrorResponse}
+ * for new APIs.
+ */
 public class CustomErrorType {
 
 	private String errorMessage;

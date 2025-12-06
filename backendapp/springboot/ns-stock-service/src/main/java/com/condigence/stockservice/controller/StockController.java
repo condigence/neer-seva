@@ -13,7 +13,10 @@ import com.condigence.stockservice.service.ShopService;
 import com.condigence.stockservice.service.StockService;
 import com.condigence.stockservice.service.StockQueryService;
 import com.condigence.stockservice.util.AppProperties;
-import com.condigence.stockservice.util.CustomErrorType;
+import com.condigence.stockservice.exception.StockNotFoundException;
+import com.condigence.stockservice.exception.InvalidOrderException;
+import com.condigence.stockservice.exception.ShopNotFoundException;
+import com.condigence.stockservice.exception.ShopOperationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
@@ -71,8 +74,7 @@ public class StockController {
             return ResponseEntity.ok(shopDtoOpt.get());
         } else {
             logger.error("Unable to Find. Shop with id {} not found.", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("Unable to Find. Shop with id " + id + " not found."));
+            throw new ShopNotFoundException("Shop with id " + id + " not found.");
         }
     }
 
@@ -104,7 +106,7 @@ public class StockController {
 
         List<ShopDTO> dtos = shopService.getShopDtosByVendorId(id);
         if (dtos.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorType("Shop not found."));
+            throw new ShopNotFoundException("Shop not found for vendor id " + id);
         }
         return ResponseEntity.ok(dtos);
 
@@ -125,9 +127,8 @@ public class StockController {
             shopService.deleteById(id);
             return ResponseEntity.ok().build();
         } else {
-            logger.error("Unable to delete. Brand with id {} not found.", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("Unable to delete. Brand with id " + id + " not found."));
+            logger.error("Unable to delete. Shop with id {} not found.", id);
+            throw new ShopNotFoundException("Shop with id " + id + " not found.");
         }
     }
 
@@ -136,8 +137,7 @@ public class StockController {
         logger.info("Entering addShop with shop Details >>>>>>>>  : {}", dto);
         Shop shop = shopService.save(dto);
         if (shop == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CustomErrorType("Issue while saving Shop"));
+            throw new ShopOperationException("Issue while saving Shop");
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -148,8 +148,7 @@ public class StockController {
         Optional<Shop> shopOpt = shopService.getById(dto.getId());
         if (shopOpt.isEmpty()) {
             logger.error("Unable to update. Shop with id {} not found.", dto.getId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("Unable to update. Shop with id " + dto.getId() + " not found."));
+            throw new ShopNotFoundException("Shop with id " + dto.getId() + " not found.");
         } else {
             Shop shop = shopOpt.get();
             shop.setShopName(dto.getName());
@@ -173,8 +172,7 @@ public class StockController {
             stock.setStockQuantity(stock.getStockQuantity() + s.getQuantity());
             Stock saved = stockService.saveStock(stock);
             if (saved == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new CustomErrorType("Issue while saving stock"));
+                throw new InvalidOrderException("Issue while saving stock");
             }
             return ResponseEntity.ok(saved);
 
@@ -187,8 +185,7 @@ public class StockController {
             stock.setShopId(s.getShopId());
             Stock saved = stockService.saveStock(stock);
             if (saved == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new CustomErrorType("Issue while saving stock"));
+                throw new InvalidOrderException("Issue while saving stock");
             }
             return ResponseEntity.ok(saved);
         }
@@ -201,15 +198,13 @@ public class StockController {
         Optional<Stock> stockOpt = stockService.getStockById(stockDTO.getId());
         if (stockOpt.isEmpty()) {
             logger.error("Unable to update. Stock with id {} not found.", stockDTO.getId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("Unable to update. Stock with id " + stockDTO.getId() + " not found."));
+            throw new StockNotFoundException("Stock with id " + stockDTO.getId() + " not found.");
         }
         Stock stock = stockOpt.get();
         stock.setStockQuantity(stockDTO.getQuantity());
         Stock saved = stockService.saveStock(stock);
         if (saved == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CustomErrorType("Issue while saving stock"));
+            throw new InvalidOrderException("Issue while saving stock");
         }
         return ResponseEntity.ok(saved);
     }
@@ -228,8 +223,7 @@ public class StockController {
         logger.info("Fetching Stock with id {}", id);
         Optional<Stock> stockOpt = stockService.getStockById(id);
         if (stockOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("Stock with id " + id + " not found"));
+            throw new StockNotFoundException("Stock with id " + id + " not found.");
         }
         Stock stock = stockOpt.get();
         ItemDTO item = productClient.getItemById(stock.getItemId());
@@ -245,8 +239,7 @@ public class StockController {
         logger.info("Fetching & Deleting Stock with id {}", id);
         Optional<Stock> stockOpt = stockService.getStockById(id);
         if (stockOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("Unable to delete. Stock with id " + id + " not found."));
+            throw new StockNotFoundException("Stock with id " + id + " not found.");
         }
         stockService.deleteStockById(id);
         return ResponseEntity.noContent().build();
@@ -261,13 +254,9 @@ public class StockController {
 
         // Get All the Shop/s by vendor id. Assume only one shop per vendor
         List<Shop> shops = shopService.getByVendorId(id);
-        // Get stock by shop id
-        // get items by Shop id
-        //prepare list and send Item dto
         List<ItemDTO> itemDtos = new ArrayList<>();
         if (shops.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CustomErrorType("Items Not Found! Please Contact Admin"));
+            throw new ShopNotFoundException("Items Not Found! Please Contact Admin");
         }
 
         List<Stock> stocks = stockService.getStockByShopId(shops.get(0).getShopId());
@@ -298,7 +287,7 @@ public class StockController {
     public ResponseEntity<List<StockDTO>> getStocksItemByShopId(@PathVariable("id") Long id) {
         List<StockDTO> dtos = stockQueryService.getStocksItemByShopId(id);
         if (dtos.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(dtos);
+            throw new StockNotFoundException("No stock items found for shop id " + id);
         }
         return ResponseEntity.ok(dtos);
     }
@@ -307,11 +296,11 @@ public class StockController {
     public ResponseEntity<Long> getStockQuantityByShopIdAndItemId(@PathVariable("shopId") Long shopId,
                                                                   @PathVariable("itemId") Long itemId) {
         if (shopId == null || itemId == null) {
-            return ResponseEntity.badRequest().build();
+            throw new ShopOperationException("Shop id and item id must be provided");
         }
         Stock stock = stockService.getStockByShopAndItemId(shopId, itemId);
         if (stock == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new StockNotFoundException("Stock not found for item " + itemId + " in shop " + shopId);
         }
         return ResponseEntity.ok((long) stock.getStockQuantity());
     }
