@@ -22,10 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/neerseva/api")
+@Tag(name = "Wallets", description = "Wallet operations")
 public class WalletController {
 
 	public static final Logger logger = LoggerFactory.getLogger(WalletController.class);
@@ -52,6 +56,7 @@ public class WalletController {
 	
 	
 	@PostMapping("/balance")
+	@Operation(summary = "Add balance", description = "Add balance to the current user's wallet")
 	public Boolean addBalance(@RequestBody Long amount) {
 		return userService.addBalance(amount);
 	}

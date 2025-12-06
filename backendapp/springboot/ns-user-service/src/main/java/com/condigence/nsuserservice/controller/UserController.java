@@ -25,9 +25,19 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/neerseva/api")
+@Tag(name = "Users", description = "User and address management APIs")
 public class UserController {
 
     public static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -50,6 +60,12 @@ public class UserController {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @PostMapping(value = "/v1/users")
+    @Operation(summary = "Register new user", description = "Register a new user if the contact number is not already registered")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "User registered successfully"),
+            @ApiResponse(responseCode = "409", description = "User already registered", content = @Content(schema = @Schema(implementation = CustomErrorType.class))),
+            @ApiResponse(responseCode = "500", description = "Error while saving user", content = @Content(schema = @Schema(implementation = CustomErrorType.class)))
+    })
     public ResponseEntity<?> addUsers(@RequestBody UserDTO dto) {
         logger.info("Entering addUsers with user Details >>>>>>>>  : {}", dto);
         HttpHeaders headers = new HttpHeaders();
@@ -73,6 +89,12 @@ public class UserController {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @PostMapping(value = "/v1/verify/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Verify login", description = "Verify user login with contact. For CUSTOMER type, performs quick registration if user does not exist.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login verified"),
+            @ApiResponse(responseCode = "400", description = "Contact missing", content = @Content(schema = @Schema(implementation = CustomErrorType.class))),
+            @ApiResponse(responseCode = "404", description = "Contact not found", content = @Content(schema = @Schema(implementation = CustomErrorType.class)))
+    })
     public ResponseEntity<?> verifyLogin(@RequestBody UserDTO dto) {
         logger.info("Entering login with user Details >>>>>>>>  : {}", dto.getContact());
 
@@ -115,6 +137,11 @@ public class UserController {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @PostMapping(value = "/v1/verify/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Verify registration", description = "Verify if user with provided contact is already registered")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User can register"),
+            @ApiResponse(responseCode = "409", description = "User already registered", content = @Content(schema = @Schema(implementation = CustomErrorType.class)))
+    })
     public ResponseEntity<?> verifyRegistration(@RequestBody UserDTO dto) {
         logger.info("Entering Verify User with user Details >>>>>>>>  : {}", dto);
         Optional<User> user = service.findByContact(dto.getContact());
@@ -127,6 +154,12 @@ public class UserController {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @PostMapping(value = "/v1/verify/otp")
+    @Operation(summary = "Verify OTP", description = "Verify the OTP for the user identified by contact")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OTP verified, user details returned"),
+            @ApiResponse(responseCode = "404", description = "Invalid OTP", content = @Content(schema = @Schema(implementation = CustomErrorType.class))),
+            @ApiResponse(responseCode = "500", description = "User not present or internal error", content = @Content(schema = @Schema(implementation = CustomErrorType.class)))
+    })
     public ResponseEntity<?> verifyOTP(@RequestBody UserDTO dto) {
         logger.info("Entering otp with user Details >>>>>>>>  : {}", dto);
         logger.debug("Inside verifyOTP with contact {}", dto.getContact());
@@ -176,6 +209,12 @@ public class UserController {
     }
 
     @GetMapping("/v1/users")
+    @Operation(summary = "Get all users", description = "Retrieve all registered users")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of users",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
+            @ApiResponse(responseCode = "404", description = "No users found", content = @Content(schema = @Schema(implementation = CustomErrorType.class)))
+    })
     public ResponseEntity<?> getAllUsers() {
 
         List<UserDTO> dtos = new ArrayList<>();
@@ -209,6 +248,7 @@ public class UserController {
     }
 
     @GetMapping("v1/users/customers/top/5")
+    @Operation(summary = "Get top 5 customers", description = "Retrieve top 5 customers ordered by creation date")
     public ResponseEntity<?> gettop5Customers() {
 
         List<User> users = service.getAll();
@@ -247,6 +287,7 @@ public class UserController {
     }
 
     @GetMapping("v1/users/vendors/top/5")
+    @Operation(summary = "Get top 5 vendors", description = "Retrieve top 5 vendors as per service logic")
     public ResponseEntity<?> getTop5Vendors() {
         List<User> top5Vendors = service.getTop5Vendors();
 
@@ -280,7 +321,12 @@ public class UserController {
     }
 
     @GetMapping("/v1/users/{id:\\d+}")
-    public ResponseEntity<?> getByUserId(@PathVariable("id") Long id) {
+    @Operation(summary = "Get user by id", description = "Retrieve user profile for given id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User found", content = @Content(schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content(schema = @Schema(implementation = CustomErrorType.class)))
+    })
+    public ResponseEntity<?> getByUserId(@Parameter(description = "User ID") @PathVariable("id") Long id) {
         Optional<User> user = service.getById(id);
         UserDTO dto = new UserDTO();
         if (user.isPresent()) {
@@ -312,6 +358,7 @@ public class UserController {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @PutMapping(value = "/v1/users")
+    @Operation(summary = "Update user", description = "Update basic details of a user")
     public ResponseEntity<?> updateUser(@RequestBody UserDTO dto) {
         logger.info("Updating User  with id {}", dto.getId());
         logger.debug("Update payload: {}", dto);
@@ -351,7 +398,8 @@ public class UserController {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @DeleteMapping(value = "/v1/users/{id:\\d+}")
-    public ResponseEntity<?> deleteUsers(@PathVariable("id") long id) {
+    @Operation(summary = "Delete user", description = "Delete a user by id")
+    public ResponseEntity<?> deleteUsers(@Parameter(description = "User ID") @PathVariable("id") long id) {
         logger.info("Fetching & Deleting Users with id {}", id);
         Optional<User> user = service.getById(id);
         if (user.isPresent()) {
@@ -367,13 +415,15 @@ public class UserController {
     //////////////////// Address /////////
 
     @DeleteMapping(value = "/v1/addresses/{id:\\d+}")
-    public ResponseEntity<?> deleteAddressById(@PathVariable("id") long id) {
+    @Operation(summary = "Delete address", description = "Delete address by id")
+    public ResponseEntity<?> deleteAddressById(@Parameter(description = "Address ID") @PathVariable("id") long id) {
         logger.info("Fetching & Deleting Users Address with id {}", id);
         service.deleteAddressById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping(value = "/v1/address")
+    @Operation(summary = "Add address", description = "Add a new address for a user")
     public ResponseEntity<?> addUserAddress(@RequestBody AddressDTO dto) {
         logger.info("Entering addUserAddress with Details >>>>>>>>  : {}", dto);
         Address address = service.saveAddress(dto);
@@ -381,6 +431,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/v1/addresses/by/{id:\\d+}")
+    @Operation(summary = "Update address", description = "Update an existing address")
     public ResponseEntity<?> updateUserAddress(@RequestBody AddressDTO dto) {
         logger.info("Entering updateUserAddress with Details >>>>>>>>  : {}", dto);
         Address address = service.updateAddress(dto);
@@ -388,7 +439,8 @@ public class UserController {
     }
 
     @GetMapping("/v1/addresses/by/user/{id:\\d+}")
-    public ResponseEntity<?> getAllUserAddressesById(@PathVariable("id") long id) {
+    @Operation(summary = "Get all addresses for user", description = "Retrieve all addresses for a given user id")
+    public ResponseEntity<?> getAllUserAddressesById(@Parameter(description = "User ID") @PathVariable("id") long id) {
         List<AddressDTO> dtos = new ArrayList<>();
         List<Address> addresses = service.getAllAddressesByUserId(id);
 
@@ -427,6 +479,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/v1/makeDefault")
+    @Operation(summary = "Make default address", description = "Set the default address for a user")
     public ResponseEntity<?> makeDefault(@RequestBody AddressDTO dto) {
         logger.info("Updating Address  with id {}", dto.getId());
         List<Address> address = getAllUserAddresses(dto.getUserId());
@@ -443,7 +496,8 @@ public class UserController {
     }
 
     @GetMapping("/v1/getDefault/addresses/by/user/{id:\\d+}")
-    public ResponseEntity<?> getDefaultAddressesById(@PathVariable("id") long id) {
+    @Operation(summary = "Get default address for user", description = "Retrieve default address for a given user id")
+    public ResponseEntity<?> getDefaultAddressesById(@Parameter(description = "User ID") @PathVariable("id") long id) {
         List<Address> addresses = service.getAllAddressesByUserId(id);
 
         if (addresses == null || addresses.isEmpty()) {
@@ -484,7 +538,8 @@ public class UserController {
     }
 
     @GetMapping("/v1/addresses/by/{id:\\d+}")
-    public ResponseEntity<?> getAddressesById(@PathVariable("id") long id) {
+    @Operation(summary = "Get address by id", description = "Retrieve address for given id")
+    public ResponseEntity<?> getAddressesById(@Parameter(description = "Address ID") @PathVariable("id") long id) {
         Optional<Address> address = service.getAddressesById(id);
 
         if (address.isEmpty()) {
@@ -516,12 +571,14 @@ public class UserController {
     }
 
     @GetMapping("/v1/users/active/count")
+    @Operation(summary = "Count active users", description = "Get number of active users")
     public ResponseEntity<Long> countActiveUsers() {
         long activeCount = service.countActiveUsers();
         return ResponseEntity.ok(activeCount);
     }
 
     @GetMapping("/v1/users/counts")
+    @Operation(summary = "Get user counts", description = "Get total, active, customers and vendors counts")
     public ResponseEntity<Map<String, Long>> getUserCounts() {
         logger.info("Getting user counts (total, active, customers, vendors)");
         long total = service.getAll().size();
