@@ -4,17 +4,22 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
 @CrossOrigin(origins = "*")
+@Tag(name = "Home", description = "Health and welcome endpoints for NS-Order-Service")
 public class HomeController {
 
+    @Operation(summary = "Root welcome message", description = "Simple text message to verify the service is up.")
     @GetMapping(value="/", produces = MediaType.APPLICATION_JSON_VALUE)
     public String home(){
         return "Welcome to our Neerseva Application!";
     }
 
+    @Operation(summary = "Welcome message", description = "Another simple endpoint to verify the service is working.")
     @GetMapping(value="/welcome", produces = MediaType.APPLICATION_JSON_VALUE)
     public String welcome(){
         return "WELCOME!";

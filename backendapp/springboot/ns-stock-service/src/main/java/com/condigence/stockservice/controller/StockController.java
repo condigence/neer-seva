@@ -14,6 +14,8 @@ import com.condigence.stockservice.service.StockService;
 import com.condigence.stockservice.service.StockQueryService;
 import com.condigence.stockservice.util.AppProperties;
 import com.condigence.stockservice.util.CustomErrorType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import java.util.*;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/neerseva/api/v1/stocks")
+@Tag(name = "Stocks", description = "Operations pertaining to stock and shops")
 public class StockController {
 
     public static final Logger logger = LoggerFactory.getLogger(StockController.class);
@@ -108,6 +111,7 @@ public class StockController {
     }
 
     @GetMapping("/by/shop/{id}")
+    @Operation(summary = "Get all stock entries for a shop", description = "Returns a list of StockDTO for the given shop id, including item and quantity details where available.")
     public ResponseEntity<List<StockDTO>> getStocksByShopId(@PathVariable("id") Long id) {
         List<StockDTO> dtos = stockQueryService.getStocksByShopId(id);
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
@@ -161,6 +165,7 @@ public class StockController {
     //////////////////////// Shop End Here ////////////////////
 
     @PostMapping("/")
+    @Operation(summary = "Add or increase stock", description = "Creates a new stock entry or increases quantity for an existing stock for a given shop and item.")
     public ResponseEntity<?> addStock(@RequestBody StockBean s) {
 
         Stock stock = stockService.getStockByShopAndItemId(s.getShopId(), s.getItemId());
@@ -190,6 +195,7 @@ public class StockController {
     }
 
     @PutMapping(value = "/{id}")
+    @Operation(summary = "Update stock quantity", description = "Updates the quantity of an existing stock record by its id.")
     public ResponseEntity<?> updateStock(@RequestBody StockDTO stockDTO) {
         logger.info("Updating Stock  with id {}", stockDTO.getId());
         Optional<Stock> stockOpt = stockService.getStockById(stockDTO.getId());
@@ -209,6 +215,7 @@ public class StockController {
     }
 
     @PostMapping(value = "/update/on/order")
+    @Operation(summary = "Update stock after order", description = "Updates stock levels based on an order detail payload.")
     public ResponseEntity<?> updateStockByOrder(@RequestBody OrderDetailDTO orderDetail) {
         logger.info("Updating Stock on orderDetails {}", orderDetail);
         stockService.updateStockByOrder(orderDetail);
@@ -216,6 +223,7 @@ public class StockController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get stock details by id", description = "Fetches a single stock record with enriched item and shop information.")
     public ResponseEntity<?> getStockdetail(@PathVariable("id") Long id) {
         logger.info("Fetching Stock with id {}", id);
         Optional<Stock> stockOpt = stockService.getStockById(id);
