@@ -23,6 +23,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+@Tag(name = "Products", description = "Operations related to product brands and items")
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/neerseva/api/v1/products")
@@ -126,6 +133,15 @@ public class ProductController {
 		return null;
 	}
 
+	@Operation(
+            summary = "Create a new brand",
+            description = "Creates a new brand with the provided details. Returns 201 on success."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Brand created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid brand payload"),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+    })
 	@RequestMapping(path = {"/brands", "/brands/"}, method = RequestMethod.POST)
 	public ResponseEntity<?> addBrands(@RequestBody BrandBean brandBean) {
 		logger.info("Entering addBrands with Brand Details >>>>>>>>  : {}", brandBean);
@@ -134,6 +150,14 @@ public class ProductController {
 		return new ResponseEntity<>(headers, HttpStatus.CREATED);
 	}
 
+	@Operation(
+            summary = "Get all brands",
+            description = "Returns a list of all available brands with optional image data embedded."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of brands returned successfully"),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+    })
 	@GetMapping(path = {"/brands", "/brands/"})
 //	@CircuitBreaker(name=USER_SERVICE,fallbackMethod = "userFallback")
 	public ResponseEntity<?> getAllBrands() {
@@ -166,6 +190,15 @@ public class ProductController {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@CrossOrigin
 	@DeleteMapping(value = "/brands/{id}")
+	@Operation(
+            summary = "Delete a brand",
+            description = "Deletes a brand identified by its ID. Returns 200 if deletion is successful, 404 if the brand is not found."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Brand deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Brand not found"),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+    })
 	public ResponseEntity<?> deleteBrand(@PathVariable("id") long id) {
 		logger.info("Fetching & Deleting Brand with id {}", id);
 		Optional<Brand> brand = brandService.getById(id);
@@ -179,8 +212,19 @@ public class ProductController {
 		return new ResponseEntity<Brand>(HttpStatus.OK);
 	}
 
+	@Operation(
+            summary = "Get brand by ID",
+            description = "Retrieves a single brand by its unique identifier. Includes image data when available."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Brand details returned successfully"),
+            @ApiResponse(responseCode = "404", description = "Brand not found"),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+    })
 	@GetMapping("/brands/{id}")
-	public ResponseEntity<?> getBrand(@PathVariable("id") Long id) {
+	public ResponseEntity<?> getBrand(
+			@Parameter(description = "ID of the brand to retrieve", example = "1")
+			@PathVariable("id") Long id) {
 
 		BrandDTO dto = new BrandDTO();
 		Optional<Brand> brand = brandService.getById(id);
