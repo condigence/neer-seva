@@ -11,32 +11,64 @@
                 </div>
                 <div class="card-body">
                   <div class="table-responsive">
-                  <table id="example" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Item Id</th>
-                            <th>Item Name</th>
-                            <th>Item Type</th>
-                            <th>Total Quantity Sold</th>
-                            <th>Total Price</th>
-                            <th>Date</th>
-                            <!-- <th>Action</th> -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>b1</td>
-                            <td>Bisleri 20L</td>
-                            <td>Packaged Drinking Water</td>
-                            <td>20</td>
-                            <td>2000</td>
-                            <td>2020/04/25</td>
-                            <!-- <td><a routerLink="/edit-sale" class="btn btn-sm btn-primary"><i class="zmdi zmdi-edit"></i></a></td> -->
-                        </tr>
-                        
-                       
-                    </tbody>                    
-                </table>
+            <!-- FILTER TABS -->
+          <div class="filter-container">
+            <button class="filter-tab"
+              [class.active]="selectedFilter === 'daily'"
+              (click)="applyFilter('daily')">Daily</button>
+
+            <button class="filter-tab"
+              [class.active]="selectedFilter === 'weekly'"
+              (click)="applyFilter('weekly')">Weekly</button>
+
+            <button class="filter-tab"
+              [class.active]="selectedFilter === 'monthly'"
+              (click)="applyFilter('monthly')">Monthly</button>
+
+            <button class="filter-tab"
+              [class.active]="selectedFilter === 'yearly'"
+              (click)="applyFilter('yearly')">Yearly</button>
+          </div>
+
+
+                  <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Order Date</th>
+                <th>Item Name</th>
+                <th>Qty</th>
+                <th>Item Price</th>
+                <th>Subtotal</th>
+                <th>Customer</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let sale of filteredSales">
+                <td>{{ sale.orderId }}</td>
+                <td>{{ sale.orderDate | date }}</td>
+                <td>{{ sale.itemName }}</td>
+                <td>{{ sale.quantity }}</td>
+                <td>₹{{ sale.price }}</td>
+                <td>₹{{ sale.subtotal }}</td>
+                <td>{{ sale.customerName }}</td>
+                <td>{{ sale.deliveryStatus }}</td>
+              </tr>
+            </tbody>
+
+            <tfoot>
+              <tr style="background:#f1f1f1; font-weight:bold;">
+                <td colspan="3">TOTAL</td>
+                <td>{{ totalQuantity }}</td>
+                <td></td>
+                <td>₹{{ totalRevenue }}</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+
+          </table>
                 </div>
                 </div>
               </div>

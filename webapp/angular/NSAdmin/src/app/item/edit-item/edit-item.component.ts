@@ -72,7 +72,7 @@ export class EditItemComponent implements OnInit {
       //  type: ['', Validators.required],
       //  description: ['', Validators.required],
       imageId: ['', Validators.required],
-      pic: ['', Validators.required],
+      pic: [''],
     });
 
     this.brandService.getAllBrands().subscribe(
@@ -85,8 +85,9 @@ export class EditItemComponent implements OnInit {
     );
   }
 
-  receiveMessage($event: number) {
-    this.imageId = $event;
+  receiveMessage($event: number | any) {
+    this.imageId = $event?.id;
+    console.log('Image ID received at edit item component: line no 90, edit-item ' + this.imageId , $event?.id);
     this.editForm.controls['imageId'].setValue(this.imageId);
   }
 
@@ -101,7 +102,11 @@ export class EditItemComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
+          // console.log("Form value before update:", this.editForm.value);
+
     if (this.editForm.valid) {
+      // console.log("Form value after update:", this.editForm.value);
+
       this.itemService
         .updateItem(this.editForm.value)
         .pipe(first())

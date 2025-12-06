@@ -45,21 +45,21 @@ export class EditShopComponent implements OnInit {
         code: ['', Validators.required],
         branch: ['', Validators.required],
         userId: ['', Validators.required],
-        pic: ['', Validators.required]
+        pic: ['']
       });
       
       let currentUser = localStorage.getItem('currentUser');
     //  this.shopService.getShopByVendorId(JSON.parse(currentUser).id)
 
       this.shopService.getShopById(+id)
-        .subscribe(data => {     
+        .subscribe(data => {  
         this.editForm.setValue(data);
     });
   }
 
   receiveMessage($event) {
     this.imageId = $event;
-    console.log(this.imageId);
+    // console.log(this.imageId , "line no 62 edit shop comp", $event);
     this.editForm.controls['imageId'].setValue(this.imageId);
   }
 
