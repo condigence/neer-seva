@@ -72,6 +72,33 @@ public class ExternalServiceClient {
         }
     }
 
+    /**
+     * Fetch all addresses for a given user from NS-USER-SERVICE.
+     */
+    public java.util.List<AddressDTO> getAddressesByUserId(Long userId) {
+        try {
+            ResponseEntity<AddressDTO[]> response = restTemplate.getForEntity(
+                    "http://NS-USER-SERVICE/neerseva/api/v1/users/" + userId + "/addresses",
+                    AddressDTO[].class);
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                logger.debug("Address service returned non-2xx or empty body for user {}", userId);
+                return java.util.Collections.emptyList();
+            }
+            AddressDTO[] body = response.getBody();
+            java.util.List<AddressDTO> list = new java.util.ArrayList<>();
+            java.util.Collections.addAll(list, body);
+            return list;
+        } catch (HttpClientErrorException.NotFound nf) {
+            String body = safeBody(nf);
+            logger.debug("No addresses found for user {}: {}", userId, body);
+            // Treat as no addresses rather than hard error
+            return java.util.Collections.emptyList();
+        } catch (RestClientException rce) {
+            logger.warn("Failed to fetch addresses for user {}: {}", userId, rce.getMessage());
+            return java.util.Collections.emptyList();
+        }
+    }
+
     public Boolean updateStockOnOrder(OrderDetailDTO orderDetailDTO) {
         try {
             ResponseEntity<Boolean> response = restTemplate.postForEntity("http://NS-STOCK-SERVICE/neerseva/api/v1/stocks/update/on/order", orderDetailDTO, Boolean.class);
@@ -120,4 +147,3 @@ public class ExternalServiceClient {
         }
     }
 }
-

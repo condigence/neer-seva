@@ -88,13 +88,12 @@ public class OrderService {
                 orderDetail.setOrderItemId(stockItemDto.getItemId());
                 orderDetail.setOrderItemQuantity(stockItemDto.getQuantity());
                 // set parent relationship
-                orderDetail.setOrder(order);
+                orderDetail.setOrder(order.getOrderId());
                 // add to list
                 orderDetailList.add(orderDetail);
             }
             // attach order details to order so they are cascaded on save
             order.setOrderDetail(orderDetailList);
-            // TODO: compute grandTotal from items if price available
             order.setOrderGrandTotal(grandTotal);
         }
         order.setOrderDate(java.time.LocalDate.now());
@@ -148,30 +147,7 @@ public class OrderService {
         return false;
     }
 
-//    public boolean updateOrder(OrderDTO orderDTO) {
-//        // TODO Auto-generated method stub
-//        Order order = orderRepo.findById(orderDTO.getOrderId()).get();
-//        if (null != order) {
-//            order.setEta(orderDTO.getEta());
-//            order.setOrderDeliveryStatus(orderDTO.getOrderDeliveryStatus());
-//            order.setOrderStatus(orderDTO.getOrderStatus());
-//            orderRepo.save(order);
-//            List<OrderDetail> orderDetailList = order.getOrderDetail();
-//            for (OrderDetail orderDetail : orderDetailList) {
-//                Item item = itemRepo.findById(orderDetail.getOrderItemId()).get();
-//                logger.info("Item is *******11111111111****" + item.toString());
-//                int remainingItemInStock = item.getItemQuantity() - orderDetail.getOrderItemQuantity();
-//                logger.info("item.getItemQuantity()***********" + item.getItemQuantity());
-//                logger.info(" orderDetail.getOrderItemQuantity()**********" + orderDetail.getOrderItemQuantity());
-//                logger.info("remaining Quantity****" + remainingItemInStock);
-//                item.setItemQuantity(remainingItemInStock);
-//                Item item1 = itemRepo.save(item);
-//                logger.info("Item is ***********" + item1.toString());
-//            }
-//            return true;
-//        }
-//        return false;
-//    }
+
 
     public List<OrderDTO> getOrderByVendorId(long vendorId) {
         List<OrderDTO> OrderDtoList = new ArrayList<OrderDTO>();
@@ -333,6 +309,15 @@ public class OrderService {
                 logger.debug("Vendor image fetch failed for imageId {}: {}", vendor.getImageId(), e.getMessage());
             }
         }
+
+        // Populate address list for the customer using ExternalServiceClient
+        try {
+            List<AddressDTO> addresses = externalClient.getAddressesByUserId(vendor.getId());
+            vendorDto.setAddressList(addresses);
+        } catch (Exception e) {
+            // Fail gracefully: log and leave address list null/empty
+            logger.debug("Failed to fetch addresses for Vendor {}: {}", vendorDto.getVendorId(), e.getMessage());
+        }
         return vendorDto;
     }
 
@@ -352,6 +337,14 @@ public class OrderService {
             } catch (Exception e) {
                 logger.debug("Customer image fetch failed for imageId {}: {}", customer.getImageId(), e.getMessage());
             }
+        }
+        // Populate address list for the customer using ExternalServiceClient
+        try {
+            List<AddressDTO> addresses = externalClient.getAddressesByUserId(customer.getId());
+            custDto.setAddressList(addresses);
+        } catch (Exception e) {
+            // Fail gracefully: log and leave address list null/empty
+            logger.debug("Failed to fetch addresses for customer {}: {}", customer.getId(), e.getMessage());
         }
         return custDto;
     }

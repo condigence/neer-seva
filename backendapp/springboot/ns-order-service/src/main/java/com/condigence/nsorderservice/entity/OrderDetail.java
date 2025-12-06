@@ -25,10 +25,9 @@ public class OrderDetail {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_detail_seq_gen")
 	private Long orderDetailId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "order_id")
-    @JsonBackReference
-	private Order order;
+
+	@Column(name = "order_id")
+	private Long order;
 
 	@Column(name = "order_item_id")
 	private Long orderItemId;
