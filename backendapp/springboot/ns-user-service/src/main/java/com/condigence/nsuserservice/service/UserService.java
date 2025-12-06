@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,6 +59,8 @@ public class UserService {
         user.setIsActive("N");
         user.setIsDeleted("N");
         user.setOtp("1234"); // By Default 1234 for Now
+        // populate creation timestamp for quick-registered customers
+        user.setDateCreated(String.valueOf(LocalDateTime.now()));
         return repository.save(user);
     }
 
